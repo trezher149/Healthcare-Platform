@@ -8,9 +8,12 @@ sleepSerialDataSchema = new Schema({
     type: Date,
     default: () => Date.now()
   }
+},
+{
+  collection: "sleepSerialData"
 })
 
-const sleepSerialDB = mongoose.connection.db('calSerialData')
-const sleepSerialData = sleepSerialDB.model('calSerialData', sleepSerialDataSchema)
+const sleepSerialDB = mongoose.connection.db('sleepData')
+const sleepSerialData = sleepSerialDB.model('sleepSerialData', sleepSerialDataSchema)
 
 module.exports = sleepSerialData

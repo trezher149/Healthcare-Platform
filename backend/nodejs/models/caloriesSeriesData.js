@@ -8,9 +8,12 @@ caloriesSerialDataSchema = new Schema({
     type: Date,
     default: () => Date.now()
   }
+},
+{
+  collection: "caloriesSerialData"
 })
 
-const caloriesSerialDB = mongoose.connection.db('calSerialData')
+const caloriesSerialDB = mongoose.connection.useDb('caloriesData')
 const caloriesSerialData = caloriesSerialDB.model('calSerialData', caloriesSerialDataSchema)
 
 module.exports = caloriesSerialData

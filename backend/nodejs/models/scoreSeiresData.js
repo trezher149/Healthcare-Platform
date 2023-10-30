@@ -8,9 +8,12 @@ scoreSerialDataSchema = new Schema({
     type: Date,
     default: () => Date.now()
   }
+},
+{
+  collection: "scoreSerialData"
 })
 
-const scoreSerialDB = mongoose.connection.db('calSerialData')
-const scoreSerialData = scoreSerialDB.model('calSerialData', scoreSerialDataSchema)
+const scoreSerialDB = mongoose.connection.db('scoreData')
+const scoreSerialData = scoreSerialDB.model('scoreSerialData', scoreSerialDataSchema)
 
 module.exports = scoreSerialData

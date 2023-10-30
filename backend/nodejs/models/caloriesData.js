@@ -14,6 +14,10 @@ const caloriesDataSchema = new Schema({
     type: String,
     required: true,
   },
+  bmr: {
+    type: Number,
+    required: true
+  },
   caloriesTotal: {
     type: Number,
     default: 0
@@ -29,6 +33,7 @@ const caloriesDataSchema = new Schema({
 )
 
 
-const caloriesData = mongoose.model('caloriesData', caloriesDataSchema)
+const caloriesDataDB = mongoose.connection.useDb('caloriesData')
+const caloriesData = caloriesDataDB.model('caloriesData', caloriesDataSchema)
 
 module.exports = caloriesData

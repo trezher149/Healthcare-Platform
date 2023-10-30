@@ -7,6 +7,7 @@ const sleepDataSchema = new Schema({
   },
 })
 
-const sleepData = mongoose.model('sleepData', sleepDataSchema)
+const sleepDataDB = mongoose.connection.db('sleepData')
+const sleepData = sleepDataDB.model('sleepData', sleepDataSchema)
 
 module.exports = sleepData

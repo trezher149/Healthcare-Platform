@@ -6,7 +6,14 @@ const userHealthDataSchema = new Schema({
     type: String,
     required: true
   },
-  sex: Boolean, // false = male, true = female (Don't accuse me for being sexist because I'm not...)
+  sex: {
+    type: Boolean,
+    required: true // false = male, true = female (Don't accuse me for being sexist because I'm not...)
+  },
+  age: {
+    type: Number,
+    required: true
+  },
   height: {
     type: Number,
     required: true
