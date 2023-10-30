@@ -16,7 +16,6 @@ const scoreDataSchema = new Schema({
     type: Number,
     default: 0
   },
-  scoreSeires: [scoreSeiresDataSchema],
 },
 {
   timestamps: true

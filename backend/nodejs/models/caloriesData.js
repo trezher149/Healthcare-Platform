@@ -22,10 +22,6 @@ const caloriesDataSchema = new Schema({
     type: Number,
     default: 0
   },
-  caloriesSerialData: {
-    type: [caloriesSerialDataSchema],
-    default: []
-  },
 },
 {
   timestamps: true
