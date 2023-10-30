@@ -1,0 +1,6 @@
+backend/linebotImg/.venv/**
+backend/nodejs/node_modules/**
+frontend/**/.vscode/**
+frontend/vite_test/**
+frontend/**/node_modules/**
+docker-compose.yaml

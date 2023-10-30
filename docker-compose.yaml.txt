@@ -1,0 +1,29 @@
+version: '3'
+services:
+  #backend
+  cheffy:
+    container_name: "cheffy"
+    build: ./backend/nodejs/.
+    restart: always
+    ports:
+      - "14000:14000"
+    environment:
+      MONGODB_ADMINUSERNAME: ***
+      MONGODB_ADMINPASSWD: ***
+      MONGODB_NAME: cupboard
+    depends_on:
+      - cupboard
+  #database
+  cupboard:
+    container_name: "cupboard"
+    image: "mongo:latest"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ***
+      MONGO_INITDB_ROOT_PASSWORD: ***
+      MONGO_INITDB_ROOT_DATABASE: ***
+    ports:
+      - "27017:27017"
+  #Line-bot
+  # postal-examiner:
+  # #Frontend
+  # cuisine:
