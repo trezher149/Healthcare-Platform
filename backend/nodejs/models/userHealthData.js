@@ -24,8 +24,10 @@ const userHealthDataSchema = new Schema({
   },
   favFoodId: [Number],
   occupationId: Number
+}, {
+  collection: "userHealthData"
 })
 
-const userHealthDB = mongoose.connection.useDb('userHealthData')
+const userHealthDB = mongoose.connection.useDb('userData')
 const userHealthData = userHealthDB.model('userHealthData', userHealthDataSchema)
 module.exports = userHealthData

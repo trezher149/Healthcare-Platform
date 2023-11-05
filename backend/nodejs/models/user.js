@@ -21,7 +21,7 @@ const userSchema = new Schema({
   },
 })
 
-const userDB = mongoose.connection.useDb('user')
+const userDB = mongoose.connection.useDb('userData')
 const user = userDB.model('user', userSchema)
 
 module.exports = user
