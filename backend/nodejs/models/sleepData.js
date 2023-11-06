@@ -5,6 +5,10 @@ const sleepDataSchema = new Schema({
     type: String,
     required: true
   },
+  sleepWellCount: {
+    type: Number,
+    required: true
+  }
 })
 
 const sleepDataDB = mongoose.connection.db('sleepData')
