@@ -1,12 +1,5 @@
 const mongoose = require('mongoose')
 const { Schema } = mongoose
-const scoreSeriesDataSchema = new Schema({
-  score: Number
-},
-{
-  timestamps: true
-}
-)
 const scoreDataSchema = new Schema({
   userId: {
     type: String,
@@ -22,6 +15,7 @@ const scoreDataSchema = new Schema({
 }
 )
 
-const sleepData = mongoose.model('sleepData', sleepDataSchema)
+const scoreDataDB = mongoose.connection.useDb('scoreData')
+const scoreData = scoreDataDB.model('scoreData', scoreDataSchema)
 
-module.exports = sleepData
+module.exports = scoreData

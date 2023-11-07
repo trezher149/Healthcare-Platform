@@ -13,7 +13,7 @@ scoreSerialDataSchema = new Schema({
   collection: "scoreSerialData"
 })
 
-const scoreSerialDB = mongoose.connection.db('scoreData')
+const scoreSerialDB = mongoose.connection.useDb('scoreData')
 const scoreSerialData = scoreSerialDB.model('scoreSerialData', scoreSerialDataSchema)
 
 module.exports = scoreSerialData
