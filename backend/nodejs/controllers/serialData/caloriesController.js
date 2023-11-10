@@ -1,50 +1,92 @@
 const mongoose = require('mongoose')
-const userHealthData = require('../../models/userHealthData')
-const caloriesData = require('../../models/caloriesData')
-const caloriesSeriesData = require('../../models/caloriesSeriesData')
+const userHealthDataModel = require('../../models/userHealthData')
+const caloriesDataModel = require('../../models/caloriesData')
+const caloriesSeriesDataModel = require('../../models/caloriesSeriesData')
+const { updateScoreCal }= require('./scoreController')
 
-const mongodbName = process.env.MONGODB_ADMINUSERNAME
-const mongodbPasswd = process.env.MONGODB_ADMINPASSWD
-const dbName = process.env.MONGODB_NAME
-
-async function updateCalories(data){
-  await mongoose.connect(`mongodb://${mongodbName}:${mongodbPasswd}@${dbName}:27017/`)
-  const usrHealth = await userHealthData.findOne({userId: data.userId})
-  var calData = await caloriesData.findOne({userId: data.userId})
-  if (calData == null) {
-    //  First time user using the app 
-    calData = new caloriesData({
-      userId: data.userId,
-      caloriesTotal: data.calories,
-    })
-    calData.save()
-    .then(() => {return Promise.resolve(2)})
+async function createNewDataSet(userId, usrHealth, otherData = {}) {
+  //  First time user using the app
+  // The bmr is the minimum
+  // Using Harris-Benedict equation with average IC value in mind
+  console.log("Creating a new data set...")
+  // Female
+  var bmr = 0
+  if (usrHealth.sex) {
+    bmr = 655.0955 + (9.5634 * usrHealth.weight) + (1.8496 * usrHealth.height) - (4.6756 * usrHealth.age)
   }
-  calSeriesData = new caloriesSeriesData({
-    calDataSetRef: calData._id,
-    calories: data.calories
+  // Male
+  else {
+    bmr = 66.4730 + (13.7516 * usrHealth.weight )+ (5.0033 * usrHealth.height) - (6.7550 * usrHealth.age)
+  }
+  var caloriesData = new caloriesDataModel({
+    userId: userId,
+    bmr: Math.round(bmr) - 329,
+  })
+  console.log("Creating complete")
+  console.log(otherData.setCaloriesGoal)
+  if (otherData.setCaloriesGoal) {
+    caloriesData.caloriesGoal = otherData.setCaloriesGoal
+  }
+  console.log("Returning data...")
+  return caloriesData
+}
+
+async function updateCalories(calories, userId){
+  await mongoose.connect(`mongodb://${mongodbName}:${mongodbPasswd}@${dbName}:27017/`)
+  const usrHealth = await userHealthDataModel.findOne({userId: userId})
+  var caloriesData = await caloriesDataModel.findOne({userId: userId})
+  if (caloriesData == null) {
+    caloriesData = await createNewDataSet(userId, usrHealth)
+  } 
+  var calSeriesData = new caloriesSeriesDataModel({
+    calDataSetRef: caloriesData._id,
+    calories: calories
   })
   await calSeriesData.save()
   .then(() => {
-    calData.caloriesTotal += data.calories
-    calData.save()
+    caloriesData.caloriesTotal += calories
+    if (calories >= caloriesData.caloriesGoal && caloriesData.caloriesGoal > 0){
+      caloriesData.hasAchivedTime += 1
+    }
   })
-  .then(() => {return Promise.resolve(1)})
-
+  console.log("Saving to database...")
+  // Save the caloriesData and update score return with Promise
+  return await calData.save()
+  .then(updateScoreCal(userId, calories, caloriesData.bmr, caloriesData.hasAchivedTime))
+  .then(() => {
+    return Promise.resolve("Saved complete!")})
+  .catch(() => {return Promise.reject("Error!")})
 }
 
 async function getCaloriesData(userId) {
-  await mongoose.connect(`mongodb://${mongodbName}:${mongodbPasswd}@${dbName}:27017/`)
-  const calData = await caloriesData.findOne({userId: userId})
-  const calSeriesData = await calSeriesData.find({
+  const caloriesData = await caloriesDataModel.findOne({userId: userId})
+  const calSeriesData = await caloriesSeriesDataModel.find({
     calDataSetRef: calData._id,
   }).limit(30).sort({timestamp: -1})
   .select({ calories: 1, timestamp: 1})
-  .exec().lean()
+  .exec()
   return {
-    'caloriesTotal': calData.caloriesTotal,
+    'caloriesTotal': caloriesData.caloriesTotal,
+    'bmr': caloriesData.bmr,
     'series': calSeriesData
   }
 }
 
-module.exports = {updateCalories, getCaloriesData}
+async function setCaloriesGoal(userId, data){
+  var caloriesData = caloriesDataModel.findById(userId)
+  if (caloriesData != null) {
+    if (caloriesData.updatedAt.getDate() != Date.now().getDate()){
+      caloriesData.caloriesGoal = data.setCaloriesGoal
+      caloriesData.hasAchivedTime = 0
+      return caloriesData.save().then(() => { return Promise.resolve("Setting complete!") })
+    }
+    return Promise.reject("Already set!")
+  }
+  else {
+    const usrHealth = await userHealthDataModel.findOne({userId: userId})
+    caloriesData = createNewDataSet(userId, usrHealth, data)
+    return caloriesData.save().then(() => { Promise.resolve(1) }) 
+  }
+}
+
+module.exports = {updateCalories, getCaloriesData, setCaloriesGoal}
