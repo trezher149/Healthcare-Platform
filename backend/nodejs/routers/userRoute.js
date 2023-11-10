@@ -1,8 +1,14 @@
 const express = require('express')
 const router = express.Router()
+const mongoose = require('mongoose')
 const { addUser, getUserData } = require('../controllers/user/userController')
 
+const mongodbName = process.env.MONGODB_ADMINUSERNAME
+const mongodbPasswd = process.env.MONGODB_ADMINPASSWD
+const dbName = process.env.MONGODB_NAME
+
 router.post('/adduser', async (req, res) => { 
+  mongoose.connect(`mongodb://${mongodbName}:${mongodbPasswd}@${dbName}:27017/`)
   addUser(req.body.email, req.body.name, req.body.password, req.body.healthData)
   .then((status) => {
       res.json({data_sts:status})
@@ -23,14 +29,12 @@ router.post('/adduser', async (req, res) => {
 })
 
 router.post('/showuserdata', (req, res) => {
+  mongoose.connect(`mongodb://${mongodbName}:${mongodbPasswd}@${dbName}:27017/`)
   getUserData(req.body.userId)
   .then(
     (userData) => {
-      console.log(typeof(userData))
       console.log(userData[0])
       console.log(userData[1])
-      userData[0].pop("_id")
-      userData[1].pop("_id")
       res.json({user:userData[0], user_data:userData[1]})
     }
   )
