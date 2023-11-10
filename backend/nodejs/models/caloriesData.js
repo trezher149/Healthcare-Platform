@@ -18,6 +18,18 @@ const caloriesDataSchema = new Schema({
     type: Number,
     required: true
   },
+  streak: {
+    type: Number,
+    default: 0
+  },
+  caloriesGoal: {
+    type: Number,
+    default: 0
+  },
+  hasAchivedTime: {
+    type: Number,
+    default: 0
+  },
   caloriesTotal: {
     type: Number,
     default: 0

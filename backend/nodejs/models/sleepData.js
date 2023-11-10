@@ -5,9 +5,17 @@ const sleepDataSchema = new Schema({
     type: String,
     required: true
   },
-  sleepWellCount: {
+  streak: {
     type: Number,
-    required: true
+    default: 0
+  },
+  streakGoal: {
+    type: Number,
+    default: 0
+  },
+  hasAchived: {
+    type: Boolean,
+    default: false
   }
 })
 

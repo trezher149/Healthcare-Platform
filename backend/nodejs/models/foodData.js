@@ -2,6 +2,10 @@ const mongoose = require('mongoose')
 const { Schema } = mongoose
 
 const foodDataSchema = new Schema({
+  _id: {
+    type: String,
+    default: crypto.randomBytes(4).toString('hex')
+  },
   foodName: {
     type: String,
     required: true
@@ -10,6 +14,10 @@ const foodDataSchema = new Schema({
   favAmount: {
     type: Number,
     default: 0
+  },
+  picturePath: {
+    type: String,
+    default: ''
   }
 })
 
