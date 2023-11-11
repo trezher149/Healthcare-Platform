@@ -3,10 +3,14 @@ const body_parser = require('body-parser')
 const userRoute = require('./routers/userRoute')
 const caloriesRoute = require('./routers/caloriesRoute')
 const foodRoute = require('./routers/foodRoute')
+const cors = require('cors')
 
 const app = express()
 
 app.use(body_parser.json())
+app.use(cors({
+  origin: "http://localhost:5173"
+}))
 app.use('/api/user', userRoute)
 app.use('/api/calories', caloriesRoute)
 app.use('/apu/food', foodRoute)
