@@ -35,7 +35,15 @@ router.post('/showuserdata', (req, res) => {
     (userData) => {
       console.log(userData[0])
       console.log(userData[1])
-      res.json({user:userData[0], user_data:userData[1]})
+      delete userData[1]._id
+      delete userData[1].userId
+      delete userData[1].__v
+      console.log(userData[1])
+      res.json({user:{
+        id: userData[0]._id,
+        name: userData[0].username,
+      },
+      user_data:userData[1]})
     }
   )
   .catch(
