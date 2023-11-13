@@ -32,7 +32,6 @@ async function createNewDataSet(userId, usrHealth, otherData = {}) {
 }
 
 async function updateCalories(calories, userId){
-  await mongoose.connect(`mongodb://${mongodbName}:${mongodbPasswd}@${dbName}:27017/`)
   const usrHealth = await userHealthDataModel.findOne({userId: userId})
   var caloriesData = await caloriesDataModel.findOne({userId: userId})
   if (caloriesData == null) {
@@ -51,17 +50,18 @@ async function updateCalories(calories, userId){
   })
   console.log("Saving to database...")
   // Save the caloriesData and update score return with Promise
-  return await calData.save()
-  .then(updateScoreCal(userId, calories, caloriesData.bmr, caloriesData.hasAchivedTime))
+  caloriesData.save()
+  return updateScoreCal(userId, calories, caloriesData.bmr, caloriesData.hasAchivedTime)
   .then(() => {
     return Promise.resolve("Saved complete!")})
-  .catch(() => {return Promise.reject("Error!")})
+  .catch(() => {
+    return Promise.reject("Error!")})
 }
 
 async function getCaloriesData(userId) {
   const caloriesData = await caloriesDataModel.findOne({userId: userId})
   const calSeriesData = await caloriesSeriesDataModel.find({
-    calDataSetRef: calData._id,
+    calDataSetRef: caloriesData._id,
   }).limit(30).sort({timestamp: -1})
   .select({ calories: 1, timestamp: 1})
   .exec()
@@ -72,20 +72,20 @@ async function getCaloriesData(userId) {
   }
 }
 
-async function setCaloriesGoal(userId, data){
+async function setCaloriesGoal(userId, caloriesGoal){
   var caloriesData = caloriesDataModel.findById(userId)
   if (caloriesData != null) {
     if (caloriesData.updatedAt.getDate() != Date.now().getDate()){
-      caloriesData.caloriesGoal = data.setCaloriesGoal
+      caloriesData.caloriesGoal = caloriesGoal
       caloriesData.hasAchivedTime = 0
-      return caloriesData.save().then(() => { return Promise.resolve("Setting complete!") })
+      caloriesData.save().then(() => { return "Setting complete!" })
     }
     return Promise.reject("Already set!")
   }
   else {
     const usrHealth = await userHealthDataModel.findOne({userId: userId})
-    caloriesData = createNewDataSet(userId, usrHealth, data)
-    return caloriesData.save().then(() => { Promise.resolve(1) }) 
+    caloriesData = createNewDataSet(userId, usrHealth, {setCaloriesGoal: caloriesData})
+    caloriesData.save().then(() => { return "Creating and setting complete!" }) 
   }
 }
 
