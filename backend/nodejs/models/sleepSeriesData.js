@@ -13,7 +13,7 @@ sleepSerialDataSchema = new Schema({
   collection: "sleepSerialData"
 })
 
-const sleepSerialDB = mongoose.connection.db('sleepData')
+const sleepSerialDB = mongoose.connection.useDb('sleepData')
 const sleepSerialData = sleepSerialDB.model('sleepSerialData', sleepSerialDataSchema)
 
 module.exports = sleepSerialData
