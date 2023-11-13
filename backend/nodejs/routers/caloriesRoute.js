@@ -1,7 +1,8 @@
 const express = require('express')
 const router = express.Router()
 const mongoose = require('mongoose')
-const {updateCalories, getCaloriesData} = require('../controllers/serialData/caloriesController')
+const {updateCalories, getCaloriesData,
+      setCaloriesGoal} = require('../controllers/serialData/caloriesController')
 
 const mongodbName = process.env.MONGODB_ADMINUSERNAME
 const mongodbPasswd = process.env.MONGODB_ADMINPASSWD
@@ -26,6 +27,13 @@ router.post('/getCal', (req, res) => {
       res.send(data)
     }
   )
+})
+
+router.post('/setCalGoal', (req, res) => {
+  mongoose.connect(`mongodb://${mongodbName}:${mongodbPasswd}@${dbName}:27017/`)
+  setCaloriesGoal(req.body.userId, req.body.caloriesGoal)
+  .then((msg) => {res.send(msg)})
+  .catch((msg) => {res.status(403).send(msg)})
 })
 
 module.exports = router
