@@ -1,8 +1,47 @@
 <script setup>
-const number = 2
+import { ref, onMounted } from 'vue';
+import Chart from 'chart.js/auto';
+
 const numbercal = 900;
-console.log(number)
+const xValues = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const yValues = [550, 490, 440, 512, 400, 824, 715];
+const barColors = ["rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)"];
+
+onMounted(() => {
+  const ctx = document.getElementById('kcalChart').getContext('2d');
+  new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: xValues,
+      datasets: [{
+        backgroundColor: barColors,
+        data: yValues,
+        borderRadius: 10, // ค่าของมุม (border radius)
+      }]
+    },
+    options: {
+      scales: {
+        x: {
+          grid: {
+            display: false // ปิดการแสดง grid lines ในแกน x
+          }
+        },
+        y: {
+          grid: {
+            display: false // ปิดการแสดง grid lines ในแกน y
+          },
+        }
+      },
+      legend: { display: false },
+      title: {
+        display: true,
+      }
+    }
+  });
+});
 </script>
+
+
 
 <template>
 <section class="section-cal">
@@ -12,27 +51,40 @@ console.log(number)
       <h2 class="calories-number">{{ numbercal }}</h2>
       <h1 class="kcal">kcal</h1>
     </div>
-    <h2 class="calories-h2">หรือ</h2>
+    <h2 class="calories-h2or">หรือ</h2>
     <div class="firstfloor">
-      <div class="firstpic">
+      <div class="firstpic1">
         <img src="">
         <p>ซื้ออาหาร X จาน</p>
       </div>
-      <div class="secondtpic">
+      <div class="secondpic1">
         <img src="">
         <p>ซื้ออาหาร X จาน</p>
       </div>
     </div>
     <div class="secondfloor">
-      <div class="firstpic">
+      <div class="firstpic2">
         <img src="">
         <p>ซื้ออาหาร X จาน</p>
       </div>
-      <div class="secondtpic">
+      <div class="secondpic2">
         <img src="">
         <p>ซื้ออาหาร X จาน</p>
       </div>
     </div>
+    <div class="thirdfloor">
+      <div class="firstpic3">
+        <img src="">
+        <p>ซื้ออาหาร X จาน</p>
+      </div>
+    </div>
+    <h2 class="kcal-h2">สถิติ</h2>
+  <div class="graphkcal">
+    <h2 class="graphkcal-h2">การเผาผลาญเเคลอรี่</h2>
+    <div ref="graphContainer" class="graph-container">
+      <canvas id="kcalChart" class="small-chart"></canvas>
+    </div>
+  </div>
   </div>
 </section>
 </template>
@@ -55,7 +107,7 @@ header {
 }
 
 .section-cal {
-  height: 100vh;
+  height: 300vh;
   background: rgb(249, 207, 144);
   background-position: center;
   background-size: cover;
@@ -81,6 +133,11 @@ header {
   justify-content: center;
   transform: translate(26%, 50%);
 }
+
+.calories-h2or {
+  justify-content: center;
+  transform: translate(66%, 60%);
+}
 .calories-container {
   display: flex;
   align-items: baseline; /* จัดตำแหน่งตาม baseline ของข้อความ */
@@ -96,6 +153,74 @@ header {
 .kcal {
   font-size: 0.8em; /* ปรับขนาดตัวอักษรของ "kcal" */
   transform: translate(50%, 200%);
+}
+
+.small-chart {
+  width: 100px; /* ปรับขนาดความกว้างของกราฟ */
+  height: 100px; /* ปรับขนาดความสูงของกราฟ */
+}
+
+.graph-container {
+  width: 600px; /* Set your desired width */
+  height: 320px; /* Set your desired height */
+  transform: translate(22%, 130%);
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 5px 10px #888888;
+}
+
+.kcal-h2 {
+  justify-content: center;
+  transform: translate(66%, 470%);
+  border-radius: 15px;
+}
+
+.firstfloor {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 500px;
+}
+
+.firstpic1 {
+  margin-right: 15px; /* ระยะห่างระหว่างตัวเลขกับ "kcal" */
+  margin-top: 25px;
+  transform: translate(150%, 300%);
+}
+
+.secondpic1 {
+  transform: translate(200%, 300%);
+}
+
+.secondfloor {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 500px;
+}
+
+.firstpic2 {
+  margin-right: 15px; /* ระยะห่างระหว่างตัวเลขกับ "kcal" */
+  margin-top: 25px;
+  transform: translate(150%, 500%);
+}
+
+.secondpic2 {
+  transform: translate(200%, 500%);
+}
+
+.thirdfloor {
+  justify-content: center;
+  transform: translate(45%, 700%);
+}
+
+.firstpic3 {
+  justify-content: center;
+  transform: translate(0%, 50%);
+}
+
+.graphkcal-h2 {
+  transform: translate(0%, 515%);
 }
 
 </style>

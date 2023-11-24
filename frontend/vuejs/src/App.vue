@@ -1,6 +1,7 @@
 <script setup>
 import CaloriesGraph from './components/graphs/CaloriesGraph.vue'
 import SleepGraph from './components/graphs/SleepGraph.vue'
+
 </script>
 
 <template>
