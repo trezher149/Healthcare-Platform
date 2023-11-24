@@ -1,14 +1,34 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onBeforeMount} from 'vue';
 import Chart from 'chart.js/auto';
+import axios from 'axios'
 
-const numbercal = 900;
-const xValues = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-const yValues = [550, 490, 440, 512, 400, 824, 715];
-const barColors = ["rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)"];
+var numbercal = 900;
+var xValues = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+var yValues = [550, 490, 440, 512, 400, 824, 715];
+var barColors = ["rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)"];
+
+await axios.post("http://localhost:14000/api/calories/getCal", { "userId": "375d99cbcf2a"})
+.then((res) => {
+  const calories_data= res.data
+  xValues = []
+  yValues = []
+  numbercal = calories_data.series[0].calories
+  console.log(typeof(calories_data.series[0].timestamp))
+  calories_data.series.forEach(cal_data => {
+    yValues.push(cal_data.calories)
+    var time = new Date(cal_data.timestamp)
+    xValues.push(time.toISOString().slice(0, 10)) //.toLocaleString('en-GB', { timezone: "GMT+7"}))
+  });
+  yValues.reverse()
+  xValues.reverse()
+  console.log(yValues)
+})
 
 onMounted(() => {
   const ctx = document.getElementById('kcalChart').getContext('2d');
+  console.log(yValues)
+  console.log(xValues)
   new Chart(ctx, {
     type: "bar",
     data: {

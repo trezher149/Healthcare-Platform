@@ -11,8 +11,12 @@ import SleepGraph from './components/graphs/SleepGraph.vue'
   </nav>
 </header>
 
-<CaloriesGraph /> <!-- เรียกใช้ CaloriesGraph.vue ในนี้ -->
-<SleepGraph /> <!-- เรียกใช้ CaloriesGraph.vue ในนี้ -->
+<Suspense>
+  <CaloriesGraph /> <!-- เรียกใช้ CaloriesGraph.vue ในนี้ -->
+</Suspense>
+<Suspense>
+  <SleepGraph /> <!-- เรียกใช้ CaloriesGraph.vue ในนี้ -->
+</Suspense>
 
 </template>
 
