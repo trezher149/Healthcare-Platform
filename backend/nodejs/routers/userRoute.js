@@ -1,7 +1,8 @@
 const express = require('express')
 const router = express.Router()
 const mongoose = require('mongoose')
-const { addUser, getUserData } = require('../controllers/user/userController')
+const { addUser, getUserData, addLineId,
+  getUserIdFromLineId } = require('../controllers/user/userController')
 
 const mongodbName = process.env.MONGODB_ADMINUSERNAME
 const mongodbPasswd = process.env.MONGODB_ADMINPASSWD
@@ -28,6 +29,13 @@ router.post('/adduser', async (req, res) => {
   })
 })
 
+router.post('/addlineiduser', (req, res) => {
+  mongoose.connect(`mongodb://${mongodbName}:${mongodbPasswd}@${dbName}:27017/`)
+  addLineId(req.body.userId, req.body.lineId)
+  .then(() => res.sendStatus(200))
+  .catch((reject) => res.sendStatus(reject))
+})
+
 router.post('/showuserdata', (req, res) => {
   mongoose.connect(`mongodb://${mongodbName}:${mongodbPasswd}@${dbName}:27017/`)
   getUserData(req.body.userId)
@@ -49,6 +57,13 @@ router.post('/showuserdata', (req, res) => {
   .catch(
     (reject) => {res.send(reject)}
   )
+})
+
+router.post('/getuseridfromlineid', (req, res) => {
+  mongoose.connect(`mongodb://${mongodbName}:${mongodbPasswd}@${dbName}:27017/`)
+  getUserIdFromLineId(req.body.lineId)
+  .then((userId) => res.json({userId: userId}))
+  .catch((reject) => res.sendStatus(reject))
 })
 
 module.exports = router
