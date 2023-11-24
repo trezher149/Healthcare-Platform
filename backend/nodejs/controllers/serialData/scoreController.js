@@ -61,7 +61,8 @@ async function updateScoreCal(userId, calories, bmr, caloriesGoal, hasAchivedTim
       realScore += achiveScore
     }
   }
-  return await saveScore(userId, realScore)
+  return saveScore(userId, realScore)
+  .then(() => {return realScore})
 }
 
 async function updateScoreSleep(userId, sleepDuration, streak, streakGoal, hasAchived) {

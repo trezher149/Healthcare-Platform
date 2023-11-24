@@ -52,8 +52,8 @@ async function updateCalories(calories, userId){
   // Save the caloriesData and update score return with Promise
   caloriesData.save()
   return updateScoreCal(userId, calories, caloriesData.bmr, caloriesData.hasAchivedTime)
-  .then(() => {
-    return Promise.resolve("Saved complete!")})
+  .then((score) => {
+    return Promise.resolve(score)})
   .catch(() => {
     return Promise.reject("Error!")})
 }
