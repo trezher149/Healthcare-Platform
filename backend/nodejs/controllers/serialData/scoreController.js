@@ -83,7 +83,8 @@ async function updateScoreSleep(userId, sleepDuration, streak, streakGoal, hasAc
       } 
     }
   }
-  return await saveScore(userId, realScore)
+  return saveScore(userId, realScore)
+  .then(() => {return realScore})
 }
 
 module.exports = { updateScoreCal, updateScoreSleep}

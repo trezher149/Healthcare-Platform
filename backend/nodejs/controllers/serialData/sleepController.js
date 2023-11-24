@@ -18,7 +18,7 @@ async function updateSleep(userId, sleepDur){
   })
   console.log("Saving serial data...")
   await sleepSeriesData.save()
-  if (sleepDur > 750 && sleepDur < 830) {
+  if (sleepDur > 740 && sleepDur < 820) {
     sleepData.sleepWellCount += 1
     sleepData.streak += 1
     if (sleepData.streak == sleepData.streakGoal){
@@ -32,7 +32,6 @@ async function updateSleep(userId, sleepDur){
   console.log("Saving...")
   sleepData.save()
   return updateScoreSleep(userId, sleepDur, sleepData.streak, sleepData.streakGoal, sleepData.hasAchived)
-  .then(() => {return "Score has updated!"})
 
 }
 
