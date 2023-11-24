@@ -10,7 +10,7 @@ const app = express()
 
 app.use(body_parser.json())
 app.use(cors({
-  origin: "http://localhost:5173"
+  origin: ["http://localhost:7777"]
 }))
 app.use('/api/user', userRoute)
 app.use('/api/calories', caloriesRoute)
