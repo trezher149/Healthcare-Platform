@@ -11,8 +11,8 @@ const dbName = process.env.MONGODB_NAME
 router.post('/updateCal', (req, res) => {
   mongoose.connect(`mongodb://${mongodbName}:${mongodbPasswd}@${dbName}:27017/`)
   updateCalories(req.body.calories, req.body.userId)
-  .then((resolve) => {
-    res.status(200).send(resolve)
+  .then((score) => {
+    res.status(200).json({score: score})
   })
   .catch((reject) => {
     res.status(500).send(reject)
