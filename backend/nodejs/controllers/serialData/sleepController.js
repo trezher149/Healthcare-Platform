@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 const sleepDataModel = require('../../models/sleepData')
-const sleepSerialDataModel = require('../../models/sleepSeriesData')
+const sleepSeriesDataModel = require('../../models/sleepSeriesData')
 const { updateScoreSleep } = require('./scoreController')
 
 async function updateSleep(userId, sleepDur){
@@ -12,7 +12,7 @@ async function updateSleep(userId, sleepDur){
       userId: userId,
     })
   }
-  const sleepSeriesData = new sleepSerialDataModel({
+  const sleepSeriesData = new sleepSeriesDataModel({
     sleepDataSetRef: sleepData._id,
     sleepDuration: sleepDur
   })
@@ -36,15 +36,13 @@ async function updateSleep(userId, sleepDur){
 }
 
 async function getSleepData(userId) {
-  const sData = await sleepData.findOne({userId: userId})
-  const sSeriesData = await sleepSeriesData.find({
+  const sData = await sleepDataModel.findOne({userId: userId})
+  const sSeriesData = await sleepSeriesDataModel.find({
     sleepDataSetRef: sData._id,
   }).limit(30).sort({timestamp: -1})
   .select({ sleepDuration: 1, timestamp: 1})
   .exec()
-  return {
-    'series': sSeriesData
-  }
+  return sSeriesData 
 }
 
 module.exports = {updateSleep, getSleepData}

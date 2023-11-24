@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const { Schema } = mongoose
 
-sleepSerialDataSchema = new Schema({
+const sleepSerialDataSchema = new Schema({
   sleepDataSetRef: mongoose.Types.ObjectId,
   sleepDuration: Number,
   timestamp: {
@@ -13,7 +13,7 @@ sleepSerialDataSchema = new Schema({
   collection: "sleepSerialData"
 })
 
-const sleepSerialDB = mongoose.connection.useDb('sleepData')
-const sleepSerialData = sleepSerialDB.model('sleepSerialData', sleepSerialDataSchema)
+const sleepSeriesDB = mongoose.connection.useDb('sleepData')
+const sleepSeriesData = sleepSeriesDB.model('sleepSerialData', sleepSerialDataSchema)
 
-module.exports = sleepSerialData
+module.exports = sleepSeriesData
