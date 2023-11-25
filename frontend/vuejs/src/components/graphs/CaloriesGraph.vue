@@ -8,22 +8,22 @@ var xValues = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
 var yValues = [550, 490, 440, 512, 400, 824, 715];
 var barColors = ["rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)"];
 
-await axios.post("http://localhost:14000/api/calories/getCal", { "userId": "375d99cbcf2a"})
-.then((res) => {
-  const calories_data= res.data
-  xValues = []
-  yValues = []
-  numbercal = calories_data.series[0].calories
-  console.log(typeof(calories_data.series[0].timestamp))
-  calories_data.series.forEach(cal_data => {
-    yValues.push(cal_data.calories)
-    var time = new Date(cal_data.timestamp)
-    xValues.push(time.toISOString().slice(0, 10)) //.toLocaleString('en-GB', { timezone: "GMT+7"}))
-  });
-  yValues.reverse()
-  xValues.reverse()
-  console.log(yValues)
-})
+// await axios.post("http://localhost:14000/api/calories/getCal", { "userId": "375d99cbcf2a"})
+// .then((res) => {
+  // const calories_data= res.data
+  // xValues = []
+  // yValues = []
+  // numbercal = calories_data.series[0].calories
+  // console.log(typeof(calories_data.series[0].timestamp))
+  // calories_data.series.forEach(cal_data => {
+    // yValues.push(cal_data.calories)
+    // var time = new Date(cal_data.timestamp)
+    // xValues.push(time.toISOString().slice(0, 10)) //.toLocaleString('en-GB', { timezone: "GMT+7"}))
+  // });
+  // yValues.reverse()
+  // xValues.reverse()
+  // console.log(yValues)
+// })
 
 onMounted(() => {
   const ctx = document.getElementById('kcalChart').getContext('2d');
@@ -64,7 +64,16 @@ onMounted(() => {
 
 
 <template>
-<body>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camping Gear Website | CodingNepal</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Fontawesome Link for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
+  </head>
+  <body>
     <header>
       <nav class="navbar">
         <h2 class="logo"><a href="#">Evawell</a></h2>
@@ -141,9 +150,13 @@ onMounted(() => {
     </footer>
 
   </body>
+</html>
+
 </template>
 
 <style scoped>
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap");
+
 * {
   margin: 0;
   padding: 0;
