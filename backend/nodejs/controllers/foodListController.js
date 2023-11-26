@@ -1,16 +1,13 @@
 const foodDataModel = require('../models/foodData')
+const {getUserData} = require('./user/userController')
 
-async function getFoodList(calories, foodIds = []) {
-  var foodList = await foodDataModel.find({
-    caloriesGive: { $lte: calories}
-  }).select({ favAmount: -1 })
-  .sort({ caloriesGive: 1 }).exec().lean()
-
-  for (var i = 0; i < foodIds.length; i++) {
-    foodList.push(foodIds[i])
-  }
-
-  return foodList
+async function getFoodList(calories, userId) {
+  var userFood = await getUserData(userId)
+  .then((data) => {return data[1].favFoodId})
+  const foodList = await foodDataModel.find({caloriesGive: { $lte: calories}}).limit(6 - userFood.length)
+  .sort({ caloriesGive: -1 }).select({ foodName: 1, caloriesGive: 1 }).exec()
+  
+  return userFood.concat(foodList)
 }
 
 async function getAllFoodList() {
@@ -19,10 +16,10 @@ async function getAllFoodList() {
   .exec().lean()
 }
 
-async function addFood(food) {
+async function addFood(foodName, caloriesGive) {
   return foodDataModel.create({
-    foodName: food.foodName,
-    caloriesGive: food.calories
+    foodName: foodName,
+    caloriesGive: caloriesGive
   })
 }
 

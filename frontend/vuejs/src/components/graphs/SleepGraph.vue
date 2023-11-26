@@ -9,21 +9,21 @@ var xValues = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
 var yValues = [550, 490, 440, 512, 400, 824, 715];
 const barColors = ["rgb(58, 117, 246)", "rgb(58, 117, 246)", "rgb(58, 117, 246)", "rgb(58, 117, 246)", "rgb(58, 117, 246)"];
 
-// await axios.post("http://localhost:14000/api/sleep/getSleep", {userId: "375d99cbcf2a"})
-// .then((res) => {
-  // const sleep_data = res.data
-  // xValues = []
-  // yValues = []
-  // sleep_data.series.forEach(cal_data => {
-    // yValues.push(cal_data.sleepDuration)
-    // var time = new Date(cal_data.timestamp)
-    // xValues.push(time.toISOString().slice(0, 10)) //.toLocaleString('en-GB', { timezone: "GMT+7"}))
-  // });
-  // yValues.reverse()
-  // xValues.reverse()
-  // numberhour = Math.floor(yValues[0] / 100)
-  // numberminute = yValues[0] % 100
-// })
+await axios.post("http://localhost:14000/api/sleep/getSleep", {userId: "375d99cbcf2a"})
+.then((res) => {
+  const sleep_data = res.data
+  xValues = []
+  yValues = []
+  sleep_data.series.forEach(cal_data => {
+    yValues.push(cal_data.sleepDuration)
+    var time = new Date(cal_data.timestamp)
+    xValues.push(time.toISOString().slice(0, 10)) //.toLocaleString('en-GB', { timezone: "GMT+7"}))
+  });
+  yValues.reverse()
+  xValues.reverse()
+  numberhour = Math.floor(yValues[0] / 100)
+  numberminute = yValues[0] % 100
+})
 
 onMounted(() => {
   const ctx = document.getElementById('sleepChart').getContext('2d');

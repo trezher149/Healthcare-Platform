@@ -99,7 +99,7 @@ def handle_image(event):
         binary = requests.get(f'https://api-data.line.me/v2/bot/message/{picture_id}/content', headers=headers)
         img = Image.open(io.BytesIO(binary.content))
         img.save(f"./pictures/{picture_id}.jpg")
-        status = ump.send_calories(URL, event.source.to_dict()['userId'], rand.randint(600, 1500))
+        status = ump.send_calories(URL, event.source.to_dict()['userId'], rand.randint(100, 500))
         if status == "400":
             send_msg(line_bot_api, event, "คุณยังไม่ได้ผูกบัญชีกับบัญชี line ของคุณนะคะ")
         else:

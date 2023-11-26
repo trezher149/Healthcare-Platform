@@ -2,28 +2,39 @@
 import { ref, onMounted, onBeforeMount} from 'vue';
 import Chart from 'chart.js/auto';
 import axios from 'axios'
+import internal from 'stream';
 
 var numbercal = 900;
 var xValues = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 var yValues = [550, 490, 440, 512, 400, 824, 715];
 var barColors = ["rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)"];
+var foodList = []
 
-// await axios.post("http://localhost:14000/api/calories/getCal", { "userId": "375d99cbcf2a"})
-// .then((res) => {
-  // const calories_data= res.data
-  // xValues = []
-  // yValues = []
-  // numbercal = calories_data.series[0].calories
-  // console.log(typeof(calories_data.series[0].timestamp))
-  // calories_data.series.forEach(cal_data => {
-    // yValues.push(cal_data.calories)
-    // var time = new Date(cal_data.timestamp)
-    // xValues.push(time.toISOString().slice(0, 10)) //.toLocaleString('en-GB', { timezone: "GMT+7"}))
-  // });
-  // yValues.reverse()
-  // xValues.reverse()
-  // console.log(yValues)
-// })
+await axios.post("http://localhost:14000/api/calories/getCal", { "userId": "375d99cbcf2a"})
+.then((res) => {
+  const calories_data= res.data
+  xValues = []
+  yValues = []
+  numbercal = calories_data.series[0].calories
+  console.log(typeof(calories_data.series[0].timestamp))
+  calories_data.series.forEach(cal_data => {
+    yValues.push(cal_data.calories)
+    var time = new Date(cal_data.timestamp)
+    xValues.push(time.toISOString().slice(0, 10)) //.toLocaleString('en-GB', { timezone: "GMT+7"}))
+  });
+  yValues.reverse()
+  xValues.reverse()
+  console.log(yValues)
+})
+
+await axios.post("http://localhost:14000/api/food/getFoodList", { "userId": "375d99cbcf2a", "calories": numbercal})
+.then((res) => {
+  foodList = res.data.foodList
+})
+
+function divide_calories(foodCalories) {
+  return Math.floor(numbercal / foodCalories)
+}
 
 onMounted(() => {
   const ctx = document.getElementById('kcalChart').getContext('2d');
@@ -101,9 +112,15 @@ onMounted(() => {
     <section class="services" id="services">
       <h2>อาหารที่เหมาะกับเเคลอรี่คุณ</h2>
       <ul class="cards">
-        <li class="card">
-          <img src="../../../pictures/background/food.png" alt="img">
-            <h3>ชื่อเมนู</h3>
+        <li v-for="food in foodList" class="card">
+          <img src="../../../pictures/background/food.jpg" alt="img"/>
+            <h3>{{ food.foodName }}</h3>
+            <h4>{{ food.caloriesGive }} kcal</h4>
+            <p>ซื้ออาหาร {{ divide_calories(food.caloriesGive) }} จาน</p>
+        </li>
+        <!-- <li class="card">
+          <img src="../../../pictures/background/food.jpg" alt="img">
+            <h3>{}</h3>
             <p>ซื้ออาหาร X จาน</p>
           </li>
         <li class="card">
@@ -130,7 +147,7 @@ onMounted(() => {
             <img src="../../../pictures/background/food.png" alt="img">
             <h3>ชื่อเมนู</h3>
             <p>ซื้ออาหาร X จาน</p>
-        </li>
+        </li> -->
       </ul>
     </section>
 
