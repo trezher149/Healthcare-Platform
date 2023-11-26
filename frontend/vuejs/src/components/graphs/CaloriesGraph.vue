@@ -113,7 +113,7 @@ onMounted(() => {
       <h2>อาหารที่เหมาะกับเเคลอรี่คุณ</h2>
       <ul class="cards">
         <li v-for="food in foodList" class="card">
-          <img src="../../../pictures/background/food.jpg" alt="img"/>
+          <img src="../../../pictures/background/food.png" alt="img"/>
             <h3>{{ food.foodName }}</h3>
             <h4>{{ food.caloriesGive }} kcal</h4>
             <p>ซื้ออาหาร {{ divide_calories(food.caloriesGive) }} จาน</p>
