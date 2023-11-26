@@ -102,32 +102,32 @@ onMounted(() => {
       <h2>อาหารที่เหมาะกับเเคลอรี่คุณ</h2>
       <ul class="cards">
         <li class="card">
-          <img src="../../../pictures/background/food.jpg" alt="img">
+          <img src="../../../pictures/background/food.png" alt="img">
             <h3>ชื่อเมนู</h3>
             <p>ซื้ออาหาร X จาน</p>
           </li>
         <li class="card">
-          <img src="../../../pictures/background/food.jpg" alt="img">
+          <img src="../../../pictures/background/food.png" alt="img">
             <h3>ชื่อเมนู</h3>
             <p>ซื้ออาหาร X จาน</p>
         </li>
         <li class="card">
-          <img src="../../../pictures/background/food.jpg" alt="img">
+          <img src="../../../pictures/background/food.png" alt="img">
             <h3>ชื่อเมนู</h3>
             <p>ซื้ออาหาร X จาน</p>
         </li>
         <li class="card">
-          <img src="../../../pictures/background/food.jpg" alt="img">
+          <img src="../../../pictures/background/food.png" alt="img">
             <h3>ชื่อเมนู</h3>
             <p>ซื้ออาหาร X จาน</p>
         </li>
         <li class="card">
-          <img src="../../../pictures/background/food.jpg" alt="img">
+          <img src="../../../pictures/background/food.png" alt="img">
             <h3>ชื่อเมนู</h3>
             <p>ซื้ออาหาร X จาน</p>
         </li>
         <li class="card">
-            <img src="../../../pictures/background/food.jpg" alt="img">
+            <img src="../../../pictures/background/food.png" alt="img">
             <h3>ชื่อเมนู</h3>
             <p>ซื้ออาหาร X จาน</p>
         </li>
