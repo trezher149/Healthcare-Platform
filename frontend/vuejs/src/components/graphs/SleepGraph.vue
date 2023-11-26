@@ -96,39 +96,29 @@ onMounted(() => {
             <h2>การนอนคืนที่เเล้ว</h2>
             <div class="sleep-container">
                 <div class="hour">
-                    <h2 class="sleep-number">{{ numberhour }}</h2>
-                    <h1 class="clock">ชั่วโมง</h1>
+                    <h1 class="sleep-number">{{ numberhour }}</h1>
+                    <h2 class="clock">ชั่วโมง</h2>
                 </div>
                 <div class="minute">
-                    <h2 class="sleep-number">{{ numberminute }}</h2>
-                    <h1 class="clock">นาที</h1>
+                    <h1 class="sleep-number">{{ numberminute }}</h1>
+                    <h2 class="clock">นาที</h2>
                 </div>
             </div>
         </div>
-        <a href="#services">สถิติ</a>
+        <!-- <a href="#services">สถิติ</a> -->
       </div>
     </section>
 
     <section class="services" id="services">
-      <h2>สถิติ</h2>
+      <h2>สถิติการนอนหลับ</h2>
       <div class="graphsleep">
-        <h2 class="graphsleep-h2">การนอนหลับ</h2>
+        <h2 class="graphsleep-h2"></h2>
         <div ref="graphContainer" class="graph-container">
             <canvas id="sleepChart"></canvas>
         </div>
     </div>
       
     </section>
-
-    <footer>
-      <div>
-        <span>Evawell Project</span>
-        <span class="link">
-            <a href="#">หน้าหลัก</a>
-            <a href="#contact">ติดต่อเรา</a>
-        </span>
-      </div>
-    </footer>
 
   </body>
 </html>
@@ -156,6 +146,14 @@ header {
   justify-content: center;
   background: rgb(150, 0, 0);
 }
+
+.graph-container {
+    width: 600px; /* Set your desired width */
+    height: 320px; /* Set your desired height */
+    margin: 30px; /* จัดตำแหน่ง container กลางหน้าจอ */
+    background: #fff;
+    border-radius: 10px;
+  }
 
 .navbar {
   display: flex;
@@ -208,7 +206,7 @@ header a:hover, footer a:hover {
   height: 100vh;
   width: 100%;
   position: relative;
-  background: url("17541.jpg");
+  background: url("../../../pictures/background/night.jpg");
   background-position: center 65%;
   background-size: cover;
   background-attachment: fixed;
@@ -312,7 +310,27 @@ section .cards {
 .about .team ul {
   padding-left: 20px;
 } */
-
+.sleep-container {
+  display: flex;
+    align-items: baseline; /* จัดตำแหน่งตาม baseline ของข้อความ */
+    justify-content: center;
+    transform: translate(7%, 0%);
+    }
+    
+    h1.sleep-number {
+      margin-right: 100px; /* ระยะห่างระหว่างตัวเลขกับ "kcal" */
+      margin-top: 25px;
+      color: #fff;
+      font-size: 90px;
+      font-weight: 700;
+    }
+    
+    .clock {
+      color: #fff;
+      transform: translate(15%, -200%);
+      font-size: 20px;
+    }
+    
 
 .contact form button {
   margin-top: 10px;

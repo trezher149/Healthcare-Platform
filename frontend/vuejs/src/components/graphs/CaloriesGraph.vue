@@ -65,14 +65,6 @@ onMounted(() => {
 
 <template>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Camping Gear Website | CodingNepal</title>
-    <link rel="stylesheet" href="style.css">
-    <!-- Fontawesome Link for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
-  </head>
   <body>
     <header>
       <nav class="navbar">
@@ -97,9 +89,12 @@ onMounted(() => {
       <div class="content">
         <div class="text">
           <h2>การเผาผลาญเเคลอรี่วันนี้</h2>
-          <h1>900</h1>
         </div>
-        <a href="#services">อาหารที่เหมาะกับเเคลอรี่คุณ</a>
+        <div class="calories-container">
+          <h2 class="calories-number">{{ numbercal }}</h2>
+          <h1 class="kcal">kcal</h1>
+        </div>
+        <!-- <a href="#services">อาหารที่เหมาะกับเเคลอรี่คุณ</a> -->
       </div>
     </section>
 
@@ -107,47 +102,48 @@ onMounted(() => {
       <h2>อาหารที่เหมาะกับเเคลอรี่คุณ</h2>
       <ul class="cards">
         <li class="card">
-            <img src="97866B3E-73DE-469C-AB3D-26450D797B54.jpg" alt="img">
+          <img src="../../../pictures/background/food.jpg" alt="img">
             <h3>ชื่อเมนู</h3>
             <p>ซื้ออาหาร X จาน</p>
           </li>
         <li class="card">
-            <img src="97866B3E-73DE-469C-AB3D-26450D797B54.jpg" alt="img">
+          <img src="../../../pictures/background/food.jpg" alt="img">
             <h3>ชื่อเมนู</h3>
             <p>ซื้ออาหาร X จาน</p>
         </li>
         <li class="card">
-            <img src="97866B3E-73DE-469C-AB3D-26450D797B54.jpg" alt="img">
+          <img src="../../../pictures/background/food.jpg" alt="img">
             <h3>ชื่อเมนู</h3>
             <p>ซื้ออาหาร X จาน</p>
         </li>
         <li class="card">
-            <img src="97866B3E-73DE-469C-AB3D-26450D797B54.jpg" alt="img">
+          <img src="../../../pictures/background/food.jpg" alt="img">
             <h3>ชื่อเมนู</h3>
             <p>ซื้ออาหาร X จาน</p>
         </li>
         <li class="card">
-            <img src="97866B3E-73DE-469C-AB3D-26450D797B54.jpg" alt="img">
+          <img src="../../../pictures/background/food.jpg" alt="img">
             <h3>ชื่อเมนู</h3>
             <p>ซื้ออาหาร X จาน</p>
         </li>
         <li class="card">
-            <img src="97866B3E-73DE-469C-AB3D-26450D797B54.jpg" alt="img">
+            <img src="../../../pictures/background/food.jpg" alt="img">
             <h3>ชื่อเมนู</h3>
             <p>ซื้ออาหาร X จาน</p>
         </li>
       </ul>
     </section>
 
-    <footer>
-      <div>
-        <span>Evawell Project</span>
-        <span class="link">
-            <a href="#">หน้าหลัก</a>
-            <a href="#contact">ติดต่อเรา</a>
-        </span>
+    <section class="services" id="services">
+      <h2>สถิติการเผาผลาญเเคลอรี่</h2>
+      <div class="graphsleep">
+        <h2 class="graphsleep-h2"></h2>
+        <div ref="graphContainer" class="graph-container">
+        <canvas id="kcalChart" class="small-chart"></canvas>
       </div>
-    </footer>
+    </div>
+      
+    </section>
 
   </body>
 </html>
@@ -163,6 +159,14 @@ onMounted(() => {
   box-sizing: border-box;
   font-family: "Poppins", sans-serif;
 }
+
+.graph-container {
+    width: 600px; /* Set your desired width */
+    height: 320px; /* Set your desired height */
+    margin: 30px; /* จัดตำแหน่ง container กลางหน้าจอ */
+    background: #fff;
+    border-radius: 10px;
+  }
 
 html {
   scroll-behavior: smooth;
@@ -230,11 +234,14 @@ header a:hover, footer a:hover {
   color: #ddd;
 }
 
+.graphsleep-h2 {
+  margin: 0;
+}
 .homepage {
   height: 100vh;
   width: 100%;
   position: relative;
-  background: url("834255.jpg");
+  background: url("../../../pictures/background/dumbel.jpg");
   background-position: center 65%;
   background-size: cover;
   background-attachment: fixed;
@@ -470,14 +477,16 @@ footer a {
   
   .calories-number {
     margin-right: 15px; /* ระยะห่างระหว่างตัวเลขกับ "kcal" */
-    margin-top: 25px;
-    transform: translate(0%, 50%);
     margin: 25px 0; /* ปรับระยะห่างเพื่อให้ได้ระยะทางที่ดีกว่า */
+    color: #fff;
+    font-size: 90px;
+    font-weight: 700;
   }
   
-  .kcal {
-    font-size: 0.8em; /* ปรับขนาดตัวอักษรของ "kcal" */
-    transform: translate(50%, 200%);
+  h1.kcal {
+    color: #fff;
+    transform: translate(8%, 0%);
+    font-size: 20px;
   }
 
 @media screen and (max-width: 860px) {
