@@ -6,7 +6,6 @@ const { updateScoreSleep } = require('./scoreController')
 async function updateSleep(userId, sleepDur){
   var sleepData = await sleepDataModel.findOne({userId: userId})
   if (sleepData == null) {
-    //  First time user using the app 
     console.log("Creating new sleep data set...")
     sleepData = new sleepDataModel({
       userId: userId,

@@ -1,4 +1,3 @@
-const mongoose = require('mongoose')
 const scoreDataModel = require('../../models/scoreData')
 const scoreSeriesDataModel = require('../../models/scoreSeriesData')
 
