@@ -28,6 +28,10 @@ const caloriesDataSchema = new Schema({
   },
   goalSetTime: {
     type: Date
+  },
+  goalSetIntervalDay: {
+    type: Number,
+    default: 7
   }
 },
 {
