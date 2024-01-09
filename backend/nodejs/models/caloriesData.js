@@ -1,14 +1,6 @@
 const mongoose = require('mongoose')
 const { Schema } = mongoose
 
-const caloriesSerialDataSchema = new Schema({
-  calories: Number,
-},
-{
-  timestamps: true
-}
-)
-
 const caloriesDataSchema = new Schema({
   userId: {
     type: String,
@@ -18,7 +10,7 @@ const caloriesDataSchema = new Schema({
     type: Number,
     required: true
   },
-  streak: {
+  caloriesTotal: {
     type: Number,
     default: 0
   },
@@ -26,14 +18,17 @@ const caloriesDataSchema = new Schema({
     type: Number,
     default: 0
   },
+  streak: {
+    type: Number,
+    default: 0
+  },
   hasAchivedTime: {
     type: Number,
     default: 0
   },
-  caloriesTotal: {
-    type: Number,
-    default: 0
-  },
+  goalSetTime: {
+    type: Date
+  }
 },
 {
   timestamps: true
