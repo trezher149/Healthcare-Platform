@@ -15,6 +15,10 @@ const caloriesDataSchema = new Schema({
     default: 0
   },
   goal: {
+    hasAchived: {
+      type: Boolean,
+      default: false
+    },
     hasAchivedTime: {
       type: Number,
       default: 0
