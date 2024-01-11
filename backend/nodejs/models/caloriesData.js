@@ -14,24 +14,37 @@ const caloriesDataSchema = new Schema({
     type: Number,
     default: 0
   },
-  caloriesGoal: {
-    type: Number,
-    default: 0
-  },
-  streak: {
-    type: Number,
-    default: 0
-  },
-  hasAchivedTime: {
-    type: Number,
-    default: 0
-  },
-  goalSetTime: {
-    type: Date
-  },
-  goalSetIntervalDay: {
-    type: Number,
-    default: 7
+  goal: {
+    hasAchivedTime: {
+      type: Number,
+      default: 0
+    },
+    caloriesGoal: {
+      type: Number,
+      default: 0
+    },
+    streak: {
+      type: Number,
+      default: 0
+    },
+    streakGoal: {
+      type: Number,
+      default: 7
+    },
+    setCaloriesGoalTime: {
+      type: Date
+    },
+    setCaloriesGoalIntervalDay: {
+      type: Number,
+      default: 7
+    },
+    setStreakGoalTime: {
+      type: Date
+    },
+    setStreakGoalIntervalDay: {
+      type: Number,
+      default: 7
+    }
   }
 },
 {
