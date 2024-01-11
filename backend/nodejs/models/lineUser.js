@@ -12,7 +12,7 @@ const lineUserSchema = new Schema({
   }
 })
 
-const lineUserDB = mongoose.connection.useDb('lineUser')
+const lineUserDB = mongoose.connection.useDb('userData')
 const lineUser = lineUserDB.model('lineUser', lineUserSchema)
 module.exports = lineUser
 
