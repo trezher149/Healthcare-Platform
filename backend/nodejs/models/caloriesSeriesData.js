@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const { Schema } = mongoose
 
 caloriesSeriesDataSchema = new Schema({
-  calDataSetRef: mongoose.Types.ObjectId,
+  tableRef: mongoose.Types.ObjectId,
   calories: Number,
   timestamp: {
     type: Date,
@@ -14,6 +14,6 @@ caloriesSeriesDataSchema = new Schema({
 })
 
 const caloriesSeriesDB = mongoose.connection.useDb('caloriesData')
-const caloriesSeriesData = caloriesSeriesDB.model('calSerialData', caloriesSeriesDataSchema)
+const caloriesSeriesData = caloriesSeriesDB.model('calSeriesData', caloriesSeriesDataSchema)
 
 module.exports = caloriesSeriesData
