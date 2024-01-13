@@ -1,10 +1,8 @@
-const userHealthDataModel = require('../../models/userHealthData')
 const caloriesDataModel = require('../../models/caloriesData')
 const caloriesSeriesDataModel = require('../../models/caloriesSeriesData')
-const { updateScoreCal }= require('./scoreController')
+const {saveScoreCalories, updateScoreCal }= require('./scoreController')
 
-async function updateCalories(calories, userId){
-  const usrHealth = await userHealthDataModel.findOne({userId: userId})
+async function updateCalories(userId, calories){
   var caloriesData = await caloriesDataModel.findOne({userId: userId})
   if (caloriesData == null) {
     caloriesData = await createNewDataSet(userId, usrHealth)
@@ -13,16 +11,12 @@ async function updateCalories(calories, userId){
     calDataSetRef: caloriesData._id,
     calories: calories
   })
-  await calSeriesData.save()
-
-  caloriesData.caloriesTotal += calories
-  if (calories >= caloriesData.caloriesGoal && caloriesData.caloriesGoal > 0){
-    caloriesData.hasAchivedTime += 1
-  }
-  caloriesData.save()
-  return updateScoreCal(userId, calories, caloriesData.bmr, caloriesData.hasAchivedTime)
-  .then((score) => {
-    return Promise.resolve(score)})
+  return calSeriesData.save().then(async () => {
+    caloriesData.caloriesTotal += calories
+    await caloriesData.save()
+    return saveScoreCalories(userId, calories)
+  })
+  .then((score) => {return score})
   .catch(() => {
     return Promise.reject("Error!")})
 }
