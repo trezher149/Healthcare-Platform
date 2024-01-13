@@ -5,3 +5,4 @@ frontend/**/.vscode/**
 frontend/vite_test/**
 frontend/**/node_modules/**
 docker-compose.yaml
+**/*.env
