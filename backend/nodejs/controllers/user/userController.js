@@ -1,11 +1,8 @@
-const mongoose = require('mongoose')
 const userModel = require('../../models/user')
 const userHealthData = require('../../models/userHealthData')
-const lineModel = require('../../models/userLineLink')
-const {setCaloriesGoal} = require('../serialData/caloriesController')
-const user = require('../../models/user')
+const lineModel = require('../../models/lineUser')
 
-async function addUser(email, name, password, healthData){
+async function createUser(email, name, password, healthData){
   var checkExist = [false, false] //[email, username]
   await userModel.findOne({username: name})
   .then((result) => {checkExist[1] = (result != null) ? true:false})
@@ -20,7 +17,7 @@ async function addUser(email, name, password, healthData){
     password: password
   })
   console.log(newUser._id)
-  newUser.save()
+  return newUser.save()
   .then(async () => {
     await userHealthData.create({
       userId: newUser._id,
@@ -28,12 +25,9 @@ async function addUser(email, name, password, healthData){
       age: healthData.age,
       height: healthData.height,
       weight: healthData.weight,
-      favFoodId: healthData.favFood,
-      occupationId: healthData.occupation
     })
-  }
-  )
-  return Promise.resolve(true)
+    return newUser._id
+  })
 }
 
 async function addLineId(userId, lineId) {
@@ -65,4 +59,4 @@ async function getUserIdFromLineId(lineId) {
   }
 }
 
-module.exports = { addUser, getUserData, addLineId, getUserIdFromLineId}
+module.exports = { createUser, getUserData, addLineId, getUserIdFromLineId}

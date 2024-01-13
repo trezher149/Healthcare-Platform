@@ -1,5 +1,7 @@
 const scoreDataModel = require('../../models/scoreData')
 const scoreSeriesDataModel = require('../../models/scoreSeriesData')
+const caloriesDataModel = require('../../models/caloriesData')
+const caloriesData = require('../../models/caloriesData')
 
 const achivedTimeLimit = 5
 const sleepPunish = 300
@@ -11,79 +13,50 @@ async function saveScore(userId, realScore) {
       userId: userId
     })
   }
-  console.log(scoreData)
-  console.log("Checking scoreSeriesData...")
-  var scoreSerialData = await scoreSeriesDataModel.find({ userId: userId })
-                        .sort({ timestamp: -1 }).limit(1).exec()
-  if (scoreSerialData[0] == null) {
-    console.log("Creating a new one...")
-    await scoreSeriesDataModel.create({
-      scoreDataSetRef: scoreData._id,
-      score: realScore
+  return scoreSeriesDataModel.create({
+    scoreDataSetRef: scoreData._id,
+    score: realScore
+  }).then(async () => {
+    scoreData.totalScore += realScore
+    return scoreData.save().then(async () => {
+      return realScore
     })
-  }
-  else {
-    await scoreSeriesDataModel.create({
-      scoreDataSetRef: scoreData._id,
-      score: realScore
-    })
-  }
-  scoreData.totalScore += realScore
-  console.log("Saving score...")
-  await scoreData.save()
+  }).catch(() => {return 500})
 }
 
-async function updateScoreCal(userId, calories, bmr, caloriesGoal, hasAchivedTime) {
+async function saveScoreCalories(userId, calories) {
   const baseScore = 100
-  const achiveScore = 200
+  var streakScore = 20
   var realScore = 0
-  console.log("Calculating...")
-  const sedentary = Math.round(bmr * 0.2)
-  const light = Math.round(bmr * 0.375)
-  const moderate = Math.round(bmr * 0.55)
-  const active = Math.round(bmr * 0.725)
-  const extream = Math.round(bmr * 0.9)
+  const caloriesDataGoal = await caloriesDataModel.findOne({userId: userId})
+  const sedentary = Math.round(caloriesDataGoal.bmr * 0.2)
+
   if (calories <= sedentary) {
     realScore = Math.round(calories / sedentary * baseScore) 
   }
-  else {
-    realScore = baseScore + Math.round(calories * 0.2)
-    if (calories >= light) {
-      realScore = realScore
-    }
-  }
-  if (caloriesGoal > 0) {
-    if (hasAchivedTime > achivedTimeLimit) {
-      realScore += achiveScore * 0.25
-    }
-    else {
-      realScore += achiveScore
-    }
-  }
-  return saveScore(userId, realScore)
-  .then(() => {return realScore})
-}
+  else {realScore = baseScore + Math.round(calories * 0.2)}
 
-async function updateScoreSleep(userId, sleepDuration, streak, streakGoal, hasAchived) {
-  const baseScore = 400
-  const streakScore = baseScore * 2
-  var realScore = 0
-  if (sleepDuration < 740) {
-    realScore = (baseScore - sleepPunish) * Math.round(sleepDuration / 760)
+  if (calories < caloriesDataGoal.goal.caloriesGoal) {
+    caloriesDataGoal.goal.streak = 0
   }
-  else if (sleepDuration > 820) {
-    realScore = (baseScore - sleepPunish) * Math.round(800 / sleepDuration)
-  }
-  else {
-    realScore = baseScore
-    if (streakGoal > 0) {
-      if (streak == streakGoal) {
-        realScore += streakScore
-      } 
+  else { caloriesDataGoal.goal.streak += 1 }
+
+  if (!caloriesDataGoal.goal.hasAchived && caloriesDataGoal.goal.streak > 0) {
+    streakScore += streakScore * caloriesDataGoal.goal.streak
+    if (caloriesDataGoal.goal.streak == caloriesDataGoal.goal.streakGoal) {
+      streakScore += caloriesDataGoal.goal.streakGoal * 10
+      caloriesDataGoal.goal.hasAchived = true
     }
   }
-  return saveScore(userId, realScore)
-  .then(() => {return realScore})
-}
 
-module.exports = { updateScoreCal, updateScoreSleep}
+  realScore += streakScore
+  return saveScore(userId, realScore).then(async () => {
+    return caloriesDataGoal.save().then(() => {
+      return realScore
+    })
+  }
+  )
+
+
+}
+module.exports = {saveScoreCalories}

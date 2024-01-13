@@ -1,4 +1,3 @@
-const userHealthDataModel = require('../../models/userHealthData')
 const caloriesDataModel = require('../../models/caloriesData')
 
 function HarrisBenedict(usrSex, weight, height, age) {
@@ -8,18 +7,11 @@ function HarrisBenedict(usrSex, weight, height, age) {
   }
   // Male
   else {
-    return 66.4730 + (13.7516 * usrHealth.weight )+ (5.0033 * usrHealth.height) - (6.7550 * usrHealth.age)
+    return 66.4730 + (13.7516 * weight ) + (5.0033 * height) - (6.7550 * age)
   }
 }
 
-function setOptions(options, usrTableData) {
-  if ('setCaloriesGoal' in options) {
-    usrTableData.caloriesGoal = options.setCaloriesGoal
-    usrTableData.goalSetTime = Date.now()
-  }
-}
-
-function createUserCaloriesData(userId, usrHealth, optionsData = {}) {
+async function createUserCaloriesData(userId, usrHealth, optionsData = {}) {
   //  First time user using the app
   // The bmr is the minimum
   // Using Harris-Benedict equation with average IC value in mind
@@ -34,37 +26,62 @@ function createUserCaloriesData(userId, usrHealth, optionsData = {}) {
     setOptions(options,caloriesData)
     caloriesData.caloriesGoal = otherData.setCaloriesGoal
   }
-  return caloriesData
+  return caloriesData.save().then(() => {return 200})
+  .catch(() => {return 500})
 }
 
-async function getUserCaloriesData(userId) {
-  caloriesDataModel.findOne({userId:userId})
-  .then((caloriesData) => {
-    return {
-      'caloriesTotal': caloriesData.caloriesTotal,
-      'bmr': caloriesData.bmr,
-      'caloriesGoal': caloriesData.caloriesGoal,
-      'streakGoal': caloriesData.streak,
-      'hasAchivedTime': caloriesData.hasAchivedTime
-    }
-  })
-}
-
-async function setCaloriesGoal(userId, caloriesGoal){
-  var caloriesData = caloriesDataModel.findById(userId)
+async function setCaloriesGoal(userId, caloriesGoal, streakGoal = 0){
+  const caloriesData = await caloriesDataModel.findOne({userId: userId})
+  .then((data) => {return data}).catch(() => {return 500})
+  if (caloriesData === 500) {
+    return caloriesData
+  }
   if (caloriesData != null) {
-    if (caloriesData.goalSetTime.getDate() - Date.now().getDate() > caloriesData.goalSetIntervalDay){
-      caloriesData.caloriesGoal = caloriesGoal
-      caloriesData.hasAchivedTime = 0
-      caloriesData.save().then(() => { return "Setting complete!" })
+    var differenceSetCalDays = 0
+    var differenceSetStkDays = 0
+    const today = Date.now()
+    const setCalGoalTime = caloriesData.goal.setCaloriesGoalTime ?? undefined
+    const setStkGoalTime = caloriesData.goal.setStreakGoalTime ?? undefined
+    const setCalIntvalDays = caloriesData.goal.setCaloriesGoalIntervalDay
+    const setStkIntvalDays = caloriesData.goal.setStreakGoalIntervalDay
+    if (setCalGoalTime) {
+      differenceSetCalDays =  Math.round(
+        (today - setCalGoalTime.getTime())
+        / (1000 * 3600 * 24)
+      )
     }
-    return Promise.reject("Already set!")
+    // if (differenceSetCalDays >= setCalIntvalDays ) {
+    //   caloriesData.goal.setCaloriesGoalTime = today
+    //   caloriesData.goal.caloriesGoal = caloriesGoal
+    //   caloriesData.goal.streak = 0
+    //   caloriesData.goal.hasAchived = false
+    // }
+    caloriesData.goal.caloriesGoal = caloriesGoal
+    caloriesData.goal.streak = 0
+    caloriesData.goal.hasAchived = false
+    if (streakGoal > 6) {
+      if (setStkGoalTime) {
+        differenceSetStkDays =  Math.round(
+          (today - setStkGoalTime.getTime())
+          / (1000 * 3600 * 24)
+        )
+      }
+      // if (differenceSetStkDays >= setStkIntvalDays ) {
+      //   caloriesData.goal.setStreakGoalTime = today
+      //   caloriesData.goal.streakGoal = streakGoal
+      // }
+      caloriesData.goal.streakGoal = streakGoal
+    }
+    return caloriesData.save().then(() => {
+        return 200
+      })
+      .catch(() => {
+        return 500
+      })
   }
   else {
-    const usrHealth = await userHealthDataModel.findOne({userId: userId})
-    caloriesData = createUserCaloriesData(userId, usrHealth, {setCaloriesGoal: caloriesData})
-    caloriesData.save().then(() => { return "Creating and setting complete!" }) 
+    return Promise.reject(406)
   }
 }
 
-module.exports = {getUserCaloriesData, setCaloriesGoal}
+module.exports = {createUserCaloriesData, setCaloriesGoal}
