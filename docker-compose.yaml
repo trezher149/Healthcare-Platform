@@ -7,31 +7,27 @@ services:
     restart: always
     ports:
       - "14000:14000"
-    environment:
-      MONGODB_ADMINUSERNAME: root
-      MONGODB_ADMINPASSWD: password
-      MONGODB_NAME: cupboard
+    env_file:
+      - ./backend/nodejs/.env
     depends_on:
       - cupboard
   #database
   cupboard:
     container_name: "cupboard"
     image: "mongo:latest"
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: password
-      MONGO_INITDB_ROOT_DATABASE: root-db
+    env_file:
+      - ./backend/.env
     ports:
       - "27017:27017"
   #Line-bot
   waiter:
     container_name: "waiter"
     build: "./backend/linebotImg/."
-    environment:
-      CHANNEL_ACCESS_TOKEN: *** 
-      CHANNEL_SECRET: *** 
-      NGROK_AUTHTOKEN: *** 
+    env_file:
+      - ./backend/linebotImg/.env
     ports:
       - "12777:12777"
     volumes:
       - "./backend/linebotImg/pictures:/usr/src/app/pictures"
+  # #Frontend
+  # cuisine:
