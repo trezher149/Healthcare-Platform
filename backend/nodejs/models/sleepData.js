@@ -5,17 +5,38 @@ const sleepDataSchema = new Schema({
     type: String,
     required: true
   },
-  streak: {
+  avgSleepTimeMinute: {
     type: Number,
     default: 0
   },
-  streakGoal: {
+  totalSleepTimeMinute: {
     type: Number,
     default: 0
   },
-  hasAchived: {
-    type: Boolean,
-    default: false
+  goal: {
+    hasAchived: {
+      type: Boolean,
+      default: false
+    },
+    hasAchivedTime: {
+      type: Number,
+      default: 0
+    },
+    streak: {
+      type: Number,
+      default: 0
+    },
+    streakGoalDay: {
+      type: Number,
+      default: 0
+    },
+    setStreakGoalTime: {
+      type: Date
+    },
+    setStreakGoalIntervalDay: {
+      type: Number,
+      default: 7
+    }
   }
 })
 

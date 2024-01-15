@@ -1,8 +1,10 @@
 const express = require('express')
 const router = express.Router()
 const mongoose = require('mongoose')
-const { addUser, getUserData, addLineId,
+const { createUser, getUserData, addLineId,
   getUserIdFromLineId } = require('../controllers/user/userController')
+const {createUserCaloriesData} = require('../controllers/staticData/caloriesController')
+const {createUserSleepData} = require('../controllers/staticData/sleepController')
 
 const mongodbName = process.env.MONGODB_ADMINUSERNAME
 const mongodbPasswd = process.env.MONGODB_ADMINPASSWD
@@ -10,11 +12,17 @@ const dbName = process.env.MONGODB_NAME
 
 router.post('/adduser', async (req, res) => { 
   mongoose.connect(`mongodb://${mongodbName}:${mongodbPasswd}@${dbName}:27017/`)
-  addUser(req.body.email, req.body.name, req.body.password, req.body.healthData)
-  .then((status) => {
-      res.json({data_sts:status})
+  createUser(req.body.email, req.body.name, req.body.password, req.body.healthData)
+  .then(async (userId) => {
+      return createUserCaloriesData(userId, req.body.healthData)
+      .then(() => {return userId}).catch(() => {return Promise.reject(500)})
     }
-  ).catch((reject) => {
+  ).then((userId) => {return createUserSleepData(userId)})
+  .then((status) => { res.sendStatus(status) })
+  .catch((reject) => {
+      if (typeof reject != "object") {
+        return Promise.reject(reject)
+      }
       let errMsg = {err_email:"",err_name:""}
       if (reject[0]) {
         errMsg.err_email = "อีเมลนี้ถูกใช้งานแล้ว"
@@ -24,8 +32,8 @@ router.post('/adduser', async (req, res) => {
       }
       res.status(406).json(errMsg)
     }
-  ).catch((err) => {
-    res.json({err_msg: err})
+  ).catch((status) => {
+    res.sendStatus(status)
   })
 })
 

@@ -2,30 +2,18 @@ const mongoose = require('mongoose')
 const crypto = require('crypto')
 const { Schema } = mongoose
 
-const userSchema = new Schema({
+const userFavFoodSchema = new Schema({
   _id: {
     type: String,
     default: crypto.randomBytes(6).toString('hex')
   },
-  username: {
+  favFood: {
     type: String,
     required: true
   },
-  password: {
-    type: String,
-    required: true
-  },
-  email: {
-    type: String,
-    required: true
-  },
-  is_line_user: {
-    type: Boolean,
-    default: false
-  }
 })
 
 const userDB = mongoose.connection.useDb('userData')
-const user = userDB.model('user', userSchema)
+const userFavFood = userDB.model('userFavFood', userFavFoodSchema)
 
-module.exports = user
+module.exports = userFavFood

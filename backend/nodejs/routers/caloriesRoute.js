@@ -1,8 +1,8 @@
 const express = require('express')
 const router = express.Router()
 const mongoose = require('mongoose')
-const {updateCalories, getCaloriesData,
-      setCaloriesGoal} = require('../controllers/serialData/caloriesController')
+const {updateCalories, getCaloriesData} = require('../controllers/seriesData/caloriesController')
+const {setCaloriesGoal} = require('../controllers/staticData/caloriesController')
 
 const mongodbName = process.env.MONGODB_ADMINUSERNAME
 const mongodbPasswd = process.env.MONGODB_ADMINPASSWD
@@ -10,7 +10,7 @@ const dbName = process.env.MONGODB_NAME
 
 router.post('/updateCal', (req, res) => {
   mongoose.connect(`mongodb://${mongodbName}:${mongodbPasswd}@${dbName}:27017/`)
-  updateCalories(req.body.calories, req.body.userId)
+  updateCalories(req.body.userId, req.body.calories)
   .then((score) => {
     res.status(200).json({score: score})
   })
@@ -31,9 +31,9 @@ router.post('/getCal', (req, res) => {
 
 router.post('/setCalGoal', (req, res) => {
   mongoose.connect(`mongodb://${mongodbName}:${mongodbPasswd}@${dbName}:27017/`)
-  setCaloriesGoal(req.body.userId, req.body.caloriesGoal)
-  .then((msg) => {res.send(msg)})
-  .catch((msg) => {res.status(403).send(msg)})
+  setCaloriesGoal(req.body.userId, req.body.caloriesGoal, req.body.streakGoal)
+  .then((status) => {res.sendStatus(status)})
+  .catch((status) => {res.sendStatus(status)})
 })
 
 module.exports = router
