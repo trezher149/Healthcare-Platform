@@ -1,8 +1,8 @@
 const mongoose = require('mongoose')
 const { Schema } = mongoose
 
-scoreSeriesDataSchema = new Schema({
-  scoreDataSetRef: mongoose.Types.ObjectId,
+const scoreSeriesDataSchema = new Schema({
+  tableRef: mongoose.Types.ObjectId,
   score: Number,
   timestamp: {
     type: Date,

@@ -4,21 +4,39 @@ const caloriesDataModel = require('../../models/caloriesData')
 const sleepDataModel = require('../../models/sleepData')
 
 async function saveScore(userId, realScore) {
-  var scoreData = await scoreDataModel.findOne({userId: userId})
+  const scoreData = await scoreDataModel.findOne({userId: userId})
+  const today = new Date()
+  var latestDate = undefined
   if (scoreData == null) {
     scoreData = new scoreDataModel({
       userId: userId
     })
   }
-  return scoreSeriesDataModel.create({
-    scoreDataSetRef: scoreData._id,
-    score: realScore
-  }).then(async () => {
-    scoreData.totalScore += realScore
-    return scoreData.save().then(async () => {
-      return realScore
+  var scoreSeriesData = await scoreSeriesDataModel
+    .findOne({tableRef: scoreData._id}).sort({timestamp: -1})
+  if (scoreSeriesData) {latestDate = scoreSeriesData.timestamp}
+
+  if (!latestDate) {
+    scoreSeriesData = new scoreSeriesDataModel({
+      tableRef: scoreData._id,
+      score: realScore
     })
-  }).catch(() => {return 500})
+  }
+  else if (today.getDay() == latestDate.getDay()) {
+    scoreSeriesData.score += realScore 
+    scoreSeriesData.timestamp = today
+  }
+  else {
+    scoreSeriesData = new scoreSeriesDataModel({
+      tableRef: scoreData._id,
+      score: realScore
+    })
+  }
+  scoreData.totalScore += realScore
+  return scoreSeriesData.save().then(() => {
+    return scoreData.save()
+  }).then(() => {return scoreSeriesData.score})
+  .catch(() => {return 500})
 }
 
 async function saveScoreCalories(userId, calories) {
@@ -47,12 +65,10 @@ async function saveScoreCalories(userId, calories) {
   }
 
   realScore += streakScore
-  return saveScore(userId, realScore).then(async () => {
-    return caloriesDataGoal.save().then(() => {
-      return realScore
-    })
-  }
-  )
+  return saveScore(userId, realScore).then(async (score) => {
+    await caloriesDataGoal.save()
+    return score
+  })
 
 }
 
@@ -79,10 +95,9 @@ async function saveScoreSleep(userId, minutes) {
     sleepData.goal.streak = 0
     realScore = baseScore - sleepPunish
   }
-  return saveScore(userId, realScore).then(() => {
-    return sleepData.save().then(() => {
-      return realScore
-    })
+  return saveScore(userId, realScore).then(async (score) => {
+    await sleepData.save()
+    return score
   })
 }
 
