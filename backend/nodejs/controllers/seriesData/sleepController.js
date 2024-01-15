@@ -1,37 +1,21 @@
-const mongoose = require('mongoose')
 const sleepDataModel = require('../../models/sleepData')
 const sleepSeriesDataModel = require('../../models/sleepSeriesData')
-const { updateScoreSleep } = require('./scoreController')
+const { saveScoreSleep } = require('./scoreController')
 
-async function updateSleep(userId, sleepDur){
+async function updateSleep(userId, sleepDurMinute){
   var sleepData = await sleepDataModel.findOne({userId: userId})
   if (sleepData == null) {
-    console.log("Creating new sleep data set...")
-    sleepData = new sleepDataModel({
-      userId: userId,
-    })
+    return Promise.reject(403)
   }
   const sleepSeriesData = new sleepSeriesDataModel({
-    sleepDataSetRef: sleepData._id,
-    sleepDuration: sleepDur
+    tableRef: sleepData._id,
+    sleepDuration: sleepDurMinute
   })
-  console.log("Saving serial data...")
-  await sleepSeriesData.save()
-  if (sleepDur > 740 && sleepDur < 820) {
-    sleepData.sleepWellCount += 1
-    sleepData.streak += 1
-    if (sleepData.streak == sleepData.streakGoal){
-      sleepData.hasAchived = true
-      sleepData.streak = 0
-    }
-  }
-  else {
-    sleepData.streak = 0
-  }
-  console.log("Saving...")
-  sleepData.save()
-  return updateScoreSleep(userId, sleepDur, sleepData.streak, sleepData.streakGoal, sleepData.hasAchived)
-
+  return sleepSeriesData.save().then(() => {
+    return sleepData.save()
+  }).then(() => {
+    return saveScoreSleep(userId, sleepDurMinute)
+  }).catch(() => {return Promise.reject(500)})
 }
 
 async function getSleepData(userId) {

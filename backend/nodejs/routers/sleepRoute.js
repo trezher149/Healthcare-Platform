@@ -1,7 +1,8 @@
 const express = require('express')
 const router = express.Router()
 const mongoose = require('mongoose')
-const { updateSleep, getSleepData } = require('../controllers/serialData/sleepController')
+const { updateSleep, getSleepData } = require('../controllers/seriesData/sleepController')
+const { setSleepGoal } = require('../controllers/staticData/sleepController')
 
 const mongodbName = process.env.MONGODB_ADMINUSERNAME
 const mongodbPasswd = process.env.MONGODB_ADMINPASSWD
@@ -11,7 +12,7 @@ router.post('/updateSleep', (req, res) => {
   mongoose.connect(`mongodb://${mongodbName}:${mongodbPasswd}@${dbName}:27017/`)
   updateSleep(req.body.userId, req.body.sleepDur)
   .then((score) => res.json({score: score}))
-  .catch((reject) => res.sendStatus(500))
+  .catch((reject) => res.sendStatus(reject))
 })
 
 router.post('/getSleep', (req, res) => {
@@ -25,6 +26,13 @@ router.post('/getSleep', (req, res) => {
       })
     }
   )
+})
+
+router.post('/setSleepGoal', (req, res) => {
+  mongoose.connect(`mongodb://${mongodbName}:${mongodbPasswd}@${dbName}:27017/`)
+  setSleepGoal(req.body.userId, req.body.streakGoal)
+  .then((status) => res.sendStatus(status) )
+  .catch((status) => res.sendStatus(status))
 })
 
 module.exports = router

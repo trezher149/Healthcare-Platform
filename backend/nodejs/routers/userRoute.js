@@ -4,6 +4,7 @@ const mongoose = require('mongoose')
 const { createUser, getUserData, addLineId,
   getUserIdFromLineId } = require('../controllers/user/userController')
 const {createUserCaloriesData} = require('../controllers/staticData/caloriesController')
+const {createUserSleepData} = require('../controllers/staticData/sleepController')
 
 const mongodbName = process.env.MONGODB_ADMINUSERNAME
 const mongodbPasswd = process.env.MONGODB_ADMINPASSWD
@@ -14,8 +15,9 @@ router.post('/adduser', async (req, res) => {
   createUser(req.body.email, req.body.name, req.body.password, req.body.healthData)
   .then(async (userId) => {
       return createUserCaloriesData(userId, req.body.healthData)
+      .then(() => {return userId}).catch(() => {return Promise.reject(500)})
     }
-  )
+  ).then((userId) => {return createUserSleepData(userId)})
   .then((status) => { res.sendStatus(status) })
   .catch((reject) => {
       if (typeof reject != "object") {

@@ -1,10 +1,7 @@
 const scoreDataModel = require('../../models/scoreData')
 const scoreSeriesDataModel = require('../../models/scoreSeriesData')
 const caloriesDataModel = require('../../models/caloriesData')
-const caloriesData = require('../../models/caloriesData')
-
-const achivedTimeLimit = 5
-const sleepPunish = 300
+const sleepDataModel = require('../../models/sleepData')
 
 async function saveScore(userId, realScore) {
   var scoreData = await scoreDataModel.findOne({userId: userId})
@@ -57,6 +54,36 @@ async function saveScoreCalories(userId, calories) {
   }
   )
 
-
 }
-module.exports = {saveScoreCalories}
+
+async function saveScoreSleep(userId, minutes) {
+  const baseScore = 400
+  const sleepPunish = 300
+  var streakScore = 40
+  var realScore = 0
+
+  const sleepData = await sleepDataModel.findOne({userId: userId})
+  if (minutes > 460 && minutes < 500) {
+    sleepData.goal.streak += 1
+    realScore = baseScore
+    if (!sleepData.goal.hasAchived && sleepData.goal.streakGoalDay > 0){
+      streakScore += streakScore * sleepData.goal.streak
+      if (sleepData.goal.streak == sleepData.goal.streakGoalDay) {
+        streakScore += sleepData.goal.streakGoalDay * 10
+        sleepData.goal.hasAchived = true
+      }
+      realScore += streakScore
+    }
+  }
+  else {
+    sleepData.goal.streak = 0
+    realScore = baseScore - sleepPunish
+  }
+  return saveScore(userId, realScore).then(() => {
+    return sleepData.save().then(() => {
+      return realScore
+    })
+  })
+}
+
+module.exports = {saveScoreCalories, saveScoreSleep}

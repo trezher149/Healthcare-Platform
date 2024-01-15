@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const { Schema } = mongoose
 
 const sleepSeriesDataSchema = new Schema({
-  sleepDataSetRef: mongoose.Types.ObjectId,
+  tableRef: mongoose.Types.ObjectId,
   sleepDuration: Number,
   timestamp: {
     type: Date,
