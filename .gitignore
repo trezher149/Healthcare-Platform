@@ -1,6 +1,6 @@
 backend/linebotImg/.venv/**
 backend/nodejs/node_modules/**
-backend/linebotImg/pictures/**
+backend/linebotImg/pictures_byte/**
 frontend/**/.vscode/**
 frontend/vite_test/**
 frontend/**/node_modules/**
