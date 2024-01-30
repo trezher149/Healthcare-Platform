@@ -28,6 +28,6 @@ services:
     ports:
       - "12777:12777"
     volumes:
-      - "./backend/linebotImg/pictures:/usr/src/app/pictures"
+      - "./backend/linebotImg/pictures_byte:/usr/src/app/pictures_byte"
   # #Frontend
   # cuisine:
