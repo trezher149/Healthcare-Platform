@@ -4,11 +4,12 @@ const {saveScoreCalories, updateScoreCal }= require('./scoreController')
 
 async function updateCalories(userId, calories){
   var caloriesData = await caloriesDataModel.findOne({userId: userId})
-  if (caloriesData == null) {
-    caloriesData = await createNewDataSet(userId, usrHealth)
-  } 
+  // if (caloriesData == null) {
+  //   caloriesData = await createNewDataSet(userId, usrHealth)
+  // } 
+  const tableRef = caloriesData._id
   var calSeriesData = new caloriesSeriesDataModel({
-    calDataSetRef: caloriesData._id,
+    tableRef: tableRef,
     calories: calories
   })
   return calSeriesData.save().then(async () => {
@@ -24,7 +25,7 @@ async function updateCalories(userId, calories){
 async function getCaloriesSeriesData(userId) {
   const caloriesData = await caloriesDataModel.findOne({userId: userId})
   const calSeriesData = await caloriesSeriesDataModel.find({
-    calDataSetRef: caloriesData._id,
+    tableRef: caloriesData._id
   }).limit(30).sort({timestamp: -1})
   .select({ calories: 1, timestamp: 1})
   .exec()

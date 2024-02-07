@@ -11,8 +11,8 @@ const dbName = process.env.MONGODB_NAME
 router.post('/updateCal', (req, res) => {
   mongoose.connect(`mongodb://${mongodbName}:${mongodbPasswd}@${dbName}:27017/`)
   updateCalories(req.body.userId, req.body.calories)
-  .then((score) => {
-    res.status(200).json({score: score})
+  .then((scoreObj) => {
+    res.status(200).json(scoreObj)
   })
   .catch((reject) => {
     res.status(500).send(reject)
@@ -31,8 +31,8 @@ router.post('/getCal', (req, res) => {
 
 router.post('/setCalGoal', (req, res) => {
   mongoose.connect(`mongodb://${mongodbName}:${mongodbPasswd}@${dbName}:27017/`)
-  setCaloriesGoal(req.body.userId, req.body.caloriesGoal, req.body.streakGoal)
-  .then((status) => {res.sendStatus(status)})
+  setCaloriesGoal(req.body.userId, req.body.caloriesGoal, req.body.endDays)
+  .then((obj) => {res.json(obj)})
   .catch((status) => {res.sendStatus(status)})
 })
 

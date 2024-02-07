@@ -5,7 +5,7 @@ const { createUser, getUserData, addLineId,
   getUserIdFromLineId } = require('../controllers/user/userController')
 const {createUserCaloriesData} = require('../controllers/staticData/caloriesController')
 const {createUserSleepData} = require('../controllers/staticData/sleepController')
-
+const createScoreTable = require('../controllers/staticData/scoreController')
 const mongodbName = process.env.MONGODB_ADMINUSERNAME
 const mongodbPasswd = process.env.MONGODB_ADMINPASSWD
 const dbName = process.env.MONGODB_NAME
@@ -17,8 +17,14 @@ router.post('/adduser', async (req, res) => {
       return createUserCaloriesData(userId, req.body.healthData)
       .then(() => {return userId}).catch(() => {return Promise.reject(500)})
     }
-  ).then((userId) => {return createUserSleepData(userId)})
-  .then((status) => { res.sendStatus(status) })
+  ).then((userId) => {
+    return createUserSleepData(userId)
+  })
+  .then((userId) => {
+    console.log(userId)
+    return createScoreTable(userId)
+  })
+  .then((userId) => { res.json({userId: userId}) })
   .catch((reject) => {
       if (typeof reject != "object") {
         return Promise.reject(reject)
@@ -40,7 +46,7 @@ router.post('/adduser', async (req, res) => {
 router.post('/addlineiduser', (req, res) => {
   mongoose.connect(`mongodb://${mongodbName}:${mongodbPasswd}@${dbName}:27017/`)
   addLineId(req.body.userId, req.body.lineId)
-  .then(() => res.sendStatus(200))
+  .then((status) => res.sendStatus(status))
   .catch((reject) => res.sendStatus(reject))
 })
 

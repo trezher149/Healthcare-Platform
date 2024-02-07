@@ -1,12 +1,12 @@
 const mongoose = require('mongoose')
 const { Schema } = mongoose
 
-caloriesSeriesDataSchema = new Schema({
+const caloriesSeriesDataSchema = new Schema({
   tableRef: mongoose.Types.ObjectId,
   calories: Number,
   timestamp: {
     type: Date,
-    default: () => Date.now()
+    default: () => new Date()
   }
 },
 {
