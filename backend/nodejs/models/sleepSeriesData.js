@@ -6,7 +6,7 @@ const sleepSeriesDataSchema = new Schema({
   sleepDuration: Number,
   timestamp: {
     type: Date,
-    default: () => Date.now()
+    default: () => new Date()
   }
 },
 {

@@ -1,4 +1,5 @@
 const caloriesDataModel = require('../../models/caloriesData')
+const caloriesGoalModel = require('../../models/caloriesGoalData')
 
 function HarrisBenedict(usrSex, weight, height, age) {
   // Female
@@ -30,58 +31,70 @@ async function createUserCaloriesData(userId, usrHealth, optionsData = {}) {
   .catch(() => {return 500})
 }
 
-async function setCaloriesGoal(userId, caloriesGoal, streakGoal = 0){
+async function setCaloriesGoal(userId, caloriesGoalVal, endDays = 7){
   const caloriesData = await caloriesDataModel.findOne({userId: userId})
   .then((data) => {return data}).catch(() => {return 500})
-  if (caloriesData === 500) {
-    return caloriesData
-  }
-  if (caloriesData != null) {
-    var differenceSetCalDays = 0
-    var differenceSetStkDays = 0
-    const today = Date.now()
-    const setCalGoalTime = caloriesData.goal.setCaloriesGoalTime ?? undefined
-    const setStkGoalTime = caloriesData.goal.setStreakGoalTime ?? undefined
-    const setCalIntvalDays = caloriesData.goal.setCaloriesGoalIntervalDay
-    const setStkIntvalDays = caloriesData.goal.setStreakGoalIntervalDay
-    if (setCalGoalTime) {
-      differenceSetCalDays =  Math.round(
-        (today - setCalGoalTime.getTime())
-        / (1000 * 3600 * 24)
-      )
-    }
-    // if (differenceSetCalDays >= setCalIntvalDays ) {
-    //   caloriesData.goal.setCaloriesGoalTime = today
-    //   caloriesData.goal.caloriesGoal = caloriesGoal
-    //   caloriesData.goal.streak = 0
-    //   caloriesData.goal.hasAchived = false
-    // }
-    caloriesData.goal.caloriesGoal = caloriesGoal
-    caloriesData.goal.streak = 0
-    caloriesData.goal.hasAchived = false
-    if (streakGoal > 6) {
-      if (setStkGoalTime) {
-        differenceSetStkDays =  Math.round(
-          (today - setStkGoalTime.getTime())
-          / (1000 * 3600 * 24)
-        )
-      }
-      // if (differenceSetStkDays >= setStkIntvalDays ) {
-      //   caloriesData.goal.setStreakGoalTime = today
-      //   caloriesData.goal.streakGoal = streakGoal
-      // }
-      caloriesData.goal.streakGoal = streakGoal
-    }
-    return caloriesData.save().then(() => {
-        return 200
-      })
-      .catch(() => {
-        return 500
-      })
-  }
-  else {
+  if (caloriesData == null) {
     return Promise.reject(406)
   }
+  var caloriesGoal = await caloriesGoalModel.findOne({tableRef: caloriesData._id})
+                      .sort({setCaloriesGoalTime: -1})
+
+  const today = new Date()
+  const endDate = new Date(today)
+  endDate.setDate(endDate.getDate() + endDays)
+  const minimumDays = 7
+
+  if (caloriesGoal) {
+    if (!caloriesGoal.isAchived) {
+      const diffDays = (today - caloriesGoal.setCaloriesGoalTime) / (1000 * 3600 * 24)
+      if (diffDays < caloriesGoal.setGoalIntervalDays && caloriesGoal.isActive) {
+        return Promise.reject(406)
+      }
+    }
+  }
+
+  const sedentary = Math.round(bmr * 0.2)
+  const light = Math.round(bmr * 0.375)
+  const medium = Math.round(bmr * 0.55)
+  const heavy = Math.round(bmr * 0.725)
+
+  var scoreToGet = 1000
+  if (caloriesGoalVal < sedentary) {
+    scoreToGet = scoreToGet * (caloriesGoalVal / sedentary) * 100
+  }
+  else if (caloriesGoalVal < light) {}
+  else if (caloriesGoalVal < medium) {scoreToGet += 500}
+  else if (caloriesGoalVal < heavy) {scoreToGet += 1000}
+  else {scoreToGet += 1500}
+
+  if (endDays % minimumDays > 2) {
+    scoreToGet *= 1 - ((endDays - (miminumDays * 2)) * 0.75) 
+  }
+
+  const goals = {
+    caloriesGoal: caloriesGoalVal,
+    endDays: endDays,
+    scoreToGet: scoreToGet,
+    endGoalTime: endDate.toLocaleString()
+  }
+
+  const fields = {
+    tableRef: caloriesData._id,
+    caloriesGoal: caloriesGoalVal,
+    scoreToGet: scoreToGet,
+    endGoalTime: endDate
+  }
+
+  caloriesGoal = new caloriesGoalModel(fields)
+
+  return caloriesGoal.save().then(() => {
+    return caloriesData.save()
+  })
+  .then(() => { return goals})
+  .catch(() => {
+    return Promise.reject(500)
+  })
 }
 
 module.exports = {createUserCaloriesData, setCaloriesGoal}

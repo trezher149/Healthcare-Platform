@@ -1,33 +1,47 @@
 const sleepDataModel = require('../../models/sleepData')
+const sleepDataGoalModel = require('../../models/sleepGoalData')
 
 async function createUserSleepData(userId, optionsData = {}) {
   const sleepData = new sleepDataModel({userId: userId})
   if (Object.keys(optionsData).length > 0) {;}
-  return sleepData.save().then(() => {return 200})
+  return sleepData.save().then(() => {return userId})
   .catch(() => {return 500})
 }
 
-async function setSleepGoal(userId, streakGoal) {
+async function setSleepGoal(userId, streakGoal, endDays = 7) {
   const sleepData = await sleepDataModel.findOne({userId: userId})
-  const today = Date.now()
-  const setStkGoalTime = sleepData.goal.setStreakGoalTime
-  const setStkGoalIntvalDay = sleepData.goal.setStreakGoalIntervalDay
-  var differenceSetStkDays = 0
-  if (setStkGoalTime) {
-    differenceSetStkDays = Math.round(
-      (today - setStkGoalTime.getTime())
-      / (1000 * 3600 * 24)
-    )
+  var sleepDataGoal = await sleepDataGoalModel.findOne({tableRef: sleepData._id})
+                        .sort({setSleepGoalTime: -1})
+  const today = new Date()
+  const endDate = new Date(today)
+  endDate.setDate(endDate.getDate() + endDays) 
+
+  const goals = {
+    streakGoal: streakGoal,
+    endDays: endDays,
+    endGoalDate: endDate.toLocaleString()
   }
-  // if (differenceSetStkDays >= setStkGoalIntvalDay) {
-  //   sleepData.goal.streak = 0
-  //   sleepData.goal.streakGoalDay = streakGoal
-  //   sleepData.goal.hasAchived = false
-  // }
-  sleepData.goal.streak = 0
-  sleepData.goal.streakGoalDay = streakGoal
-  sleepData.goal.hasAchived = false
-  return sleepData.save().then(() => {return 200}).catch(() => {return Promise.reject(500)})
+
+  const fields = {
+    tableRef: sleepData._id,
+    streakGoal: streakGoal,
+    endGoalTime: endDate
+  }
+
+  if (sleepDataGoal) {
+    if (!sleepDataGoal.isAchived) {
+      const diffDays = (today - sleepDataGoal.setSleepGoalTime) / (1000 * 3600 * 24)
+      if (diffDays < sleepDataGoal.setGoalIntervalDays) {
+        return Promise.reject(406)
+      }
+    }
+  }
+
+  sleepDataGoal = new sleepDataGoalModel(fields)
+
+  return sleepDataGoal.save().then(() => {
+    sleepData.save()
+  }).then(() => { return goals })
 }
 
 module.exports = {createUserSleepData, setSleepGoal}

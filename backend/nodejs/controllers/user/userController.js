@@ -36,10 +36,13 @@ async function addLineId(userId, lineId) {
     return Promise.reject(400)
   }
   console.log('Creating...')
+  var user = await userModel.findById(userId)
+  user.is_line_user = true
   return lineModel.create({
     userId: userId,
     lineId, lineId
-  })
+  }).then(user.save())
+  .then(() => {return 200})
 }
 
 async function getUserData(userId) {

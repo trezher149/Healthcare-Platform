@@ -30,8 +30,8 @@ router.post('/getSleep', (req, res) => {
 
 router.post('/setSleepGoal', (req, res) => {
   mongoose.connect(`mongodb://${mongodbName}:${mongodbPasswd}@${dbName}:27017/`)
-  setSleepGoal(req.body.userId, req.body.streakGoal)
-  .then((status) => res.sendStatus(status) )
+  setSleepGoal(req.body.userId, req.body.streakGoal, req.body.endGoalTime)
+  .then((obj) => res.json(obj) )
   .catch((status) => res.sendStatus(status))
 })
 

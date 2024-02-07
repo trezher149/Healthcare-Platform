@@ -6,7 +6,7 @@ const scoreSeriesDataSchema = new Schema({
   score: Number,
   timestamp: {
     type: Date,
-    default: () => Date.now()
+    default: () => new Date()
   }
 },
 {
