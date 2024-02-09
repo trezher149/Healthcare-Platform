@@ -44,6 +44,7 @@ async function setCaloriesGoal(userId, caloriesGoalVal, endDays = 7){
   const endDate = new Date(today)
   endDate.setDate(endDate.getDate() + endDays)
   const minimumDays = 7
+  const bmr = caloriesData.bmr
 
   if (caloriesGoal) {
     if (!caloriesGoal.isAchived) {
