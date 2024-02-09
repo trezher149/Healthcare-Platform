@@ -96,6 +96,10 @@ async function saveScoreCalories(userId, calories) {
       results.isActive = caloriesGoal.isActive = false
     }
   }
+  else {
+    results.isAchived = true
+    results.isActive = false
+  }
 
   results.caloriesTotal = caloriesGoal.caloriesTotal
   results.caloriesGoal = caloriesGoal.caloriesGoal

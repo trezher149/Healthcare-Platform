@@ -6,4 +6,4 @@ RUN npm install
 COPY . .
 
 EXPOSE 14000
-CMD ["node", "main.js"]
+CMD ["node", "--trace-warnings", "main.js"]
