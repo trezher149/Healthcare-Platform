@@ -31,16 +31,23 @@ async function createUser(email, name, password, healthData){
 }
 
 async function addLineId(userId, lineId) {
-  if (await lineModel.findOne({userId: userId})) {
+  console.log(userId)
+  console.log(typeof(userId))
+  console.log(lineId)
+  if (await lineModel.findOne({userId: userId}) != null) {
     console.log('Rejected')
-    return Promise.reject(400)
+    return Promise.reject(406)
   }
   console.log('Creating...')
-  var user = await userModel.findById(userId)
+  const user = await userModel.findById(userId)
+  console.log(user)
+  if (user == null) {
+    return Promise.reject(401)
+  }
   user.is_line_user = true
   return lineModel.create({
     userId: userId,
-    lineId, lineId
+    lineId: lineId
   }).then(user.save())
   .then(() => {return 200})
 }
