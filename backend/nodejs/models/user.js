@@ -5,7 +5,7 @@ const { Schema } = mongoose
 const userSchema = new Schema({
   _id: {
     type: String,
-    default: crypto.randomBytes(6).toString('hex')
+    default: () => crypto.randomBytes(4).toString('hex')
   },
   username: {
     type: String,

@@ -7,6 +7,7 @@ const sleepGoalDataModel = require('../../models/sleepGoalData')
 
 async function saveScore(userId, realScore) {
   const scoreData = await scoreDataModel.findOne({userId: userId})
+  console.log(scoreData)
   const today = new Date()
   var latestDate = undefined
   if (scoreData == null) {
@@ -16,7 +17,11 @@ async function saveScore(userId, realScore) {
   }
   var scoreSeriesData = await scoreSeriesDataModel
     .findOne({tableRef: scoreData._id}).sort({timestamp: -1})
-  if (scoreSeriesData) {latestDate = scoreSeriesData.timestamp}
+  console.log(scoreSeriesData)
+  if (scoreSeriesData != null) {
+    latestDate = scoreSeriesData.timestamp
+    console.log(latestDate.toLocaleString())
+  }
 
   if (!latestDate) {
     scoreSeriesData = new scoreSeriesDataModel({
@@ -60,6 +65,7 @@ async function saveScoreCalories(userId, calories) {
                       .sort({setCaloriesGoalTime: -1})
   const results = {
     score: 0,
+    achiveScore: 0,
     totalScore: 0,
     hasGoal: true,
     caloriesTotal: 0,
@@ -67,17 +73,19 @@ async function saveScoreCalories(userId, calories) {
     isAchived: false,
     isActive: true
   }
+  console.log(caloriesGoal == null)
   if (caloriesGoal == null) {
-    return saveScore(userId, realScore).then(async (score) => {
+    return saveScore(userId, realScore).then((score) => {
       results.score = score.score
       results.totalScore = score.totalScore
       results.hasGoal = false
+      console.log(results)
       return results
     })
   }
 
   const diffDays = today - caloriesGoal.endGoalTime
-  if (diffDays > 0) {
+  if (diffDays > 0 && !caloriesGoal.isAchived) {
     results.isActive = caloriesGoal.isActive = false
     await caloriesGoal.save()
     await caloriesGoalModel.create({tableRef: caloriesData._id, isRenew: true})
@@ -92,17 +100,24 @@ async function saveScoreCalories(userId, calories) {
     caloriesGoal.caloriesTotal += calories
     if (caloriesGoal.caloriesTotal >= caloriesGoal.caloriesGoal) {
       realScore += caloriesGoal.scoreToGet
+      results.achiveScore = caloriesGoal.scoreToGet
       results.isAchived = caloriesGoal.isAchived = true
       results.isActive = caloriesGoal.isActive = false
     }
   }
   else {
-    results.isAchived = true
+    results.isAchived = false
     results.isActive = false
   }
 
-  results.caloriesTotal = caloriesGoal.caloriesTotal
-  results.caloriesGoal = caloriesGoal.caloriesGoal
+  if (results.isActive) {
+    results.caloriesTotal = caloriesGoal.caloriesTotal
+    if (caloriesGoal.caloriesTotal > caloriesData.caloriesGoal) {
+      results.caloriesGoal = results.caloriesGoal
+    }
+    else { results.caloriesGoal = caloriesGoal.caloriesGoal }
+  }
+  
   return saveScore(userId, realScore).then(async (score) => {
     await caloriesGoal.save()
     results.score = score.score
