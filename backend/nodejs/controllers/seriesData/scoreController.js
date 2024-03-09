@@ -102,7 +102,6 @@ async function saveScoreCalories(userId, calories) {
       realScore += caloriesGoal.scoreToGet
       results.achiveScore = caloriesGoal.scoreToGet
       results.isAchived = caloriesGoal.isAchived = true
-      results.isActive = caloriesGoal.isActive = false
     }
   }
   else {
@@ -139,23 +138,25 @@ async function saveScoreSleep(userId, minutes) {
   const results = {
     score: 0,
     totalScore: 0,
+    goalScore: 0,
     hasGoal: true,
     streakTotal: 0,
     streakGoal: 0,
-    isAchived: false
+    isAchived: false,
+    isActive: true
   }
-  if (minutes > 460 && minutes < 500) {
+
+  if (minutes >= 420) {
     realScore = baseScore
     if (sleepGoalData == null) {}
     else if (sleepGoalData.isActive) {
       sleepGoalData.sleepStreakTotal += 1
       if (sleepGoalData.sleepStreakTotal == sleepGoalData.streakGoal) {
-        realScore += 2000
+        results.goalScore = sleepGoalData.scoreToGet
+        realScore += results.goalScore 
         results.isAchived = sleepGoalData.isAchived = true
         sleepGoalData.isActive = false 
       }
-      streakScore += streakScore * sleepGoalData.sleepStreakTotal
-      realScore += streakScore
     }
   }
   else {
@@ -169,17 +170,20 @@ async function saveScoreSleep(userId, minutes) {
       await sleepData.save()
       results.score = score.score
       results.totalScore = score.totalScore
+      results.achiveScore = sleepGoalData.scoreToGet
       results.streakTotal = sleepGoalData.sleepStreakTotal
       results.streakGoal = sleepGoalData.streakGoal
       return results
     })
   }
+
   else {
     return saveScore(userId, realScore).then(async (score) => {
       await sleepData.save()
       results.score = score.score
       results.totalScore = score.totalScore
       results.hasGoal = false
+      results.isActive = false
       return results
     })
   }
