@@ -8,23 +8,27 @@ async function createUserSleepData(userId, optionsData = {}) {
   .catch(() => {return 500})
 }
 
-async function setSleepGoal(userId, streakGoal, endDays = 7) {
+async function setSleepGoal(userId, sleepDays, endDays = 14) {
   const sleepData = await sleepDataModel.findOne({userId: userId})
   var sleepDataGoal = await sleepDataGoalModel.findOne({tableRef: sleepData._id})
                         .sort({setSleepGoalTime: -1})
+  console.log(sleepData)
+  console.log(sleepDataGoal)
   const today = new Date()
   const endDate = new Date(today)
   endDate.setDate(endDate.getDate() + endDays) 
 
   const goals = {
-    streakGoal: streakGoal,
+    streakGoal: sleepDays,
+    scoreToGet: 0,
     endDays: endDays,
     endGoalDate: endDate.toLocaleString()
   }
 
   const fields = {
     tableRef: sleepData._id,
-    streakGoal: streakGoal,
+    streakGoal: sleepDays,
+    scoreToGet: 0,
     endGoalTime: endDate
   }
 
@@ -36,6 +40,8 @@ async function setSleepGoal(userId, streakGoal, endDays = 7) {
       }
     }
   }
+
+  fields.scoreToGet = goals.scoreToGet = 3000 + ((sleepDays - 14) * 100)
 
   sleepDataGoal = new sleepDataGoalModel(fields)
 

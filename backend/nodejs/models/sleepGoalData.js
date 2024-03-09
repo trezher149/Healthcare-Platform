@@ -33,6 +33,10 @@ const sleepGoalDataSchema = new Schema({
   isActive: {
     type: Boolean,
     default: true
+  },
+  isRenew: {
+    type: Boolean,
+    default: false
   }
 },
 {

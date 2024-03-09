@@ -42,7 +42,7 @@ async function addLineId(userId, lineId) {
   const user = await userModel.findById(userId)
   console.log(user)
   if (user == null) {
-    return Promise.reject(401)
+    return Promise.reject(404)
   }
   user.is_line_user = true
   return lineModel.create({
@@ -65,7 +65,7 @@ async function getUserIdFromLineId(lineId) {
     return Promise.resolve(user.userId)
   }
   else {
-    return Promise.reject(400)
+    return Promise.reject(404)
   }
 }
 
