@@ -4,16 +4,19 @@
 
 from flask import Flask, request, abort
 from logging.config import dictConfig
-import ngrok, os, time, requests
+import ngrok, os, requests, json
 from dotenv import load_dotenv
-from io import BytesIO
-import usermodules as ump
-import random as rand
 from datetime import datetime
-from picture_proc import PictureProcess as PicProc
-from msg_create import MessageCreate
+import modules.usermodules as ump
+from modules.msg_create import MessageCreate, ResultMessage
+from modules.picture_proc import PictureProcess as PicProc
+from modules.goal_set import GoalSet
 
 load_dotenv()
+
+f = open("messages/msg_th.json")
+MSG_TH: dict= json.loads(f.read())
+f.close()
 
 CHANNEL_ACCESS_TOKEN = os.environ.get("CHANNEL_ACCESS_TOKEN")
 CHANNEL_SECRET = os.environ.get("CHANNEL_SECRET")
@@ -59,10 +62,11 @@ configuration = Configuration(access_token=CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(CHANNEL_SECRET)
 
 MessageCreate = MessageCreate()
+ResultMessage = ResultMessage()
 
 def date_format():
     today = datetime.now()
-    date_str = f"{today.day}{today.month}{today.year}-{today.hour}{today.minute}"
+    date_str = f"{today.day}-{today.month}-{today.year}_{today.hour}-{today.minute}-{today.second}"
     return date_str
 
 @app.route("/test", methods=["GET"])
@@ -91,62 +95,82 @@ def callback():
 @handler.add(MessageEvent, message=TextMessageContent)
 def handle_message(event):
     with ApiClient(configuration) as api_client:
+        app.logger.info(type(event))
         line_bot_api = MessagingApi(api_client)
-        if (event.message.text[0:2] == 'id'):
-            site_user_id = event.message.text[2:]
-            if len(site_user_id) < 8:
-                send_msg(line_bot_api, event, MessageCreate.default("$ User Id ต้องมี 8 ตัวนะคะ" ,
-                                                ["5ac21a18040ab15980c9b43e"],
-                                                ["063"]))
-                return 1
-            status_code = ump.add_user_id(USER_URL + "/addlineiduser", site_user_id, event.source.to_dict()['userId'])
-            if status_code == 200:
-                send_msg(line_bot_api, event, MessageCreate.default("ผูกบัญชี line กับบัญชีเรียบร้อยแล้วค่า~"))
-            elif status_code == 403:
-                send_msg(line_bot_api, event, MessageCreate.default("คุณได้ผูก line กับบัญชีของคุณแล้วนะคะ"))
-            elif status_code == 401:
-                send_msg(line_bot_api, event, MessageCreate.default("$ คุณยังไม่ได้สร้างบัญชีกับเว็บไซต์ของเรานะคะ\n" +
-                                                                "หลังจากสร้างบัญชีเสร็จ พิมพ์ id[id ผู้ใช้] โดยไม่มี \"[]\" ในไลน์นี้นะคะ",
-                                                                ["5ac21a18040ab15980c9b43e"],
-                                                                ["074"]))
-            return 0
-        send_msg(line_bot_api, event, MessageCreate.default("ขอโทษค่ะ หนูไม่รู้คำสั่งนี้นะคะ $$",
-                                                            ["5ac22a8c031a6752fb806d66", "5ac21a18040ab15980c9b43e"],
-                                                            ["035", "060"]))
+        message: list = event.message.text.split()
+        func_id: str = message[0]
+        line_id: str = event.source.to_dict()['userId']
+        site_user_id: str
+        match func_id:
+            case "id":
+                site_user_id = message[1]
+                if len(site_user_id) < 8:
+                    send_msg(line_bot_api, event, MessageCreate.default(MSG_TH["Err"]["InvalidId"]))
+                    return 1
+                status_code = ump.add_user_id(USER_URL + "/addlineiduser", site_user_id, line_id)
+                if status_code == 200:
+                    send_msg(line_bot_api, event, MessageCreate.default(MSG_TH["Confirmations"]["AddUserId"]))
+                elif status_code == 406:
+                    send_msg(line_bot_api, event, MessageCreate.default(MSG_TH["Confirmations"]["AlreadyAdded"]))
+                elif status_code == 404:
+                    send_msg(line_bot_api, event, MessageCreate.default(MSG_TH["UnregisteredUser"]))
+                return 0
+            case "set":
+                site_user_id, status_code = ump.get_user_id(URL, event.source.user_id)
+                if status_code == 404:
+                    send_msg(line_bot_api, event, MessageCreate.default(MSG_TH["UnregisteredUser"]))
+                    return 0
+                Goal = GoalSet(MSG_TH["SetGoals"])
+                goal: str = message[1]
+                match goal:
+                    case "cal":
+                        calories: int = int(message[2])
+                        if len(message) == 3:
+                            send_msg(line_bot_api, event, Goal.calories_goal(site_user_id, calories))
+                        else:
+                            send_msg(line_bot_api, event, Goal.calories_goal(site_user_id, calories, int(message[3])))
+                        return 0
+                    case "sleep":
+                        sleep_days: int = int(message[2])
+                        if len(message) == 3:
+                            send_msg(line_bot_api, event, Goal.sleep_goal(site_user_id, sleep_days))
+                        else:
+                            send_msg(line_bot_api, event, Goal.sleep_goal(site_user_id, sleep_days, int(message[3])))
+                        return 0
+                    case _:
+                        send_msg(line_bot_api, event, MessageCreate.default(MSG_TH["UnregisteredUser"]))
+                pass
+            case "show":
+                pass
+            case _:
+                send_msg(line_bot_api, event, MessageCreate.default(MSG_TH["Err"]["UnknownCommand"]))
                 
 
 @handler.add(MessageEvent, message=ImageMessageContent)
 def handle_image(event):
     with ApiClient(configuration) as api_client:
+        app.logger.info(type(event))
         line_bot_api = MessagingApi(api_client)
         picture_id = ""
-        user_id = ""
         try:
             picture_id = event.message.id
         except(KeyError):
             return
 
-        user_id = ump.get_user_id(URL, event.source.user_id)
-        if user_id == 400:
-            send_msg(line_bot_api, event, MessageCreate.default("$ คุณยังไม่ได้ผูกบัญชีกับบัญชีไลน์นะคะ\n" +
-                                                                "พิมพ์ id[id ผู้ใช้] โดยไม่มี \"[]\" ในไลน์นี้นะคะ",
-                                                                ["5ac21a18040ab15980c9b43e"],
-                                                                ["074"]))
+        user_id, status_code = ump.get_user_id(URL, event.source.user_id)
+        if status_code == 404:
+            send_msg(line_bot_api, event, MessageCreate.default(MSG_TH["UnregisteredUser"]))
             return 1
         headers = {'Authorization': 'Bearer {' + f'{CHANNEL_ACCESS_TOKEN}' + '}'}
         binary = requests.get(f'https://api-data.line.me/v2/bot/message/{picture_id}/content', headers=headers)
 
-        picproc = PicProc(binary.content, f"{IMAGE_LOCATION}/{user_id}", date_format())
+        picproc = PicProc(binary.content, f"{IMAGE_LOCATION}/{user_id}", date_format(), user_id)
         if picproc.check_file_match(user_id):
-            send_msg(line_bot_api, event, MessageCreate.default("$ ขอโทษค่ะ ลงรูปที่ซ้ำกันไม่ได้นะคะ $" ,
-                                                ["5ac21a18040ab15980c9b43e", "5ac22a8c031a6752fb806d66"],
-                                                ["063", "036"]))
+            send_msg(line_bot_api, event, MessageCreate.default(MSG_TH["Err"]["SamePicture"]))
             return 1
         types, values = picproc.read_image()
         if len(types) == 0:
-            send_msg(line_bot_api, event, MessageCreate.default("$ ขอโทษค่ะ ไม่พบค่าในหน้าจอสมาร์ทวอทช์หรืออ่านค่าไม่ได้ >< $" ,
-                                                ["5ac21a18040ab15980c9b43e", "5ac22a8c031a6752fb806d66"],
-                                                ["063", "036"]))
+            send_msg(line_bot_api, event, MessageCreate.default(MSG_TH["Err"]["ValueNotFound"]))
             return 1
         msgs = []
         cal_data: dict
@@ -155,24 +179,35 @@ def handle_image(event):
         for t in types:
             match t:
                 case 'cal':
-                    cal_data = ump.send_calories(URL, event.source.to_dict()['userId'], values[i])
+                    cal_data, status_code = ump.send_calories(URL, user_id, values[i])
                     app.logger.info(cal_data)
-                    if cal_data != int:
-                        send_msg(line_bot_api, event, MessageCreate.calories(cal_data))
+                    send_msg(line_bot_api, event, ResultMessage.calories(cal_data, MSG_TH["PictureData"]))
+                    app.logger.info("message send...")
                 case 'sleep':
+                    sleep_data, status_code = ump.send_sleep(URL, user_id, values[i])
+                    app.logger.info(cal_data)
+                    send_msg(line_bot_api, event, ResultMessage.sleep(cal_data, MSG_TH["PictureData"]))
+                    app.logger.info("message send...")
                     pass
             i += 1
-        if cal_data == 400 or sleep_data == "400":
-            app.logger.info(cal_data)
-            send_msg(line_bot_api, event, MessageCreate.default("$ คุณยังไม่ได้สร้างบัญชีกับเว็บไซต์ของเรานะคะ\n" +
-                                                                "หลังจากสร้างบัญชีเสร็จ พิมพ์ id[id ผู้ใช้] โดยไม่มี \"[]\" ในไลน์นี้นะคะ",
-                                                                ["5ac21a18040ab15980c9b43e"],
-                                                                ["074"]))
-        else:
-            picproc.save_image()
+        #if cal_data == 400 or sleep_data == "400":
+        #    app.logger.info(cal_data)
+        #    send_msg(line_bot_api, event, MessageCreate.default("$ คุณยังไม่ได้สร้างบัญชีกับเว็บไซต์ของเรานะคะ\n" +
+        #                                                        "หลังจากสร้างบัญชีเสร็จ พิมพ์ id[id ผู้ใช้] โดยไม่มี \"[]\" ในไลน์นี้นะคะ",
+        #                                                        ["5ac21a18040ab15980c9b43e"],
+        #                                                        ["074"]))
+        #else:
+        #    app.logger.info("saving picture...")
+        #    picproc.save_image()
+        app.logger.info("saving picture...")
+        picproc.save_image()
 
 def send_msg(api, event, msg_create):
+    app.logger.info(type(api))
+    app.logger.info(type(event))
     msg, emojis = msg_create
+    app.logger.info(msg)
+    app.logger.info(emojis)
     if len(emojis) == 0:
         api.reply_message_with_http_info(
             ReplyMessageRequest(
@@ -181,8 +216,6 @@ def send_msg(api, event, msg_create):
             )
         )
     else:
-        app.logger.info(msg)
-        app.logger.info(emojis)
         api.reply_message_with_http_info(
             ReplyMessageRequest(
                 reply_token=event.reply_token,
