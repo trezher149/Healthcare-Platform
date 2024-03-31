@@ -7,7 +7,6 @@ const sleepGoalDataModel = require('../../models/sleepGoalData')
 
 async function saveScore(userId, realScore) {
   const scoreData = await scoreDataModel.findOne({userId: userId})
-  console.log(scoreData)
   const today = new Date()
   var latestDate = undefined
   if (scoreData == null) {
@@ -17,7 +16,6 @@ async function saveScore(userId, realScore) {
   }
   var scoreSeriesData = await scoreSeriesDataModel
     .findOne({tableRef: scoreData._id}).sort({timestamp: -1})
-  console.log(scoreSeriesData)
   if (scoreSeriesData != null) {
     latestDate = scoreSeriesData.timestamp
     console.log(latestDate.toLocaleString())
@@ -29,37 +27,33 @@ async function saveScore(userId, realScore) {
       score: realScore
     })
   }
-  else if (today.getDay() == latestDate.getDay()) {
-    scoreSeriesData.score += realScore 
+  else if (today.getDate() == latestDate.getDate()) {
+    scoreSeriesData.score += realScore
     scoreSeriesData.timestamp = today
   }
-  else {
-    scoreSeriesData = new scoreSeriesDataModel({
-      tableRef: scoreData._id,
-      score: realScore
-    })
-  }
-  scoreData.totalScore += realScore
+
   const scoreResult = {
     score: realScore,
     totalScore: scoreSeriesData.score
   }
+  scoreData.totalScore += realScore
   return scoreSeriesData.save().then(() => {
     return scoreData.save()
   }).then(() => {return scoreResult})
   .catch(() => {return 500})
 }
 
-async function saveScoreCalories(userId, calories) {
+async function saveScoreCalories(userId, calories, oldCalories, isSameDate) {
   const baseScore = 100
-  var realScore = 0
   const caloriesData = await caloriesDataModel.findOne({userId: userId})
   const sedentary = Math.round(caloriesData.bmr * 0.2)
   const today = Date.now()
-  if (calories <= sedentary) {
-    realScore = Math.round(calories / sedentary * baseScore) 
-  }
-  else {realScore = baseScore + Math.round(calories * 0.2)}
+  var newScore = (calories <= sedentary) ? Math.round(calories / sedentary * baseScore) :
+                  baseScore + Math.round(calories * 0.2)
+  var oldScore = (oldCalories <= sedentary) ? Math.round(oldCalories / sedentary * baseScore) :
+                  baseScore + Math.round(oldCalories * 0.2)
+  
+  newScore -= oldScore
 
   const caloriesGoal = await caloriesGoalModel.findOne({tableRef: caloriesData._id})
                       .sort({setCaloriesGoalTime: -1})
@@ -75,7 +69,7 @@ async function saveScoreCalories(userId, calories) {
   }
   console.log(caloriesGoal == null)
   if (caloriesGoal == null) {
-    return saveScore(userId, realScore).then((score) => {
+    return saveScore(userId, newScore).then((score) => {
       results.score = score.score
       results.totalScore = score.totalScore
       results.hasGoal = false
@@ -89,7 +83,7 @@ async function saveScoreCalories(userId, calories) {
     results.isActive = caloriesGoal.isActive = false
     await caloriesGoal.save()
     await caloriesGoalModel.create({tableRef: caloriesData._id, isRenew: true})
-    return saveScore(userId, realScore).then(async (score) => {
+    return saveScore(userId, newScore).then(async (score) => {
       await caloriesDataGoal.save()
       results.score = score.score
       results.totalScore = score.totalScore
@@ -99,7 +93,7 @@ async function saveScoreCalories(userId, calories) {
   if (!caloriesGoal.isAchived) {
     caloriesGoal.caloriesTotal += calories
     if (caloriesGoal.caloriesTotal >= caloriesGoal.caloriesGoal) {
-      realScore += caloriesGoal.scoreToGet
+      newScore += caloriesGoal.scoreToGet
       results.achiveScore = caloriesGoal.scoreToGet
       results.isAchived = caloriesGoal.isAchived = true
     }
@@ -117,7 +111,7 @@ async function saveScoreCalories(userId, calories) {
     else { results.caloriesGoal = caloriesGoal.caloriesGoal }
   }
   
-  return saveScore(userId, realScore).then(async (score) => {
+  return saveScore(userId, newScore).then(async (score) => {
     await caloriesGoal.save()
     results.score = score.score
     results.totalScore = score.totalScore
