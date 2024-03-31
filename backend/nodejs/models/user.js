@@ -13,10 +13,11 @@ const userSchema = new Schema({
   },
   password: {
     type: String,
-    required: true
+    required: true,
   },
   email: {
     type: String,
+    lowercase: true,
     required: true
   },
   is_line_user: {
