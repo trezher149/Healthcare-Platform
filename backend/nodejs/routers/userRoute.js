@@ -8,18 +8,18 @@ const {createUserSleepData} = require('../controllers/staticData/sleepController
 const createScoreTable = require('../controllers/staticData/scoreController')
 const mongodbName = process.env.MONGODB_ADMINUSERNAME
 const mongodbPasswd = process.env.MONGODB_ADMINPASSWD
-const dbName = process.env.MONGODB_NAME
+const mongoDockerName = process.env.MONGODB_NAME
+
+
 
 router.post('/adduser', async (req, res) => { 
-  mongoose.connect(`mongodb://${mongodbName}:${mongodbPasswd}@${dbName}:27017/`)
+  mongoose.connect(`mongodb://${mongodbName}:${mongodbPasswd}@${mongoDockerName}:27017/`)
   createUser(req.body.email, req.body.name, req.body.password, req.body.healthData)
   .then(async (userId) => {
       return createUserCaloriesData(userId, req.body.healthData)
       .then(() => {return userId}).catch(() => {return Promise.reject(500)})
-    }
-  ).then((userId) => {
-    return createUserSleepData(userId)
-  })
+    })
+  .then((userId) => { return createUserSleepData(userId) })
   .then((userId) => {
     console.log(userId)
     return createScoreTable(userId)
@@ -44,14 +44,14 @@ router.post('/adduser', async (req, res) => {
 })
 
 router.post('/addlineiduser', (req, res) => {
-  mongoose.connect(`mongodb://${mongodbName}:${mongodbPasswd}@${dbName}:27017/`)
+  mongoose.connect(`mongodb://${mongodbName}:${mongodbPasswd}@${mongoDockerName}:27017/`)
   addLineId(req.body.userId, req.body.lineId)
   .then((status) => res.sendStatus(status))
   .catch((reject) => res.sendStatus(reject))
 })
 
 router.post('/showuserdata', (req, res) => {
-  mongoose.connect(`mongodb://${mongodbName}:${mongodbPasswd}@${dbName}:27017/`)
+  mongoose.connect(`mongodb://${mongodbName}:${mongodbPasswd}@${mongoDockerName}:27017/`)
   getUserData(req.body.userId)
   .then(
     (userData) => {
@@ -74,7 +74,7 @@ router.post('/showuserdata', (req, res) => {
 })
 
 router.post('/getuseridfromlineid', (req, res) => {
-  mongoose.connect(`mongodb://${mongodbName}:${mongodbPasswd}@${dbName}:27017/`)
+  mongoose.connect(`mongodb://${mongodbName}:${mongodbPasswd}@${mongoDockerName}:27017/`)
   getUserIdFromLineId(req.body.lineId)
   .then((userId) => res.json({userId: userId}))
   .catch((reject) => res.sendStatus(reject))
