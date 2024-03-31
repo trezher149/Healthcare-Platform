@@ -1,6 +1,8 @@
 backend/linebotImg/.venv/**
 backend/nodejs/node_modules/**
+backend/nodejs/package-lock.json
 backend/linebotImg/pictures_byte/**
+backend/linebotImg/.EasyOCR
 frontend/**/.vscode/**
 frontend/vite_test/**
 frontend/**/node_modules/**
