@@ -1,7 +1,7 @@
 import calendar
 import random
 
-class MessageCreate:
+class EmojiManager:
 
     def emoji_jsonfied(self, index, prodId, emojiId):
         emoji = {}
@@ -34,6 +34,8 @@ class MessageCreate:
                 i += 1
         return emojis
 
+class DefaultMessage(EmojiManager):
+
     def default(self, msgs: dict, index_init = 0):
         index = index_init
         text = ""
@@ -41,7 +43,8 @@ class MessageCreate:
             for msg in msgs:
                 text += msg
         else: text = msgs["Message"]
-        
+
+        #If message doesn't have emoji(s) 
         if "Emoji" not in msgs:
             return text, []
 
@@ -50,11 +53,9 @@ class MessageCreate:
         else:
             emojis = self.create_emoji(text, msgs["ProductId"], msgs["Emoji"], index)
         return text, emojis
-        
-    def score(self, data: dict, msgs: dict, index_init = 0):
-        index = index_init
 
-class ResultMessage(MessageCreate):
+
+class ResultMessage(EmojiManager):
 
     def calories(self, data: dict, msgs: dict, index_init = 0):
         index = index_init
@@ -78,6 +79,18 @@ class ResultMessage(MessageCreate):
         emoji_ids.append(msgs["CaloriesGoal"]["Complete"]["Emoji"])
         text += msgs["Score"]["Total"]["Message"].format(data["totalScore"])
         emojis.extend(self.create_emoji(text, product_id, emoji_ids, index))
+        return text, emojis
+    
+    def calories_arr(self, data_arr: list[dict]):
+        text = ""
+        emojis = []
+        offset = 0
+        for item in data_arr:
+            text += "$ " + item["timestamp"] + "\n"
+            text += f"{item['calories']:,} กิโลแคลอรี่\n\n"
+            emojis.extend(self.create_emoji(text, "5ac21a18040ab15980c9b43e", ["129"], offset))
+            offset = len(text)
+        text = text[:len(text) - 2]
         return text, emojis
     
     def sleep(self, data: dict, msgs: dict, index_init = 0):
@@ -104,7 +117,24 @@ class ResultMessage(MessageCreate):
         emojis.extend(self.create_emoji(text, product_id, emoji_ids, index))
         return text, emojis
 
-class GoalSetMessage(MessageCreate):
+    def sleep_arr(self, data_arr: list[dict]):
+        text = ""
+        emojis = []
+        offset = 0
+        for item in data_arr:
+            text += "$ " + item["timestamp"] + "\n"
+            hour = int(item["sleepDuration"]) // 60
+            minute = int(item["sleepDuration"]) % 60
+            if minute == 0:
+                text += f"{hour} ชั่วโมง\n\n"
+            else:
+                text += f"{hour} ชั่วโมง {minute} นาที\n\n"
+            emojis.extend(self.create_emoji(text, "5ac21a18040ab15980c9b43e", ["129"], offset))
+            offset = len(text)
+        text = text[:len(text) - 2]
+        return text, emojis
+
+class GoalSetMessage(EmojiManager):
 
     def date_format(self, text: str, end_goal_time: str, end_days: int) -> str:
         date: list = end_goal_time.split(",")[0].split("/")
@@ -134,4 +164,15 @@ class GoalSetMessage(MessageCreate):
         rand_msg = msgs["RandomMessages"][random.randint(0, 2)]
         text += rand_msg["Message"]
         emojis.extend(self.create_emoji(text, rand_msg["ProductId"], [rand_msg["Emoji"]], index))
+        return text, emojis
+
+class HelpMessage(EmojiManager):
+
+    def general_msg(self, msgs: dict, prod_id: str, emoji_id: str):
+        index = 0
+        emojis = []
+        text: str = msgs["Title"]
+        emojis.extend(self.create_emoji(text, prod_id, [emoji_id], index))
+        for msg in msgs["MessageList"]:
+            text += msg
         return text, emojis
