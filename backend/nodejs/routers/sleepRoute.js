@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const mongoose = require('mongoose')
-const { updateSleep, getSleepData } = require('../controllers/seriesData/sleepController')
+const { updateSleep, getSleepSeriesData } = require('../controllers/seriesData/sleepController')
 const { setSleepGoal } = require('../controllers/staticData/sleepController')
 
 const mongodbName = process.env.MONGODB_ADMINUSERNAME
@@ -11,21 +11,15 @@ const dbName = process.env.MONGODB_NAME
 router.post('/updateSleep', (req, res) => {
   mongoose.connect(`mongodb://${mongodbName}:${mongodbPasswd}@${dbName}:27017/`)
   updateSleep(req.body.userId, req.body.sleepDur)
-  .then((score) => res.json({score: score}))
-  .catch((reject) => res.sendStatus(reject))
+  .then(scoreData => res.json(scoreData))
+  .catch(errCode => res.sendStatus(errCode))
 })
 
 router.post('/getSleep', (req, res) => {
   mongoose.connect(`mongodb://${mongodbName}:${mongodbPasswd}@${dbName}:27017/`)
-  getSleepData(req.body.userId)
-  .then(
-    (series) => {
-      res.json({
-        userId: "userId",
-        series: series
-      })
-    }
-  )
+  getSleepSeriesData(req.body.userId, req.body.lengthDays)
+  .then(sleepData => res.json(sleepData))
+  .catch(errCode => res.sendStatus(errCode))
 })
 
 router.post('/setSleepGoal', (req, res) => {
