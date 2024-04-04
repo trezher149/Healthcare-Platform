@@ -6,7 +6,9 @@ const sleepDataModel = require('../../models/sleepData')
 const sleepGoalDataModel = require('../../models/sleepGoalData')
 
 async function saveScore(userId, realScore) {
-  const scoreData = await scoreDataModel.findOne({userId: userId})
+  //Change later
+  const sD = scoreDataModel.findOne({userId: userId})
+  const scoreData = await sD
   const today = new Date()
   var latestDate = undefined
   if (scoreData == null) {
@@ -67,7 +69,6 @@ async function saveScoreCalories(userId, calories, oldCalories, isSameDate) {
     isAchived: false,
     isActive: true
   }
-  console.log(caloriesGoal == null)
   if (caloriesGoal == null) {
     return saveScore(userId, newScore).then((score) => {
       results.score = score.score
