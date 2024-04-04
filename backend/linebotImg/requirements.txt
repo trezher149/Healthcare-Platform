@@ -6,9 +6,11 @@ async-timeout==4.0.3
 attrs==23.1.0
 blinker==1.6.3
 certifi==2023.7.22
+cffi==1.16.0
 charset-normalizer==3.3.1
 click==8.1.7
 contourpy==1.2.0
+cryptography==42.0.5
 cycler==0.12.1
 Deprecated==1.2.14
 easyocr==1.7.1
@@ -23,6 +25,7 @@ idna==3.4
 imageio==2.34.0
 itsdangerous==2.1.2
 Jinja2==3.1.2
+JSPy==1.0.0
 kiwisolver==1.4.5
 lazy_loader==0.3
 line-bot-sdk==3.5.0
@@ -54,8 +57,10 @@ pillow==10.2.0
 psutil==5.9.8
 py-cpuinfo==9.0.0
 pyclipper==1.3.0.post5
+pycparser==2.22
 pydantic==2.4.2
 pydantic_core==2.10.1
+PyJWT==2.8.0
 pyngrok==7.0.0
 pyparsing==3.1.2
 python-bidi==0.4.2

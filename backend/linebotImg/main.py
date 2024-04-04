@@ -203,10 +203,13 @@ def handle_image(event):
         try:
             picture_id = event.message.id
         except(KeyError):
-            return
+            return 0
 
         #Check if user register with line
-        user_id, status_code = um.get_user_id(URL, event.source.user_id)
+        try:
+            user_id, status_code = um.get_user_id(URL, event.source.user_id)
+        except:
+            return 0
         if status_code == 404:
             send_msg(line_bot_api, event, DefaultMessage.default(MSG_TH["UnregisteredUser"]))
             return 0
@@ -218,7 +221,7 @@ def handle_image(event):
         #Check if the image is the same as previous one
         if picproc.check_file_match(user_id):
             send_msg(line_bot_api, event, DefaultMessage.default(MSG_TH["Err"]["SamePicture"]))
-            return 1
+            return 0
         
         #Image is being processed
         #send_msg(line_bot_api, event, DefaultMessage.default(MSG_TH["Confirmations"]["Uploaded"]))
