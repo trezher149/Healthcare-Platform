@@ -8,3 +8,4 @@ frontend/vite_test/**
 frontend/**/node_modules/**
 **/*.env
 **.pem
+backend/db
