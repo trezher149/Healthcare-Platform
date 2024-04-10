@@ -18,6 +18,8 @@ services:
       - ./backend/.env
     ports:
       - "27017:27017"
+    volumes:
+      - "./backend/db:/var/lib/mongodb"
   #Line-bot
   waiter:
     container_name: "waiter"
