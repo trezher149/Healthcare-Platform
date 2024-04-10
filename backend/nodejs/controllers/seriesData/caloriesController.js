@@ -7,7 +7,6 @@ async function updateCalories(userId, calories){
   const tableRef = caloriesData._id
   const today = new Date()
   var calData = undefined
-  var sameDate = false
   var oldCalories = 0
   const recentCalData = await caloriesSeriesDataModel.findOne({tableRef: tableRef}).sort({timestamp:-1})
 
@@ -26,7 +25,6 @@ async function updateCalories(userId, calories){
         caloriesData.caloriesTotal = (caloriesData.caloriesTotal - oldCalories) + calories
       }
       else { return Promise.reject(406) }
-      sameDate = true
       calData = recentCalData
     }
     else {
@@ -40,7 +38,7 @@ async function updateCalories(userId, calories){
 
   return calData.save().then(async () => {
     await caloriesData.save()
-    return saveScoreCalories(userId, calories, oldCalories, sameDate)
+    return saveScoreCalories(userId, calories, oldCalories)
   })
   .then((score) => {return score})
   .catch(() => {return Promise.reject(500)})

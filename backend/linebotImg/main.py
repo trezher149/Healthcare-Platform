@@ -4,7 +4,7 @@
 
 from flask import Flask, request, abort
 from logging.config import dictConfig
-import ngrok, os, requests, json
+import ngrok, os, requests, json, time
 from dotenv import load_dotenv
 from datetime import datetime
 import modules.usermodules as um
@@ -188,7 +188,7 @@ def handle_message(event):
                                                                             help_msgs["ProductId"],
                                                                             help_msgs["Emoji"]))
                     case _:
-                        send_msg(line_bot_api, event, (help_msgs["UnknownCommand"], []))
+                        send_msg(line_bot_api, event, DefaultMessage.default(help_msgs["UnknownCommand"]))
             case _:
                 send_msg(line_bot_api, event, DefaultMessage.default(MSG_TH["Err"]["UnknownCommand"]))
 
@@ -203,10 +203,13 @@ def handle_image(event):
         try:
             picture_id = event.message.id
         except(KeyError):
-            return
+            return 0
 
         #Check if user register with line
-        user_id, status_code = um.get_user_id(URL, event.source.user_id)
+        try:
+            user_id, status_code = um.get_user_id(URL, event.source.user_id)
+        except:
+            return 0
         if status_code == 404:
             send_msg(line_bot_api, event, DefaultMessage.default(MSG_TH["UnregisteredUser"]))
             return 0
@@ -218,7 +221,7 @@ def handle_image(event):
         #Check if the image is the same as previous one
         if picproc.check_file_match(user_id):
             send_msg(line_bot_api, event, DefaultMessage.default(MSG_TH["Err"]["SamePicture"]))
-            return 1
+            return 0
         
         #Image is being processed
         #send_msg(line_bot_api, event, DefaultMessage.default(MSG_TH["Confirmations"]["Uploaded"]))
@@ -228,31 +231,41 @@ def handle_image(event):
             return 1
         
         #Send result back to user
-        msgs = []
         cal_data: dict
         sleep_data: dict
         i = 0
+        txt_msgs = []
         for t in types:
             match t:
                 case 'cal':
                     cal_data, status_code = um.send_calories(URL, user_id, values[i])
-                    app.logger.info(cal_data)
                     match status_code:
                         case 200:
-                            send_msg(line_bot_api, event, ResultMessage.calories(cal_data, MSG_TH["PictureData"]))
+                            # send_msg(line_bot_api, event, ResultMessage.calories(cal_data, MSG_TH["PictureData"]))
+                            text, emojis = ResultMessage.calories(cal_data, MSG_TH["PictureData"])
+                            txt_msgs.append(TextMessage(text=text, emojis=emojis))
                         case 403:
-                            send_msg(line_bot_api, event, ("", []))
                             pass
+                        case 406:
+                            text, emojis = DefaultMessage.default(MSG_TH["PictureData"]["Err"]["CaloriesSameOrLess"])
+                            txt_msgs.append(TextMessage(text=text, emojis=emojis))
+                            send_msg(line_bot_api, event, DefaultMessage.default(
+                                MSG_TH["PictureData"]["Err"]["CaloriesSameOrLess"]
+                                ))
                 case 'sleep':
                     sleep_data, status_code = um.send_sleep(URL, user_id, values[i])
-                    app.logger.info(sleep_data)
                     match status_code:
                         case 200:
-                            send_msg(line_bot_api, event, ResultMessage.sleep(sleep_data, MSG_TH["PictureData"]))
+                            text, emojis = ResultMessage.sleep(sleep_data, MSG_TH["PictureData"])
+                            txt_msgs.append(TextMessage(text=text, emojis=emojis))
                         case 403:
                             pass
+                        case 406:
+                            text, emojis = DefaultMessage.default(MSG_TH["PictureData"]["Err"]["SleepSent"])
+                            txt_msgs.append(TextMessage(text=text, emojis=emojis))
             i += 1
-        
+            time.sleep(1)
+        send_msg_obj(line_bot_api, event, txt_msgs) 
         #Save image for checking match image next time
         app.logger.info("saving picture...")
         picproc.save_image()
@@ -276,6 +289,15 @@ def send_msg(api, event, msg_create):
                 messages=[TextMessage(text=msg, emojis=emojis)]
             )
         )
+
+def send_msg_obj(api, event, txt_msg):
+    api.reply_message_with_http_info(
+        ReplyMessageRequest(
+            reply_token=event.reply_token,
+            messages=txt_msg
+        )
+    )
+
 
 def emoji_create(index, prodId, emojiId):
     emoji = {}

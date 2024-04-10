@@ -3,29 +3,46 @@ const router = express.Router()
 const mongoose = require('mongoose')
 const { updateSleep, getSleepSeriesData } = require('../controllers/seriesData/sleepController')
 const { setSleepGoal } = require('../controllers/staticData/sleepController')
+const tokenManager = require('./tokenManager')
 
 const mongodbName = process.env.MONGODB_ADMINUSERNAME
 const mongodbPasswd = process.env.MONGODB_ADMINPASSWD
-const dbName = process.env.MONGODB_NAME
+const mongoServerName = process.env.MONGODB_NAME
+const mongodbPort = process.env.MONGODB_PORT
+
+const mongodbURI = process.env.MONGODB_ATLAS_NAME ? process.env.MONGODB_ATLAS_NAME : 
+                    `mongodb://${mongodbName}:${mongodbPasswd}@${mongoServerName}:${mongodbPort}/`
 
 router.post('/updateSleep', (req, res) => {
-  mongoose.connect(`mongodb://${mongodbName}:${mongodbPasswd}@${dbName}:27017/`)
-  updateSleep(req.body.userId, req.body.sleepDur)
-  .then(scoreData => res.json(scoreData))
+  const auth_header = req.headers.authorization
+  const decoded = tokenManager.headerTokenDecode("linebot-public.pem", auth_header)
+  mongoose.connect(mongodbURI)
+  updateSleep(decoded.userId, req.body.sleepDur)
+  .then((scoreData) => {
+    const encoded = tokenManager.generateToken("backend-private.pem", scoreData)
+    res.json({payload: encoded})
+  })
   .catch(errCode => res.sendStatus(errCode))
 })
 
 router.post('/getSleep', (req, res) => {
-  mongoose.connect(`mongodb://${mongodbName}:${mongodbPasswd}@${dbName}:27017/`)
-  getSleepSeriesData(req.body.userId, req.body.lengthDays)
-  .then(sleepData => res.json(sleepData))
+  const auth_header = req.headers.authorization
+  const decoded = tokenManager.headerTokenDecode("linebot-public.pem", auth_header)
+  mongoose.connect(mongodbURI)
+  getSleepSeriesData(decoded.userId, req.body.lengthDays)
+  .then((data) => {
+    const encoded = tokenManager.generateToken("backend-private.pem", {data})
+    res.json({payload: encoded})
+  })
   .catch(errCode => res.sendStatus(errCode))
 })
 
 router.post('/setSleepGoal', (req, res) => {
-  mongoose.connect(`mongodb://${mongodbName}:${mongodbPasswd}@${dbName}:27017/`)
-  setSleepGoal(req.body.userId, req.body.sleepDays, req.body.endDays)
-  .then((obj) => res.json(obj) )
+  const auth_header = req.headers.authorization
+  const decoded = tokenManager.headerTokenDecode("linebot-public.pem", auth_header)
+  mongoose.connect(mongodbURI)
+  setSleepGoal(decoded.userId, req.body.sleepDays, req.body.endDays)
+  .then((goalData) => res.json(goalData) )
   .catch((status) => res.sendStatus(status))
 })
 

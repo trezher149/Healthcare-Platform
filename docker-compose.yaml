@@ -4,7 +4,6 @@ services:
   cheffy:
     container_name: "cheffy"
     build: ./backend/nodejs/.
-    restart: always
     ports:
       - "14000:14000"
     env_file:
@@ -19,6 +18,8 @@ services:
       - ./backend/.env
     ports:
       - "27017:27017"
+    volumes:
+      - "./backend/db:/var/lib/mongodb"
   #Line-bot
   waiter:
     container_name: "waiter"
@@ -29,5 +30,7 @@ services:
       - "12777:12777"
     volumes:
       - "./backend/linebotImg/pictures_byte:/usr/src/app/pictures_byte"
+      - "./backend/linebotImg/messages:/usr/src/app/messages"
+      - "./backend/linebotImg/.EasyOCR:/root/.EasyOCR"
   # #Frontend
   # cuisine:

@@ -3,12 +3,15 @@ const userHealthData = require('../../models/userHealthData')
 const lineModel = require('../../models/lineUser')
 
 async function createUser(email, name, password, healthData){
-  var checkExist = [false, false] //[email, username]
+  const checkExist = {
+    foundSameUsername: false,
+    foundSameEmail: false
+  }
   await userModel.findOne({username: name})
-  .then((result) => {checkExist[1] = (result != null) ? true:false})
+  .then((result) => {checkExist.foundSameUsername = (result != null) ? true:false})
   await userModel.findOne({email: email})
-  .then((result) => {checkExist[0] = (result != null) ? true:false})
-  if (checkExist[0] || checkExist[1] ){
+  .then((result) => {checkExist.foundSameEmail = (result != null) ? true:false})
+  if (checkExist.foundSameUsername || checkExist.foundSameEmail ){
       return Promise.reject(checkExist)
   }
   const newUser = new userModel({
@@ -31,16 +34,11 @@ async function createUser(email, name, password, healthData){
 }
 
 async function addLineId(userId, lineId) {
-  console.log(userId)
-  console.log(typeof(userId))
-  console.log(lineId)
   if (await lineModel.findOne({userId: userId}) != null) {
     console.log('Rejected')
     return Promise.reject(406)
   }
-  console.log('Creating...')
   const user = await userModel.findById(userId)
-  console.log(user)
   if (user == null) {
     return Promise.reject(404)
   }
@@ -53,9 +51,9 @@ async function addLineId(userId, lineId) {
 }
 
 async function getUserData(userId) {
-  const user = await userModel.findOne({_id: userId}).lean()
-  const userHealth = await userHealthData.findOne({userId: userId}).lean()
-  return Promise.resolve([user, userHealth])
+  const user = userModel.findOne({_id: userId}).lean()
+  const userHealth = userHealthData.findOne({userId: userId}).lean()
+  return Promise.resolve([await user.lean(), await userHealth.lean()])
 }
 
 async function getUserIdFromLineId(lineId) {

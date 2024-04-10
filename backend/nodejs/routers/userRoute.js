@@ -6,37 +6,37 @@ const { createUser, getUserData, addLineId,
 const {createUserCaloriesData} = require('../controllers/staticData/caloriesController')
 const {createUserSleepData} = require('../controllers/staticData/sleepController')
 const createScoreTable = require('../controllers/staticData/scoreController')
+const tokenManager = require('./tokenManager')
+
 const mongodbName = process.env.MONGODB_ADMINUSERNAME
 const mongodbPasswd = process.env.MONGODB_ADMINPASSWD
-const mongoDockerName = process.env.MONGODB_NAME
+const mongoServerName = process.env.MONGODB_NAME
+const mongodbPort = process.env.MONGODB_PORT
 
-
+const mongodbURI = process.env.MONGODB_ATLAS_NAME ? process.env.MONGODB_ATLAS_NAME : 
+                    `mongodb://${mongodbName}:${mongodbPasswd}@${mongoServerName}:${mongodbPort}/`
 
 router.post('/adduser', async (req, res) => { 
-  mongoose.connect(`mongodb://${mongodbName}:${mongodbPasswd}@${mongoDockerName}:27017/`)
-  createUser(req.body.email, req.body.name, req.body.password, req.body.healthData)
+  const decoded = tokenManager.tokenDecode("web-public.pem", req.body.payload)
+  mongoose.connect(mongodbURI)
+  createUser(decoded.email, decoded.name, decoded.password, decoded.healthData)
   .then(async (userId) => {
       return createUserCaloriesData(userId, req.body.healthData)
       .then(() => {return userId}).catch(() => {return Promise.reject(500)})
     })
   .then((userId) => { return createUserSleepData(userId) })
   .then((userId) => {
-    console.log(userId)
     return createScoreTable(userId)
   })
-  .then((userId) => { res.json({userId: userId}) })
+  .then((userId) => {
+    res.setHeader("Authorization", tokenManager.generateBearer("backend-private.pub", {userId: userId}))
+    res.send()
+  })
   .catch((reject) => {
       if (typeof reject != "object") {
         return Promise.reject(reject)
       }
-      let errMsg = {err_email:"",err_name:""}
-      if (reject[0]) {
-        errMsg.err_email = "อีเมลนี้ถูกใช้งานแล้ว"
-      }
-      if (reject[1]) {
-        errMsg.err_name = "ชื่อผู้ใช้นี้ถูกใช้งานแล้ว"
-      }
-      res.status(406).json(errMsg)
+      res.status(406).json(reject)
     }
   ).catch((status) => {
     res.sendStatus(status)
@@ -44,15 +44,17 @@ router.post('/adduser', async (req, res) => {
 })
 
 router.post('/addlineiduser', (req, res) => {
-  mongoose.connect(`mongodb://${mongodbName}:${mongodbPasswd}@${mongoDockerName}:27017/`)
-  addLineId(req.body.userId, req.body.lineId)
+  const decoded = tokenManager.headerTokenDecode("linebot-public.pem", req.headers.authorization)
+  mongoose.connect(mongodbURI)
+  addLineId(decoded.userId, decoded.lineId)
   .then((status) => res.sendStatus(status))
   .catch((reject) => res.sendStatus(reject))
 })
 
 router.post('/showuserdata', (req, res) => {
-  mongoose.connect(`mongodb://${mongodbName}:${mongodbPasswd}@${mongoDockerName}:27017/`)
-  getUserData(req.body.userId)
+  const decoded = tokenManager.headerTokenDecode("web-public.pem", req.headers.authorization)
+  mongoose.connect(mongodbURI)
+  getUserData(decoded.userId)
   .then(
     (userData) => {
       console.log(userData[0])
@@ -74,9 +76,15 @@ router.post('/showuserdata', (req, res) => {
 })
 
 router.post('/getuseridfromlineid', (req, res) => {
-  mongoose.connect(`mongodb://${mongodbName}:${mongodbPasswd}@${mongoDockerName}:27017/`)
-  getUserIdFromLineId(req.body.lineId)
-  .then((userId) => res.json({userId: userId}))
+  const decoded = tokenManager.headerTokenDecode("linebot-public.pem", req.headers.authorization)
+  console.log(decoded)
+  mongoose.connect(mongodbURI)
+  getUserIdFromLineId(decoded.lineId)
+  .then((userId) => {
+    const bearer = tokenManager.generateBearer("backend-private.pem", {userId: userId})
+    res.setHeader("Authorization", bearer)
+    res.send()
+  })
   .catch((reject) => res.sendStatus(reject))
 })
 
