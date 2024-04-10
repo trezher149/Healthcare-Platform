@@ -7,8 +7,7 @@ const sleepGoalDataModel = require('../../models/sleepGoalData')
 
 async function saveScore(userId, realScore) {
   //Change later
-  const sD = scoreDataModel.findOne({userId: userId})
-  const scoreData = await sD
+  const scoreData = await scoreDataModel.findOne({userId: userId})
   const today = new Date()
   var latestDate = undefined
   if (scoreData == null) {
@@ -18,18 +17,28 @@ async function saveScore(userId, realScore) {
   }
   var scoreSeriesData = await scoreSeriesDataModel
     .findOne({tableRef: scoreData._id}).sort({timestamp: -1})
+  // console.log(scoreSeriesData)
   if (scoreSeriesData != null) {
     latestDate = scoreSeriesData.timestamp
-    console.log(latestDate.toLocaleString())
+    // console.log(today.getDate())
+    // console.log(latestDate.getDate())
+    // console.log(today.getDate() == latestDate.getDate())
   }
 
   if (!latestDate) {
+    console.log(latestDate)
     scoreSeriesData = new scoreSeriesDataModel({
       tableRef: scoreData._id,
       score: realScore
     })
   }
-  else if (today.getDate() == latestDate.getDate()) {
+  else if (today.getDate() != latestDate.getDate()) {
+    scoreSeriesData = new scoreSeriesDataModel({
+      tableRef: scoreData._id,
+      score: realScore
+    })
+  }
+  else {
     scoreSeriesData.score += realScore
     scoreSeriesData.timestamp = today
   }
@@ -38,6 +47,7 @@ async function saveScore(userId, realScore) {
     score: realScore,
     totalScore: scoreSeriesData.score
   }
+  console.log(scoreResult)
   scoreData.totalScore += realScore
   return scoreSeriesData.save().then(() => {
     return scoreData.save()
@@ -45,17 +55,23 @@ async function saveScore(userId, realScore) {
   .catch(() => {return 500})
 }
 
-async function saveScoreCalories(userId, calories, oldCalories, isSameDate) {
+async function saveScoreCalories(userId, calories, oldCalories) {
   const baseScore = 100
+  var oldScore = 0
   const caloriesData = await caloriesDataModel.findOne({userId: userId})
   const sedentary = Math.round(caloriesData.bmr * 0.2)
   const today = Date.now()
   var newScore = (calories <= sedentary) ? Math.round(calories / sedentary * baseScore) :
                   baseScore + Math.round(calories * 0.2)
-  var oldScore = (oldCalories <= sedentary) ? Math.round(oldCalories / sedentary * baseScore) :
-                  baseScore + Math.round(oldCalories * 0.2)
+  if (oldCalories > 0) {
+    oldScore = (oldCalories <= sedentary) ? Math.round(oldCalories / sedentary * baseScore) :
+                baseScore + Math.round(oldCalories * 0.2)
+  }
   
+  // console.log(newScore)
+  // console.log(oldScore)
   newScore -= oldScore
+  // console.log(newScore)
 
   const caloriesGoal = await caloriesGoalModel.findOne({tableRef: caloriesData._id})
                       .sort({setCaloriesGoalTime: -1})
@@ -92,7 +108,7 @@ async function saveScoreCalories(userId, calories, oldCalories, isSameDate) {
     })
   } 
   if (!caloriesGoal.isAchived) {
-    caloriesGoal.caloriesTotal += calories
+    caloriesGoal.caloriesTotal += (calories - oldCalories)
     if (caloriesGoal.caloriesTotal >= caloriesGoal.caloriesGoal) {
       newScore += caloriesGoal.scoreToGet
       results.achiveScore = caloriesGoal.scoreToGet
