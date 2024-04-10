@@ -95,7 +95,6 @@ class PictureProcess:
     for result in results:
       res_json = ast.literal_eval(result.tojson())
       for attrib in res_json:
-        val_type.append(attrib["name"])
         bounding_box = attrib["box"]
         value_box = image_temp[int(bounding_box["y1"]): int(bounding_box["y2"]),
                              int(bounding_box["x1"]): int(bounding_box["x2"])]
@@ -116,9 +115,8 @@ class PictureProcess:
             if not value.isnumeric():
               continue
             cal_str += value
-          if len(cal_str) == 0:
-            val_read.append(0)
-          else:
+          if len(cal_str) > 0:
+            val_type.append(attrib["name"])
             val_read.append(int(cal_str))
 
         elif attrib["name"] == "sleep":
@@ -144,6 +142,7 @@ class PictureProcess:
             else:
               minute_str = minute_str[:2]
             
+          val_type.append(attrib["name"])
           val_read.append(int(hour_str) * 60 + int(minute_str))
     #return type, value
     os.remove(f"{self.image_location}/{TEMP_FILE}")

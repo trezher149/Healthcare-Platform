@@ -105,14 +105,14 @@ class ResultMessage(EmojiManager):
             percent = round((data["streakTotal"] / data["streakGoal"]) * 100, 1)
             if percent > 100:
                 percent = 100
-            text += sleep_goal_msg["Message"].format(data["caloriesTotal"], data["caloriesGoal"], percent)
+            text += sleep_goal_msg["Message"].format(data["streakTotal"], data["streakGoal"], percent)
             emoji_ids.append(sleep_goal_msg["Emoji"])
             if data["isAchived"]:
                 text += sleep_goal_msg["Complete"]["Message1"]
                 text += sleep_goal_msg["Complete"]["Message2"].format(data['achiveScore'])
                 emoji_ids.append(sleep_goal_msg["Complete"]["Emoji"])
         text += msgs["Score"]["Recent"]["Message"].format(data["score"])
-        emoji_ids.append(msgs["CaloriesGoal"]["Complete"]["Emoji"])
+        emoji_ids.append(msgs["SleepGoal"]["Complete"]["Emoji"])
         text += msgs["Score"]["Total"]["Message"].format(data["totalScore"])
         emojis.extend(self.create_emoji(text, product_id, emoji_ids, index))
         return text, emojis
