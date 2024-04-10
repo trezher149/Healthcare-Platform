@@ -43,6 +43,7 @@ async function setCaloriesGoal(userId, caloriesGoalVal, endDays = 7){
   const today = new Date()
   const endDate = new Date(today)
   endDate.setDate(endDate.getDate() + endDays)
+  // console.log(endDate)
   const minimumDays = 7
   const bmr = caloriesData.bmr
 
@@ -69,25 +70,31 @@ async function setCaloriesGoal(userId, caloriesGoalVal, endDays = 7){
   else if (caloriesGoalVal < heavy) {scoreToGet += 1000}
   else {scoreToGet += 1500}
 
-  if (endDays % minimumDays > 2) {
-    scoreToGet *= 1 - ((endDays - (miminumDays * 2)) * 0.75) 
+  if (endDays / minimumDays > 2) {
+    const percentReduce = 1 - (Math.log10(endDays - (minimumDays * 2)) + 0.05)
+    console.log(percentReduce)
+    if (percentReduce < 0.4) {
+      return Promise.reject(406)
+    }
+    scoreToGet *= percentReduce
   }
 
   const goals = {
     caloriesGoal: caloriesGoalVal,
     endDays: endDays,
-    scoreToGet: scoreToGet,
+    scoreToGet: Math.ceil(scoreToGet),
     endGoalTime: endDate.toLocaleString()
   }
 
   const fields = {
     tableRef: caloriesData._id,
     caloriesGoal: caloriesGoalVal,
-    scoreToGet: scoreToGet,
+    scoreToGet: Math.ceil(scoreToGet),
     endGoalTime: endDate
   }
 
   caloriesGoal = new caloriesGoalModel(fields)
+  console.log(caloriesGoal)
 
   return caloriesGoal.save().then(() => {
     return caloriesData.save()

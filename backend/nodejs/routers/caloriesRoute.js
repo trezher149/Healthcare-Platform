@@ -40,7 +40,6 @@ router.post('/getCal', (req, res) => {
   getCaloriesSeriesData(decoded.userId, req.body.lenghtDays)
   .then((data) => {
     const privt_key = fromLineBot ? "backend-private.pem" : "b2w-private.pem"
-    console.log({data})
     const encoded = tokenManager.generateToken(privt_key, {data})
     res.send({payload: encoded})
   })
@@ -51,8 +50,11 @@ router.post('/setCalGoal', (req, res) => {
   const decoded = tokenManager.headerTokenDecode("linebot-public.pem", req.headers.authorization)
   mongoose.connect(mongodbURI)
   setCaloriesGoal(decoded.userId, req.body.caloriesGoal, req.body.endDays)
-  .then(goalData => res.json(goalData))
-  .catch((status) => {res.sendStatus(status)})
+  .then((goalData) => {
+    const encoded = tokenManager.generateToken("backend-private.pem", goalData)
+    res.json({payload: encoded})
+  })
+  .catch((status) => {console.log(status); res.sendStatus(500)})
 })
 
 module.exports = router

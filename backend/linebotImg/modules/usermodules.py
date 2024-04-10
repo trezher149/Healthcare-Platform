@@ -55,9 +55,9 @@ def get_calories(url, line_id: str, length_days = 10):
 def send_sleep(url, user_id: str, sleep_minutes: int) -> tuple[dict, int]:
   bearer = _gen_bearer({"userId": user_id})
   res = requests.post(url + "/sleep/updateSleep", headers={"Authorization": bearer}, json={"sleepDur": sleep_minutes})
-  decoded = _verify_token(res.json()["payload"])
   if res.status_code >= 400:
     return {}, res.status_code
+  decoded = _verify_token(res.json()["payload"])
   return decoded, res.status_code
 
 def get_sleep(url, line_id: str, length_days = 10):
