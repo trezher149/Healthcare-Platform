@@ -18,18 +18,21 @@ const mongodbURI = process.env.MONGODB_ATLAS_NAME ? process.env.MONGODB_ATLAS_NA
 
 router.post('/adduser', async (req, res) => { 
   const decoded = tokenManager.tokenDecode("web-public.pem", req.body.payload)
+  console.log(decoded)
+  console.log(decoded.healthData)
   mongoose.connect(mongodbURI)
   createUser(decoded.email, decoded.name, decoded.password, decoded.healthData)
   .then(async (userId) => {
-      return createUserCaloriesData(userId, req.body.healthData)
+      return createUserCaloriesData(userId, decoded.healthData)
       .then(() => {return userId}).catch(() => {return Promise.reject(500)})
     })
-  .then((userId) => { return createUserSleepData(userId) })
+  .then((userId) => { 
+    return createUserSleepData(userId) })
   .then((userId) => {
     return createScoreTable(userId)
   })
   .then((userId) => {
-    res.setHeader("Authorization", tokenManager.generateBearer("backend-private.pub", {userId: userId}))
+    res.setHeader("Authorization", tokenManager.generateBearer("b2w-private.pem", {userId: userId}))
     res.send()
   })
   .catch((reject) => {
