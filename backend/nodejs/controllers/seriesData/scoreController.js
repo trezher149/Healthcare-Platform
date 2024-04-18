@@ -55,19 +55,19 @@ async function saveScore(userId, realScore) {
   .catch(() => {return 500})
 }
 
-async function saveScoreCalories(userId, calories, oldCalories) {
+async function saveScoreCalories(userId, calories, oldCalories, activityLvl) {
   const baseScore = 100
   var oldScore = 0
   const caloriesData = await caloriesDataModel.findOne({userId: userId})
-  const sedentary = Math.round(caloriesData.bmr * 0.2)
   const today = Date.now()
+  const sedentary = Math.round(caloriesData.bmr * 0.2)
   var newScore = (calories <= sedentary) ? Math.round(calories / sedentary * baseScore) :
                   baseScore + Math.round(calories * 0.2)
   if (oldCalories > 0) {
     oldScore = (oldCalories <= sedentary) ? Math.round(oldCalories / sedentary * baseScore) :
                 baseScore + Math.round(oldCalories * 0.2)
   }
-  
+
   // console.log(newScore)
   // console.log(oldScore)
   newScore -= oldScore
@@ -76,6 +76,7 @@ async function saveScoreCalories(userId, calories, oldCalories) {
   const caloriesGoal = await caloriesGoalModel.findOne({tableRef: caloriesData._id})
                       .sort({setCaloriesGoalTime: -1})
   const results = {
+    activityLvl: activityLvl,
     score: 0,
     achiveScore: 0,
     totalScore: 0,
@@ -83,7 +84,8 @@ async function saveScoreCalories(userId, calories, oldCalories) {
     caloriesTotal: 0,
     caloriesGoal: 0,
     isAchived: false,
-    isActive: true
+    isActive: true,
+    daysLeft: 0
   }
   if (caloriesGoal == null) {
     return saveScore(userId, newScore).then((score) => {
@@ -96,6 +98,7 @@ async function saveScoreCalories(userId, calories, oldCalories) {
   }
 
   const diffDays = today - caloriesGoal.endGoalTime
+  results.daysLeft = Math.ceil(-diffDays / (1000 * 60 * 60 * 24))
   if (diffDays > 0 && !caloriesGoal.isAchived) {
     results.isActive = caloriesGoal.isActive = false
     await caloriesGoal.save()
@@ -140,13 +143,13 @@ async function saveScoreCalories(userId, calories, oldCalories) {
 async function saveScoreSleep(userId, minutes) {
   const baseScore = 400
   const sleepPunish = 350
-  var streakScore = 40
   var realScore = 0
 
   const sleepData = await sleepDataModel.findOne({userId: userId})
   const sleepGoalData = await sleepGoalDataModel.findOne({tableRef: sleepData._id})
                         .sort({setSleepGoalTime: -1})
   const results = {
+    sleepCond: true,
     score: 0,
     totalScore: 0,
     goalScore: 0,
@@ -154,7 +157,7 @@ async function saveScoreSleep(userId, minutes) {
     streakTotal: 0,
     streakGoal: 0,
     isAchived: false,
-    isActive: true
+    isActive: true,
   }
 
   if (minutes >= 420) {
@@ -173,6 +176,7 @@ async function saveScoreSleep(userId, minutes) {
   else {
     if (sleepGoalData) { sleepGoalData.sleepStreakTotal = 0 }
     realScore = baseScore - sleepPunish
+    results.sleepCond = false
   }
   if (sleepGoalData) {
     return sleepGoalData.save().then(() => {
@@ -200,4 +204,18 @@ async function saveScoreSleep(userId, minutes) {
   }
 }
 
-module.exports = {saveScoreCalories, saveScoreSleep}
+async function listScore(userId, lengthDays = 10) {
+  const scoreData = await scoreDataModel.findOne({userId: userId})
+  const scoreSeriesData = await scoreSeriesDataModel.find({
+    tableRef: scoreData._id
+  }).limit(lengthDays).sort({timestamp: -1})
+  .select({score: 1, timestamp: 1}).lean() 
+  
+  scoreSeriesData.forEach(item => {delete item._id})
+  return {
+    totalScore: scoreData.totalScore,
+    scoreSeries: scoreSeriesData
+  }
+}
+
+module.exports = {saveScoreCalories, saveScoreSleep, listScore}

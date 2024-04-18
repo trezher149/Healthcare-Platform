@@ -4,6 +4,7 @@ const { saveScoreSleep } = require('./scoreController')
 
 async function updateSleep(userId, sleepDurMinute){
   var sleepData = await sleepDataModel.findOne({userId: userId})
+  var sleepCond = false
   const today = new Date()
   console.log(today.getDate())
   if (sleepData == null) {
@@ -14,9 +15,14 @@ async function updateSleep(userId, sleepDurMinute){
   if (recentSleepData) {
     if (today.getDate() == recentSleepData.timestamp.getDate()) { return Promise.reject(406) }
   }
+  
+  if (sleepDurMinute >= 420) {
+    sleepCond = true
+  }
   const sleepSeriesData = new sleepSeriesDataModel({
     tableRef: tableRef,
-    sleepDuration: sleepDurMinute
+    sleepDuration: sleepDurMinute,
+    sleepCond: sleepCond
   })
   console.log(sleepSeriesData)
   return sleepSeriesData.save().then(() => { return sleepData.save() })
