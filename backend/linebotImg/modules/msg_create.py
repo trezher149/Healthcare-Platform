@@ -66,17 +66,17 @@ class ResultMessage(EmojiManager):
         product_id = msgs["Meta"]["ProductId"]
         emoji_ids.append(msgs["Title"]["Emoji"])
         if data["hasGoal"] and data["isActive"]:
-            percent = round((data["caloriesTotal"] / data["caloriesGoal"]) * 100, 1)
-            if percent > 100:
-                percent = 100
-            text += calories_goal_msg["Message"].format(data["caloriesTotal"], data["caloriesGoal"], percent)
+            text += calories_goal_msg["Message"].format(data["caloriesTotal"], data["caloriesGoal"], data["daysLeft"])
             emoji_ids.append(calories_goal_msg["Emoji"])
             if data["isAchived"]:
                 text += calories_goal_msg["Complete"]["Message1"]
                 text += calories_goal_msg["Complete"]["Message2"].format(data['achiveScore'])
                 emoji_ids.append(calories_goal_msg["Complete"]["Emoji"])
+        text += msgs["ExerciseLvl"]["Message"]
+        emoji_ids.append(msgs["ExerciseLvl"]["Emoji"])
+        text += msgs["ExerciseLvl"]["LvlMsg"][data["activityLvl"]] + "\n"
         text += msgs["Score"]["Recent"]["Message"].format(data["score"])
-        emoji_ids.append(msgs["CaloriesGoal"]["Complete"]["Emoji"])
+        emoji_ids.append(msgs["Score"]["Recent"]["Emoji"])
         text += msgs["Score"]["Total"]["Message"].format(data["totalScore"])
         emojis.extend(self.create_emoji(text, product_id, emoji_ids, index))
         return text, emojis
@@ -102,10 +102,7 @@ class ResultMessage(EmojiManager):
         product_id = msgs["Meta"]["ProductId"]
         emoji_ids.append(msgs["Title"]["Emoji"])
         if data["hasGoal"] and data["isActive"]:
-            percent = round((data["streakTotal"] / data["streakGoal"]) * 100, 1)
-            if percent > 100:
-                percent = 100
-            text += sleep_goal_msg["Message"].format(data["streakTotal"], data["streakGoal"], percent)
+            text += sleep_goal_msg["Message"].format(data["streakTotal"], data["streakGoal"])
             emoji_ids.append(sleep_goal_msg["Emoji"])
             if data["isAchived"]:
                 text += sleep_goal_msg["Complete"]["Message1"]
@@ -134,6 +131,30 @@ class ResultMessage(EmojiManager):
         text = text[:len(text) - 2]
         return text, emojis
 
+    def score_arr(self, totalScore, data_arr: list[dict]):
+        text = ""
+        emojis = []
+        offset = 0
+        text += f'$ คะแนนที่ได้ทั้งหมด: {totalScore:,} คะแนน\n\n'
+        emojis.extend(self.create_emoji(text, "5ac21a18040ab15980c9b43e", ["129"], offset))
+        offset = len(text)
+        for item in data_arr:
+            text += "$ " + item["timestamp"] + "\n"
+            text += f'{item["score"]:,} คะแนน\n\n'
+            emojis.extend(self.create_emoji(text, "5ac21a18040ab15980c9b43e", ["129"], offset))
+            offset = len(text)
+        text = text[:len(text) - 2]
+        return text, emojis
+
+class GoalSetMessage(EmojiManager):
+
+    def date_format(self, text: str, end_goal_time: str, end_days: int) -> str:
+        date: list = end_goal_time.split(",")[0].split("/")
+        return text.format(date[1], calendar.month_name[int(date[0])], int(date[2]) + 543, end_days)
+
+    def calories_goal_msg(self, data: dict, msgs: dict, index_init = 0):
+        index = index_init
+        emojis = []
 class GoalSetMessage(EmojiManager):
 
     def date_format(self, text: str, end_goal_time: str, end_days: int) -> str:
