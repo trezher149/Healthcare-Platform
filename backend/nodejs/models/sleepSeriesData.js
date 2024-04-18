@@ -4,6 +4,7 @@ const { Schema } = mongoose
 const sleepSeriesDataSchema = new Schema({
   tableRef: mongoose.Types.ObjectId,
   sleepDuration: Number,
+  sleepCond: Boolean,
   timestamp: {
     type: Date,
     default: () => new Date()
