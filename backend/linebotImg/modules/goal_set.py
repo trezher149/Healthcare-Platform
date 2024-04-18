@@ -23,9 +23,9 @@ class GoalSet(GoalSetMessage):
       json={ "caloriesGoal": calories, "endDays": period_day}
     )
     if res.status_code >= 400:
-      return res.status_code
+      return (), res.status_code
     decoded = _verify_token(res.json()["payload"])
-    return self.calories_goal_msg(decoded, self.msgs["Calories"])
+    return self.calories_goal_msg(decoded, self.msgs["Calories"]), res.status_code
     
 
   def sleep_goal(self, user_id: str, sleep_days: int, period_day: int = 14):
