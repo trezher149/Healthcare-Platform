@@ -9,11 +9,21 @@ async function updateCalories(userId, calories){
   var calData = undefined
   var oldCalories = 0
   const recentCalData = await caloriesSeriesDataModel.findOne({tableRef: tableRef}).sort({timestamp:-1})
+  var activityLvl = 0 // 0 sedentary, 1 light, 2 moderate, 3 active
+
+  const light = Math.round(caloriesData.bmr * 0.375)
+  const moderate = Math.round(caloriesData.bmr * 0.55)
+  const active = Math.round(caloriesData.bmr * 0.725)
+
+  if (calories >= light && calories < moderate) { activityLvl = 1}
+  else if (calories < active) { activityLvl = 2 }
+  else { activityLvl = 3}
 
   if (!recentCalData) {
     calData = new caloriesSeriesDataModel({
       tableRef: tableRef,
-      calories: calories
+      calories: calories,
+      activityLvl: activityLvl
     })
     caloriesData.caloriesTotal += calData.calories
   }
@@ -22,15 +32,18 @@ async function updateCalories(userId, calories){
       if (calories > recentCalData.calories) {
         oldCalories = recentCalData.calories
         recentCalData.calories = calories
+        recentCalData.activityLvl = activityLvl
         caloriesData.caloriesTotal = (caloriesData.caloriesTotal - oldCalories) + calories
       }
       else { return Promise.reject(406) }
       calData = recentCalData
+      calData.timestamp = today
     }
     else {
       calData = new caloriesSeriesDataModel({
         tableRef: tableRef,
-        calories: calories
+        calories: calories,
+        activityLvl: activityLvl
       })
       caloriesData.caloriesTotal += calData.calories
     }
@@ -38,7 +51,7 @@ async function updateCalories(userId, calories){
 
   return calData.save().then(async () => {
     await caloriesData.save()
-    return saveScoreCalories(userId, calories, oldCalories)
+    return saveScoreCalories(userId, calories, oldCalories, activityLvl)
   })
   .then((score) => {return score})
   .catch(() => {return Promise.reject(500)})

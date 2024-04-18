@@ -31,6 +31,10 @@ async function createUser(email, name, password, healthData){
     })
     return newUser._id
   })
+  .catch((e) => {
+    console.log(e)
+    return Promise.reject(500)
+  })
 }
 
 async function addLineId(userId, lineId) {

@@ -4,6 +4,7 @@ const { Schema } = mongoose
 const caloriesSeriesDataSchema = new Schema({
   tableRef: mongoose.Types.ObjectId,
   calories: Number,
+  activityLvl: Number,
   timestamp: {
     type: Date,
     default: () => new Date()

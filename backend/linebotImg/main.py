@@ -100,6 +100,7 @@ def handle_message(event):
         message: list = event.message.text.split()
         func_id: str = message[0]
         line_id: str = event.source.to_dict()['userId']
+        status_code = 0
         site_user_id: str
         match func_id:
 
@@ -125,22 +126,29 @@ def handle_message(event):
                     send_msg(line_bot_api, event, DefaultMessage.default(MSG_TH["UnregisteredUser"]))
                     return 0
                 Goal = GoalSet(MSG_TH["SetGoals"])
+                goal_msg = ()
                 goal: str = message[1]
                 match goal:
                     case "cal":
                         calories: int = int(message[2])
                         if len(message) == 3:
-                            send_msg(line_bot_api, event, Goal.calories_goal(site_user_id, calories))
+                            goal_msg, status_code = Goal.calories_goal(site_user_id, calories)
                         else:
-                            send_msg(line_bot_api, event, Goal.calories_goal(site_user_id, calories, int(message[3])))
-                        return 0
+                            goal_msg, status_code = Goal.calories_goal(site_user_id, calories, int(message[3]))
+                        if status_code > 400:
+                            send_msg(line_bot_api, event, (MSG_TH["SetGoals"]["AlreadySet"]["Message"], []))
+                        else: 
+                            send_msg(line_bot_api, event, goal_msg)
                     case "sleep":
                         sleep_days: int = int(message[2])
                         if len(message) == 3:
-                            send_msg(line_bot_api, event, Goal.sleep_goal(site_user_id, sleep_days))
+                            goal_msg, status_code = Goal.sleep_goal(site_user_id, sleep_days)
                         else:
-                            send_msg(line_bot_api, event, Goal.sleep_goal(site_user_id, sleep_days, int(message[3])))
-                        return 0
+                            goal_msg = Goal.sleep_goal(site_user_id, sleep_days, int(message[3]))
+                        if status_code > 400:
+                            send_msg(line_bot_api, event, (MSG_TH["SetGoals"]["AlreadySet"]["Message"], []))
+                        else: 
+                            send_msg(line_bot_api, event, goal_msg)
                     case _:
                         send_msg(line_bot_api, event, DefaultMessage.default(MSG_TH["UnregisteredUser"]))
                 pass
@@ -167,6 +175,17 @@ def handle_message(event):
                             send_msg(line_bot_api, event, DefaultMessage.default(MSG_TH["UnregisteredUser"]))
                         else:
                             send_msg(line_bot_api, event, ResultMessage.sleep_arr(data_arr))
+                    case "score":
+                        if len(message) < 3:
+                            data_arr, status_code = um.get_score(URL, line_id)
+                        else:
+                            data_arr, status_code = um.get_score(URL, line_id, int(message[2]))
+                        app.logger.info(data_arr)
+                        if status_code == 404:
+                            send_msg(line_bot_api, event, DefaultMessage.default(MSG_TH["UnregisteredUser"]))
+                        else:
+                            send_msg(line_bot_api, event, ResultMessage.score_arr(data_arr["totalScore"], data_arr["scoreSeries"]))
+
             case "info":
                 pass
             case "help":
@@ -243,15 +262,15 @@ def handle_image(event):
                         case 200:
                             # send_msg(line_bot_api, event, ResultMessage.calories(cal_data, MSG_TH["PictureData"]))
                             text, emojis = ResultMessage.calories(cal_data, MSG_TH["PictureData"])
+                            app.logger.info(text)
+                            app.logger.info(emojis)
                             txt_msgs.append(TextMessage(text=text, emojis=emojis))
                         case 403:
+                            app.logger.info("Something wrong...")
                             pass
                         case 406:
                             text, emojis = DefaultMessage.default(MSG_TH["PictureData"]["Err"]["CaloriesSameOrLess"])
                             txt_msgs.append(TextMessage(text=text, emojis=emojis))
-                            send_msg(line_bot_api, event, DefaultMessage.default(
-                                MSG_TH["PictureData"]["Err"]["CaloriesSameOrLess"]
-                                ))
                 case 'sleep':
                     sleep_data, status_code = um.send_sleep(URL, user_id, values[i])
                     match status_code:
@@ -259,6 +278,7 @@ def handle_image(event):
                             text, emojis = ResultMessage.sleep(sleep_data, MSG_TH["PictureData"])
                             txt_msgs.append(TextMessage(text=text, emojis=emojis))
                         case 403:
+                            app.logger.info("Something wrong...")
                             pass
                         case 406:
                             text, emojis = DefaultMessage.default(MSG_TH["PictureData"]["Err"]["SleepSent"])

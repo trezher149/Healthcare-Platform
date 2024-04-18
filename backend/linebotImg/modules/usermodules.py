@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from dateutil import parser
 import pytz
 import jwt
+import json
 
 def _gen_bearer(id_obj: dict):
   key = open("modules/keys/linebot-private.pem", "r").read()
@@ -11,7 +12,11 @@ def _gen_bearer(id_obj: dict):
 
 def _verify_token(token: str):
   key = open("modules/keys/backend-public.pem", "r").read()
-  return jwt.decode(token, key, algorithms=["RS256"])
+  decoded = jwt.decode(token, key, algorithms=["RS256"])
+  if type(decoded) == "str":
+    return json.loads(decoded)
+  return decoded
+
 
 def get_user_id(url, line_id):
   bearer = _gen_bearer({"lineId": line_id})
@@ -78,3 +83,22 @@ def get_sleep(url, line_id: str, length_days = 10):
     sleep_arr[i]["timestamp"] = time_diff.strftime("%d/%m/%Y")
   
   return sleep_arr, res.status_code
+
+def get_score(url, line_id: str, length_days = 10):
+  bearer = _gen_bearer({"lineId": line_id})
+  res = requests.post(url + "/user/getuseridfromlineid", headers={"Authorization": bearer})
+  if res.status_code == 404:
+    return {}, res.status_code
+  user_id = _verify_token(res.headers["Authorization"].split(" ")[1])["userId"]
+
+  bearer = _gen_bearer({"userId": user_id})
+  res = requests.post(url + "/score/getScore", headers={"Authorization": bearer}, json={"lengthDays": length_days})
+  if res.status_code >= 400:
+    return {}, res.status_code
+  score_data = _verify_token(res.json()["payload"])
+  for i in range(len(score_data["scoreSeries"])):
+    time_format = parser.parse(score_data["scoreSeries"][i]["timestamp"]).astimezone(pytz.timezone("Asia/Bangkok"))
+    time_diff = time_format - timedelta(days=1)
+    score_data["scoreSeries"][i]["timestamp"] = time_diff.strftime("%d/%m/%Y")
+  
+  return score_data, res.status_code

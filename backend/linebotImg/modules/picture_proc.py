@@ -109,7 +109,7 @@ class PictureProcess:
           if len(result_str) > 1:
             if result_str[0][0] == '0' or not result_str[0][0].isnumeric():
               to_read_str = result_str[1]
-          else: to_read_str = result_str[0]
+          elif len(result_str) == 1: to_read_str = result_str[0]
           for value in to_read_str.split("/")[0]:
             value = value_check(value)
             if not value.isnumeric():
