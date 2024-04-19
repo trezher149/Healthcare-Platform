@@ -1,5 +1,5 @@
 import calendar
-import random
+import random, json
 
 class EmojiManager:
 
@@ -57,7 +57,10 @@ class DefaultMessage(EmojiManager):
 
 class ResultMessage(EmojiManager):
 
-    def calories(self, data: dict, msgs: dict, index_init = 0):
+    def calories(self, data: dict, lang = "th", index_init = 0):
+        f = open(f"modules/../messages/{lang}/picture_data.json")
+        msgs = json.loads(f.read())
+        f.close()
         index = index_init
         emojis = []
         emoji_ids = []
@@ -93,7 +96,10 @@ class ResultMessage(EmojiManager):
         text = text[:len(text) - 2]
         return text, emojis
     
-    def sleep(self, data: dict, msgs: dict, index_init = 0):
+    def sleep(self, data: dict, lang = "th", index_init = 0):
+        f = open(f"modules/../messages/{lang}/picture_data.json")
+        msgs = json.loads(f.read())
+        f.close
         index = index_init
         emojis = []
         emoji_ids = []
@@ -108,6 +114,9 @@ class ResultMessage(EmojiManager):
                 text += sleep_goal_msg["Complete"]["Message1"]
                 text += sleep_goal_msg["Complete"]["Message2"].format(data['achiveScore'])
                 emoji_ids.append(sleep_goal_msg["Complete"]["Emoji"])
+        text += msgs["SleepCond"]["Message"]
+        emoji_ids.append(msgs["SleepCond"]["Emoji"])
+        text += msgs["SleepCond"]["cond"][int(data["sleepCond"])] + "\n"
         text += msgs["Score"]["Recent"]["Message"].format(data["score"])
         emoji_ids.append(msgs["SleepGoal"]["Complete"]["Emoji"])
         text += msgs["Score"]["Total"]["Message"].format(data["totalScore"])
@@ -151,17 +160,11 @@ class GoalSetMessage(EmojiManager):
     def date_format(self, text: str, end_goal_time: str, end_days: int) -> str:
         date: list = end_goal_time.split(",")[0].split("/")
         return text.format(date[1], calendar.month_name[int(date[0])], int(date[2]) + 543, end_days)
-
-    def calories_goal_msg(self, data: dict, msgs: dict, index_init = 0):
-        index = index_init
-        emojis = []
-class GoalSetMessage(EmojiManager):
-
-    def date_format(self, text: str, end_goal_time: str, end_days: int) -> str:
-        date: list = end_goal_time.split(",")[0].split("/")
-        return text.format(date[1], calendar.month_name[int(date[0])], int(date[2]) + 543, end_days)
-
-    def calories_goal_msg(self, data: dict, msgs: dict, index_init = 0):
+    
+    def calories_goal_msg(self, data: dict, lang = "th", index_init = 0):
+        f = open(f"modules/../messages/{lang}/set_goals.json")
+        msgs = json.loads(f.read())["Calories"]
+        f.close()
         index = index_init
         emojis = []
         text: str = msgs["Message1"].format(data["caloriesGoal"])
@@ -174,7 +177,10 @@ class GoalSetMessage(EmojiManager):
         emojis.extend(self.create_emoji(text, rand_msg["ProductId"], [rand_msg["Emoji"]], index))
         return text, emojis
     
-    def sleep_goal_msg(self, data: dict, msgs: dict, index_init = 0):
+    def sleep_goal_msg(self, data: dict, lang = "th", index_init = 0):
+        f = open(f"modules/../messages/{lang}/set_goals.json")
+        msgs = json.loads(f.read())["Sleep"]
+        f.close()
         index = index_init
         emojis = []
         text: str = msgs["Message1"].format(data["streakGoal"])

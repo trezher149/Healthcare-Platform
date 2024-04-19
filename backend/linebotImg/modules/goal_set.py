@@ -13,8 +13,7 @@ def _verify_token(token: str):
 
 class GoalSet(GoalSetMessage):
 
-  def __init__(self, msgs) -> None:
-    self.msgs: object = msgs
+  def __init__(self) -> None:
     self.__URL = "http://cheffy:14000/api"
   
   def calories_goal(self, user_id: str, calories: int = 0, period_day: int = 7): 
@@ -25,7 +24,7 @@ class GoalSet(GoalSetMessage):
     if res.status_code >= 400:
       return (), res.status_code
     decoded = _verify_token(res.json()["payload"])
-    return self.calories_goal_msg(decoded, self.msgs["Calories"]), res.status_code
+    return self.calories_goal_msg(decoded), res.status_code
     
 
   def sleep_goal(self, user_id: str, sleep_days: int, period_day: int = 14):
@@ -36,4 +35,4 @@ class GoalSet(GoalSetMessage):
     if res.status_code >= 400:
       return res.status_code
     decoded = _verify_token(res.json()["payload"])
-    return self.sleep_goal_msg(decoded, self.msgs["Sleep"])
+    return self.sleep_goal_msg(decoded)

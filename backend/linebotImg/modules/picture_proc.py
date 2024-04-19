@@ -91,7 +91,7 @@ class PictureProcess:
     val_read: list[int] = []
     cv.imwrite(self.image_location + "/" + TEMP_FILE, self.img_dark)
     image_temp = cv.imread(f"{self.image_location}/{TEMP_FILE}")
-    results = model.predict(image_temp, imgsz=320, conf=0.72)
+    results = model.predict(image_temp, imgsz=320, conf=0.7)
     for result in results:
       res_json = ast.literal_eval(result.tojson())
       for attrib in res_json:
@@ -135,6 +135,8 @@ class PictureProcess:
               continue
             elif number_found:
               break
+          if len(minute_str) == 0:
+            break
           if int(minute_str) > 59:
             if len(minute_str) > 3:
               hour_str += value_check(minute_str[0])
