@@ -14,8 +14,8 @@ from modules.goal_set import GoalSet
 
 load_dotenv()
 
-f = open("messages/msg_th.json")
-MSG_TH: dict= json.loads(f.read())
+f = open("messages/th/defaults.json")
+DEF_MSG_TH: dict= json.loads(f.read())
 f.close()
 
 CHANNEL_ACCESS_TOKEN = os.environ.get("CHANNEL_ACCESS_TOKEN")
@@ -108,24 +108,24 @@ def handle_message(event):
             case "id":
                 site_user_id = message[1]
                 if len(site_user_id) < 8:
-                    send_msg(line_bot_api, event, DefaultMessage.default(MSG_TH["Err"]["InvalidId"]))
+                    send_msg(line_bot_api, event, DefaultMessage.default(DEF_MSG_TH["Err"]["InvalidId"]))
                     return 1
                 status_code = um.add_user_id(USER_URL + "/addlineiduser", site_user_id, line_id)
                 if status_code == 200:
-                    send_msg(line_bot_api, event, DefaultMessage.default(MSG_TH["Confirmations"]["AddUserId"]))
+                    send_msg(line_bot_api, event, DefaultMessage.default(DEF_MSG_TH["Confirmations"]["AddUserId"]))
                 elif status_code == 406:
-                    send_msg(line_bot_api, event, DefaultMessage.default(MSG_TH["Confirmations"]["AlreadyAdded"]))
+                    send_msg(line_bot_api, event, DefaultMessage.default(DEF_MSG_TH["Confirmations"]["AlreadyAdded"]))
                 elif status_code == 404:
-                    send_msg(line_bot_api, event, DefaultMessage.default(MSG_TH["UnregisteredUser"]))
+                    send_msg(line_bot_api, event, DefaultMessage.default(DEF_MSG_TH["UnregisteredUser"]))
                 return 0
             
             #Set goal for calories and sleep
             case "set":
                 site_user_id, status_code = um.get_user_id(URL, event.source.user_id)
                 if status_code == 404:
-                    send_msg(line_bot_api, event, DefaultMessage.default(MSG_TH["UnregisteredUser"]))
+                    send_msg(line_bot_api, event, DefaultMessage.default(DEF_MSG_TH["UnregisteredUser"]))
                     return 0
-                Goal = GoalSet(MSG_TH["SetGoals"])
+                Goal = GoalSet()
                 goal_msg = ()
                 goal: str = message[1]
                 match goal:
@@ -136,7 +136,7 @@ def handle_message(event):
                         else:
                             goal_msg, status_code = Goal.calories_goal(site_user_id, calories, int(message[3]))
                         if status_code > 400:
-                            send_msg(line_bot_api, event, (MSG_TH["SetGoals"]["AlreadySet"]["Message"], []))
+                            send_msg(line_bot_api, event, (DEF_MSG_TH["SetGoals"]["AlreadySet"]["Message"], []))
                         else: 
                             send_msg(line_bot_api, event, goal_msg)
                     case "sleep":
@@ -146,11 +146,11 @@ def handle_message(event):
                         else:
                             goal_msg = Goal.sleep_goal(site_user_id, sleep_days, int(message[3]))
                         if status_code > 400:
-                            send_msg(line_bot_api, event, (MSG_TH["SetGoals"]["AlreadySet"]["Message"], []))
+                            send_msg(line_bot_api, event, (DEF_MSG_TH["SetGoals"]["AlreadySet"]["Message"], []))
                         else: 
                             send_msg(line_bot_api, event, goal_msg)
                     case _:
-                        send_msg(line_bot_api, event, DefaultMessage.default(MSG_TH["UnregisteredUser"]))
+                        send_msg(line_bot_api, event, DefaultMessage.default(DEF_MSG_TH["UnregisteredUser"]))
                 pass
             case "view":
                 data_type = message[1]
@@ -165,7 +165,7 @@ def handle_message(event):
                         else:
                             data_arr, status_code = um.get_calories(URL, line_id, int(message[2]))
                         if status_code == 404:
-                            text, emojis = DefaultMessage.default(MSG_TH["UnregisteredUser"])
+                            text, emojis = DefaultMessage.default(DEF_MSG_TH["UnregisteredUser"])
                         elif len(data_arr) > 0:
                             text, emojis = ResultMessage.calories_arr(data_arr)
                     case "sleep":
@@ -174,7 +174,7 @@ def handle_message(event):
                         else:
                             data_arr, status_code = um.get_sleep(URL, line_id, int(message[2]))
                         if status_code == 404:
-                            text, emojis = DefaultMessage.default(MSG_TH["UnregisteredUser"])
+                            text, emojis = DefaultMessage.default(DEF_MSG_TH["UnregisteredUser"])
                         elif len(data_arr) > 0:
                             text, emojis = ResultMessage.sleep_arr(data_arr)
                     case "score":
@@ -183,7 +183,7 @@ def handle_message(event):
                         else:
                             total_score, data_arr, status_code = um.get_score(URL, line_id, int(message[2]))
                         if status_code == 404:
-                            text, emojis = DefaultMessage.default(MSG_TH["UnregisteredUser"])
+                            text, emojis = DefaultMessage.default(DEF_MSG_TH["UnregisteredUser"])
                         elif len(data_arr) > 0:
                             text, emojis = send_msg(line_bot_api, event, ResultMessage.score_arr(total_score, data_arr))
                 if status_code == 404:
@@ -195,7 +195,7 @@ def handle_message(event):
             case "info":
                 pass
             case "help":
-                help_msgs = MSG_TH["Help"]
+                help_msgs = DEF_MSG_TH["Help"]
                 if len(message) == 1:
                     send_msg(line_bot_api, event, HelpMessage.general_msg(help_msgs["General"], 
                                                                           help_msgs["ProductId"],
@@ -215,7 +215,7 @@ def handle_message(event):
                     case _:
                         send_msg(line_bot_api, event, DefaultMessage.default(help_msgs["UnknownCommand"]))
             case _:
-                send_msg(line_bot_api, event, DefaultMessage.default(MSG_TH["Err"]["UnknownCommand"]))
+                send_msg(line_bot_api, event, DefaultMessage.default(DEF_MSG_TH["Err"]["UnknownCommand"]))
 
         return 0
                 
@@ -236,7 +236,7 @@ def handle_image(event):
         except:
             return 0
         if status_code == 404:
-            send_msg(line_bot_api, event, DefaultMessage.default(MSG_TH["UnregisteredUser"]))
+            send_msg(line_bot_api, event, DefaultMessage.default(DEF_MSG_TH["UnregisteredUser"]))
             return 0
         headers = {'Authorization': 'Bearer {' + f'{CHANNEL_ACCESS_TOKEN}' + '}'}
         binary = requests.get(f'https://api-data.line.me/v2/bot/message/{picture_id}/content', headers=headers)
@@ -245,14 +245,14 @@ def handle_image(event):
         picproc = PicProc(binary.content, f"{IMAGE_LOCATION}/{user_id}", date_format(), user_id)
         #Check if the image is the same as previous one
         if picproc.check_file_match(user_id):
-            send_msg(line_bot_api, event, DefaultMessage.default(MSG_TH["Err"]["SamePicture"]))
+            send_msg(line_bot_api, event, DefaultMessage.default(DEF_MSG_TH["Err"]["SamePicture"]))
             return 0
         
         #Image is being processed
         #send_msg(line_bot_api, event, DefaultMessage.default(MSG_TH["Confirmations"]["Uploaded"]))
         types, values = picproc.read_image()
         if len(types) == 0:
-            send_msg(line_bot_api, event, DefaultMessage.default(MSG_TH["Err"]["ValueNotFound"]))
+            send_msg(line_bot_api, event, DefaultMessage.default(DEF_MSG_TH["Err"]["ValueNotFound"]))
             return 1
         
         #Send result back to user
@@ -267,7 +267,7 @@ def handle_image(event):
                     match status_code:
                         case 200:
                             # send_msg(line_bot_api, event, ResultMessage.calories(cal_data, MSG_TH["PictureData"]))
-                            text, emojis = ResultMessage.calories(cal_data, MSG_TH["PictureData"])
+                            text, emojis = ResultMessage.calories(cal_data)
                             app.logger.info(text)
                             app.logger.info(emojis)
                             txt_msgs.append(TextMessage(text=text, emojis=emojis))
@@ -275,19 +275,19 @@ def handle_image(event):
                             app.logger.info("Something wrong...")
                             pass
                         case 406:
-                            text, emojis = DefaultMessage.default(MSG_TH["PictureData"]["Err"]["CaloriesSameOrLess"])
+                            text, emojis = DefaultMessage.default(DEF_MSG_TH["PictureData"]["Err"]["CaloriesSameOrLess"])
                             txt_msgs.append(TextMessage(text=text, emojis=emojis))
                 case 'sleep':
                     sleep_data, status_code = um.send_sleep(URL, user_id, values[i])
                     match status_code:
                         case 200:
-                            text, emojis = ResultMessage.sleep(sleep_data, MSG_TH["PictureData"])
+                            text, emojis = ResultMessage.sleep(sleep_data)
                             txt_msgs.append(TextMessage(text=text, emojis=emojis))
                         case 403:
                             app.logger.info("Something wrong...")
                             pass
                         case 406:
-                            text, emojis = DefaultMessage.default(MSG_TH["PictureData"]["Err"]["SleepSent"])
+                            text, emojis = DefaultMessage.default(DEF_MSG_TH["PictureData"]["Err"]["SleepSent"])
                             txt_msgs.append(TextMessage(text=text, emojis=emojis))
             i += 1
             time.sleep(1)
