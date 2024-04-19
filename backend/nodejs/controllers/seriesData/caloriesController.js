@@ -11,13 +11,14 @@ async function updateCalories(userId, calories){
   const recentCalData = await caloriesSeriesDataModel.findOne({tableRef: tableRef}).sort({timestamp:-1})
   var activityLvl = 0 // 0 sedentary, 1 light, 2 moderate, 3 active
 
+  const sedentary = Math.round(caloriesData.bmr * 0.2)
   const light = Math.round(caloriesData.bmr * 0.375)
   const moderate = Math.round(caloriesData.bmr * 0.55)
-  const active = Math.round(caloriesData.bmr * 0.725)
+  // const active = Math.round(caloriesData.bmr * 0.725)
 
-  if (calories >= light && calories < moderate) { activityLvl = 1}
-  else if (calories < active) { activityLvl = 2 }
-  else { activityLvl = 3}
+  if (calories >= sedentary) { activityLvl += 1}
+  if (calories >= light) { activityLvl += 1}
+  if (calories >= moderate) { activityLvl += 1 }
 
   if (!recentCalData) {
     calData = new caloriesSeriesDataModel({
