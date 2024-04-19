@@ -5,6 +5,7 @@ const userRoute = require('./routers/userRoute')
 const caloriesRoute = require('./routers/caloriesRoute')
 const foodRoute = require('./routers/foodRoute')
 const sleepRoute = require('./routers/sleepRoute')
+const scoreRoute = require('./routers/scoreRoute')
 
 const port = process.env.PORT
 const frontendURL = process.env.FRONTEND_URL
@@ -23,6 +24,7 @@ app.use('/api/user', userRoute)
 app.use('/api/calories', caloriesRoute)
 app.use('/api/food', foodRoute)
 app.use('/api/sleep', sleepRoute)
+app.use('/api/score', scoreRoute)
 
 app.listen(port, () => {
   console.log("The server is running on port 14000")
