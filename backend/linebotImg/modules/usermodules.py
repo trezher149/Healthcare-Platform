@@ -88,17 +88,17 @@ def get_score(url, line_id: str, length_days = 10):
   bearer = _gen_bearer({"lineId": line_id})
   res = requests.post(url + "/user/getuseridfromlineid", headers={"Authorization": bearer})
   if res.status_code == 404:
-    return {}, res.status_code
+    return 0, [], res.status_code
   user_id = _verify_token(res.headers["Authorization"].split(" ")[1])["userId"]
 
   bearer = _gen_bearer({"userId": user_id})
   res = requests.post(url + "/score/getScore", headers={"Authorization": bearer}, json={"lengthDays": length_days})
   if res.status_code >= 400:
-    return {}, res.status_code
+    return 0, [], res.status_code
   score_data = _verify_token(res.json()["payload"])
   for i in range(len(score_data["scoreSeries"])):
     time_format = parser.parse(score_data["scoreSeries"][i]["timestamp"]).astimezone(pytz.timezone("Asia/Bangkok"))
     time_diff = time_format - timedelta(days=1)
     score_data["scoreSeries"][i]["timestamp"] = time_diff.strftime("%d/%m/%Y")
   
-  return score_data, res.status_code
+  return score_data["totalScore"], score_data["scoreSeries"], res.status_code

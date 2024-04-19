@@ -156,6 +156,8 @@ def handle_message(event):
                 data_type = message[1]
                 data_arr: list[dict]
                 status_code: int
+                text = ""
+                emojis = []
                 match data_type:
                     case "cal":
                         if len(message) < 3:
@@ -163,28 +165,32 @@ def handle_message(event):
                         else:
                             data_arr, status_code = um.get_calories(URL, line_id, int(message[2]))
                         if status_code == 404:
-                            send_msg(line_bot_api, event, DefaultMessage.default(MSG_TH["UnregisteredUser"]))
-                        else:
-                            send_msg(line_bot_api, event, ResultMessage.calories_arr(data_arr))
+                            text, emojis = DefaultMessage.default(MSG_TH["UnregisteredUser"])
+                        elif len(data_arr) > 0:
+                            text, emojis = ResultMessage.calories_arr(data_arr)
                     case "sleep":
                         if len(message) < 3:
                             data_arr, status_code = um.get_sleep(URL, line_id)
                         else:
                             data_arr, status_code = um.get_sleep(URL, line_id, int(message[2]))
                         if status_code == 404:
-                            send_msg(line_bot_api, event, DefaultMessage.default(MSG_TH["UnregisteredUser"]))
-                        else:
-                            send_msg(line_bot_api, event, ResultMessage.sleep_arr(data_arr))
+                            text, emojis = DefaultMessage.default(MSG_TH["UnregisteredUser"])
+                        elif len(data_arr) > 0:
+                            text, emojis = ResultMessage.sleep_arr(data_arr)
                     case "score":
                         if len(message) < 3:
-                            data_arr, status_code = um.get_score(URL, line_id)
+                            total_score, data_arr, status_code = um.get_score(URL, line_id)
                         else:
-                            data_arr, status_code = um.get_score(URL, line_id, int(message[2]))
-                        app.logger.info(data_arr)
+                            total_score, data_arr, status_code = um.get_score(URL, line_id, int(message[2]))
                         if status_code == 404:
-                            send_msg(line_bot_api, event, DefaultMessage.default(MSG_TH["UnregisteredUser"]))
-                        else:
-                            send_msg(line_bot_api, event, ResultMessage.score_arr(data_arr["totalScore"], data_arr["scoreSeries"]))
+                            text, emojis = DefaultMessage.default(MSG_TH["UnregisteredUser"])
+                        elif len(data_arr) > 0:
+                            text, emojis = send_msg(line_bot_api, event, ResultMessage.score_arr(total_score, data_arr))
+                if status_code == 404:
+                    send_msg(line_bot_api, event, (text, emojis))
+                elif len(data_arr) == 0:
+                    send_msg(line_bot_api, event, ("คุณยังไม่มีการส่งค่านั้นค่ะ\nส่งรูปหน้าจอสมาร์ทวอทช์เพื่อเริ่มบันทึกค่านะคะ", []))
+                else: send_msg(line_bot_api, event, (text, emojis))
 
             case "info":
                 pass
@@ -196,14 +202,14 @@ def handle_message(event):
                                                                           help_msgs["Emoji"]))
                     send_msg(line_bot_api, event, (help_msgs["General"]["Tip"], []))
                     return 0
-                func_name = message[2]
+                func_name = message[1]
                 match func_name:
                     case "set":
                         send_msg(line_bot_api, event, HelpMessage.general_msg(help_msgs["Set"], 
                                                                             help_msgs["ProductId"],
                                                                             help_msgs["Emoji"]))
                     case "view":
-                        send_msg(line_bot_api, event, HelpMessage.general_msg(help_msgs["view"], 
+                        send_msg(line_bot_api, event, HelpMessage.general_msg(help_msgs["View"], 
                                                                             help_msgs["ProductId"],
                                                                             help_msgs["Emoji"]))
                     case _:
