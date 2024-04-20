@@ -42,7 +42,10 @@ router.post('/setSleepGoal', (req, res) => {
   const decoded = tokenManager.headerTokenDecode("linebot-public.pem", auth_header)
   mongoose.connect(mongodbURI)
   setSleepGoal(decoded.userId, req.body.sleepDays, req.body.endDays)
-  .then((goalData) => res.json(goalData) )
+  .then((goalData) => {
+    const encoded = tokenManager.generateToken("backend-private.pem", goalData)
+    res.json({payload:encoded})
+  } )
   .catch((status) => res.sendStatus(status))
 })
 
