@@ -211,7 +211,7 @@ class GoalSetMessage(EmojiManager):
         index = index_init
         emojis = []
         text: str = msgs["Message1"].format(data["streakGoal"])
-        text += msgs["Message3"].format(data["scoreToGet"])
+        text += msgs["Message2"].format(data["scoreToGet"])
         emojis.extend(self.create_emoji(text, msgs["ProductId"], msgs["Emoji"], index))
         index = len(text)
         rand_msg = msgs["RandomMessages"][random.randint(0, 2)]
