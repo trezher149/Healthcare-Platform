@@ -144,7 +144,7 @@ def handle_message(event):
                         if len(message) == 3:
                             goal_msg, status_code = Goal.sleep_goal(site_user_id, sleep_days)
                         else:
-                            goal_msg = Goal.sleep_goal(site_user_id, sleep_days, int(message[3]))
+                            goal_msg, status_code = Goal.sleep_goal(site_user_id, sleep_days, int(message[3]))
                         if status_code > 400:
                             send_msg(line_bot_api, event, (DEF_MSG_TH["SetGoals"]["AlreadySet"]["Message"], []))
                         else: 
@@ -192,7 +192,7 @@ def handle_message(event):
                     send_msg(line_bot_api, event, ("คุณยังไม่มีการส่งค่านั้นค่ะ\nส่งรูปหน้าจอสมาร์ทวอทช์เพื่อเริ่มบันทึกค่านะคะ", []))
                 else: send_msg(line_bot_api, event, (text, emojis))
 
-            case "info":
+            case "tip":
                 pass
             case "help":
                 help_msgs = DEF_MSG_TH["Help"]

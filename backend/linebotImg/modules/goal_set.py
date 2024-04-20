@@ -33,6 +33,6 @@ class GoalSet(GoalSetMessage):
         json={"sleepDays": sleep_days, "endDays": period_day}
     )
     if res.status_code >= 400:
-      return res.status_code
+      return (), res.status_code
     decoded = _verify_token(res.json()["payload"])
-    return self.sleep_goal_msg(decoded)
+    return self.sleep_goal_msg(decoded), res.status_code

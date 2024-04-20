@@ -98,7 +98,7 @@ class PictureProcess:
         bounding_box = attrib["box"]
         value_box = image_temp[int(bounding_box["y1"]): int(bounding_box["y2"]),
                              int(bounding_box["x1"]): int(bounding_box["x2"])]
-        result_str = reader.readtext(value_box,detail=0, low_text=0.44,
+        result_str = reader.readtext(value_box,detail=0, low_text=0.49,
                                      slope_ths=0.3, text_threshold=0.8,
                                      canvas_size=452, contrast_ths=0.2,
                                      mag_ratio=1.2, blocklist="'-.,()\{\} ",
@@ -106,13 +106,18 @@ class PictureProcess:
         if attrib["name"] == "cal":
           to_read_str = ""
           cal_str = ""
+          char_detect = 0
           if len(result_str) > 1:
             if result_str[0][0] == '0' or not result_str[0][0].isnumeric():
               to_read_str = result_str[1]
+            else: to_read_str = result_str[0]
           elif len(result_str) == 1: to_read_str = result_str[0]
           for value in to_read_str.split("/")[0]:
+            if char_detect > 2:
+              break
             value = value_check(value)
             if not value.isnumeric():
+              char_detect += 1
               continue
             cal_str += value
           if len(cal_str) > 0:
@@ -123,23 +128,62 @@ class PictureProcess:
           arr_index = 0
           if len(result_str) > 1:
             arr_index = len(result_str) // 2
-          hour_str = value_check(result_str[arr_index][0])
-
+          hour_str = ""
           minute_str = ""
           number_found = False
-          for character in result_str[arr_index][1:]:
-            character = value_check(character)
-            if character.isnumeric():
-              minute_str += character
-              number_found = True
+          start_index = 0
+          offset = 0
+          
+          # Hours
+          for res in result_str[arr_index:]:
+            for character in result_str[arr_index][0:]:
+              character = value_check(character)
+              if character.isnumeric() and len(hour_str) < 2:
+                hour_str += character
+                number_found = True
+                start_index += 1
+                continue
+              elif number_found:
+                break
+            if len(hour_str) == 0:
+              offset += 1
+              start_index = 0
               continue
-            elif number_found:
+          if int(hour_str) > 16:
+            hour_str = hour_str[0]
+          
+          arr_index += offset
+          
+          # Minutes
+          number_found = False
+          k = 0
+          for res in result_str[arr_index:]:
+            for character in res[start_index:]:
+              character = value_check(character)
+              if character == " ":
+                minute_str = ""
+                continue
+              if character.isnumeric():
+                minute_str += character
+                number_found = True
+                continue
+              elif number_found:
+                break
+            if arr_index + k + 1 < len(result_str):
+              minute_str = ""
+              start_index = 0
+              k += 1
+              continue
+            if len(minute_str) > 0:
               break
+            minute_str = ""
+            start_index = 0
           if len(minute_str) == 0:
-            break
+            continue
           if int(minute_str) > 59:
             if len(minute_str) > 3:
-              hour_str += value_check(minute_str[0])
+              if len(hour_str) == 0:
+                hour_str += value_check(minute_str[0])
               minute_str += value_check(minute_str[1:])
             else:
               minute_str = minute_str[:2]
