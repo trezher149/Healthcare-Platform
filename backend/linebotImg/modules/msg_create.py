@@ -64,7 +64,7 @@ class ResultMessage(EmojiManager):
         f = open(f"modules/../messages/{lang}/tips.json")
         tip_msgs = json.loads(f.read())
         f.close()
-        calories_tip = tip_msgs["Calories"][random.randint(0, len(tip_msgs["Calories"]) - 1)]
+        calories_tip = "$" + tip_msgs["Calories"][random.randint(0, len(tip_msgs["Calories"]) - 1)]
         calories_advice = tip_msgs["CaloriesAdvice"][random.randint(0, len(tip_msgs["CaloriesAdvice"]) - 1)]
         index = index_init
         emojis = []
@@ -86,13 +86,15 @@ class ResultMessage(EmojiManager):
         text += msgs["Score"]["Recent"]["Message"].format(data["score"])
         emoji_ids.append(msgs["Score"]["Recent"]["Emoji"])
         text += msgs["Score"]["Total"]["Message"].format(data["totalScore"]) + "\n\n"
-        emojis.extend(self.create_emoji(text, product_id, emoji_ids, index))
         text += calories_tip
+        emoji_ids.append(tip_msgs["TriviaEmoji"]["EmojiId"])
         if data["activityLvl"] == 0:
-            text += "\nคำแนะนำ: " + calories_advice
+            text += "\n$ คำแนะนำ: " + calories_advice
+            emoji_ids.append(tip_msgs["TipEmoji"]["EmojiId"])
         if not data["hasGoal"] and not data["isActive"]:
             if random.randint(0, 2) == 0:
                 text += tip_msgs["NoGoalSet"]
+        emojis.extend(self.create_emoji(text, product_id, emoji_ids, index))
         return text, emojis
     
     def calories_arr(self, data_arr: list[dict]):
@@ -114,7 +116,7 @@ class ResultMessage(EmojiManager):
         f = open(f"modules/../messages/{lang}/tips.json")
         tip_msgs = json.loads(f.read())
         f.close()
-        sleep_tip = tip_msgs["Sleep"][random.randint(0, len(tip_msgs["Sleep"]) - 1)]
+        sleep_tip = "$" + tip_msgs["Sleep"][random.randint(0, len(tip_msgs["Sleep"]) - 1)]
         sleep_advice = tip_msgs["SleepAdvice"][random.randint(0, len(tip_msgs["SleepAdvice"]) - 1)]
         index = index_init
         emojis = []
@@ -135,16 +137,17 @@ class ResultMessage(EmojiManager):
         text += msgs["SleepCond"]["cond"][int(data["sleepCond"])] + "\n"
         text += msgs["Score"]["Recent"]["Message"].format(data["score"])
         emoji_ids.append(msgs["SleepGoal"]["Complete"]["Emoji"])
-        text += msgs["Score"]["Total"]["Message"].format(data["totalScore"])
-        emojis.extend(self.create_emoji(text, product_id, emoji_ids, index))
-        text += sleep_tip
+        text += msgs["Score"]["Total"]["Message"].format(data["totalScore"]) + "\n\n"
         if not data["sleepCond"]:
-            text += "\nคำแนะนำ: " + sleep_advice
+            text += "$ คำแนะนำ: " + sleep_advice
+            emoji_ids.append(tip_msgs["TipEmoji"]["EmojiId"])
         else:
             text += sleep_tip
+            emoji_ids.append(tip_msgs["TriviaEmoji"]["EmojiId"])
         if not data["hasGoal"] and not data["isActive"]:
             if random.randint(0, 2) == 0:
                 text += tip_msgs["NoGoalSet"]
+        emojis.extend(self.create_emoji(text, product_id, emoji_ids, index))
         return text, emojis
 
     def sleep_arr(self, data_arr: list[dict]):
