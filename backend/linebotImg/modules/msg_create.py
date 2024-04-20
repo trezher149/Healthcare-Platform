@@ -64,8 +64,8 @@ class ResultMessage(EmojiManager):
         f = open(f"modules/../messages/{lang}/tips.json")
         tip_msgs = json.loads(f.read())
         f.close()
-        calories_tip = tip_msgs["Calories"][random.randint(0, len(tip_msgs["Calories"]))]
-        calories_advice = tip_msgs["CaloriesAdvice"][random.randint(0, len(tip_msgs["CaloriesAdvice"]))]
+        calories_tip = tip_msgs["Calories"][random.randint(0, len(tip_msgs["Calories"]) - 1)]
+        calories_advice = tip_msgs["CaloriesAdvice"][random.randint(0, len(tip_msgs["CaloriesAdvice"]) - 1)]
         index = index_init
         emojis = []
         emoji_ids = []
@@ -92,7 +92,7 @@ class ResultMessage(EmojiManager):
             text += "\nคำแนะนำ: " + calories_advice
         if not data["hasGoal"] and not data["isActive"]:
             if random.randint(0, 2) == 0:
-                text += tip_msgs["noGoalSet"]
+                text += tip_msgs["NoGoalSet"]
         return text, emojis
     
     def calories_arr(self, data_arr: list[dict]):
@@ -114,8 +114,8 @@ class ResultMessage(EmojiManager):
         f = open(f"modules/../messages/{lang}/tips.json")
         tip_msgs = json.loads(f.read())
         f.close()
-        sleep_tip = tip_msgs["Sleep"][random.randint(0, len(tip_msgs["Sleep"]))]
-        sleep_advice = tip_msgs["SleepAdvice"][random.randint(0, len(tip_msgs["SleepAdvice"]))]
+        sleep_tip = tip_msgs["Sleep"][random.randint(0, len(tip_msgs["Sleep"]) - 1)]
+        sleep_advice = tip_msgs["SleepAdvice"][random.randint(0, len(tip_msgs["SleepAdvice"]) - 1)]
         index = index_init
         emojis = []
         emoji_ids = []
@@ -144,7 +144,7 @@ class ResultMessage(EmojiManager):
             text += sleep_tip
         if not data["hasGoal"] and not data["isActive"]:
             if random.randint(0, 2) == 0:
-                text += tip_msgs["noGoalSet"]
+                text += tip_msgs["NoGoalSet"]
         return text, emojis
 
     def sleep_arr(self, data_arr: list[dict]):
@@ -208,7 +208,6 @@ class GoalSetMessage(EmojiManager):
         index = index_init
         emojis = []
         text: str = msgs["Message1"].format(data["streakGoal"])
-        text += self.date_format(msgs["Message2"], data["endGoalTime"], data["endDays"])
         text += msgs["Message3"].format(data["scoreToGet"])
         emojis.extend(self.create_emoji(text, msgs["ProductId"], msgs["Emoji"], index))
         index = len(text)

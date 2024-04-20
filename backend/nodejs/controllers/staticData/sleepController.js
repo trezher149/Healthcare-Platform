@@ -12,7 +12,6 @@ async function setSleepGoal(userId, sleepDays, endDays = 14) {
   const sleepData = await sleepDataModel.findOne({userId: userId})
   var sleepDataGoal = await sleepDataGoalModel.findOne({tableRef: sleepData._id})
                         .sort({setSleepGoalTime: -1})
-  console.log(sleepData)
   console.log(sleepDataGoal)
   const today = new Date()
   const endDate = new Date(today)
@@ -41,9 +40,13 @@ async function setSleepGoal(userId, sleepDays, endDays = 14) {
     }
   }
 
-  fields.scoreToGet = goals.scoreToGet = 3000 + ((sleepDays - 14) * 100)
+  fields.scoreToGet = goals.scoreToGet = 3000 + ((sleepDays - 7) * 50)
+  if (sleepDays >= 14) {
+    fields.scoreToGet = goals.scoreToGet = fields.scoreToGet + ((sleepDays - 14) * 100)
+  }
 
   sleepDataGoal = new sleepDataGoalModel(fields)
+  console.log(sleepDataGoal)
 
   return sleepDataGoal.save().then(() => {
     sleepData.save()
