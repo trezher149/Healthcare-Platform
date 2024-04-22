@@ -5,25 +5,25 @@ import axios from 'axios';
 
 var numberhour = 8;
 var numberminute = 24;
-var xValues = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+var xValues = ["17/03", "18/03", "19/03", "20/03", "21/03", "22/03", "23/03"];
 var yValues = [550, 490, 440, 512, 400, 824, 715];
 const barColors = ["rgb(58, 117, 246)", "rgb(58, 117, 246)", "rgb(58, 117, 246)", "rgb(58, 117, 246)", "rgb(58, 117, 246)"];
 
-await axios.post("http://localhost:14000/api/sleep/getSleep", {userId: "375d99cbcf2a"})
-.then((res) => {
-  const sleep_data = res.data
-  xValues = []
-  yValues = []
-  sleep_data.series.forEach(cal_data => {
-    yValues.push(cal_data.sleepDuration)
-    var time = new Date(cal_data.timestamp)
-    xValues.push(time.toISOString().slice(0, 10)) //.toLocaleString('en-GB', { timezone: "GMT+7"}))
-  });
-  yValues.reverse()
-  xValues.reverse()
-  numberhour = Math.floor(yValues[0] / 100)
-  numberminute = yValues[0] % 100
-})
+// await axios.post("http://localhost:14000/api/sleep/getSleep", {userId: "375d99cbcf2a"})
+// .then((res) => {
+//   const sleep_data = res.data
+//   xValues = []
+//   yValues = []
+//   sleep_data.series.forEach(cal_data => {
+//     yValues.push(cal_data.sleepDuration)
+//     var time = new Date(cal_data.timestamp)
+//     xValues.push(time.toISOString().slice(0, 10)) //.toLocaleString('en-GB', { timezone: "GMT+7"}))
+//   });
+//   yValues.reverse()
+//   xValues.reverse()
+//   numberhour = Math.floor(yValues[0] / 100)
+//   numberminute = yValues[0] % 100
+// })
 
 onMounted(() => {
   const ctx = document.getElementById('sleepChart').getContext('2d');
@@ -110,6 +110,10 @@ onMounted(() => {
     </section>
 
     <section class="services" id="services">
+      <h2>เป้าหมายการนอนหลับต่อสัปดาห์</h2> 
+	<div class="container"> 
+		<div class="skill html">80 %</div> 
+	</div> 
       <h2>สถิติการนอนหลับ</h2>
       <div class="graphsleep">
         <h2 class="graphsleep-h2"></h2>
@@ -132,6 +136,35 @@ onMounted(() => {
   font-family: "Poppins", sans-serif;
 }
 
+h2 { 
+  font-size: 2rem;
+		} 
+
+		.container { 
+			background-color: rgb(192, 192, 192); 
+			width: 80%; 
+			border-radius: 15px; 
+      margin-top: 20px;
+      margin-bottom: 20px;
+		} 
+
+		.skill { 
+			background-color: rgb(161, 137, 228); 
+			color: white; 
+			padding: 1%; 
+			text-align: right; 
+			font-size: 20px; 
+			border-radius: 15px; 
+		} 
+
+		.html { 
+			width: 80%; 
+		} 
+
+		.php { 
+			width: 60%; 
+		} 
+
 body {
   background: #f2f2f2;
 }
@@ -144,13 +177,13 @@ header {
   width: 100%;
   display: flex;
   justify-content: center;
-  background: rgb(150, 0, 0);
+  background: #fff;
 }
 
 .graph-container {
-    width: 600px; /* Set your desired width */
-    height: 320px; /* Set your desired height */
-    margin: 30px; /* จัดตำแหน่ง container กลางหน้าจอ */
+    width: 1000px; /* Set your desired width */
+    height: 520px; /* Set your desired height */
+    margin: 40px; /* จัดตำแหน่ง container กลางหน้าจอ */
     background: #fff;
     border-radius: 10px;
   }
@@ -192,7 +225,7 @@ header {
 header a, footer a {
   margin-left: 40px;
   text-decoration: none;
-  color: #fff;
+  color: #000000;
   height: 100%;
   padding: 20px 0;
   display: inline-block;
@@ -203,11 +236,11 @@ header a:hover, footer a:hover {
 }
 
 .homepage {
-  height: 100vh;
+  height: 80vh;
   width: 100%;
   position: relative;
-  background: url("../../../pictures/background/night.jpg");
-  background-position: center 65%;
+  background: linear-gradient(#605483, #9d9aa8);
+  /*background-position: center 65%;*/
   background-size: cover;
   background-attachment: fixed;
 }
@@ -219,7 +252,7 @@ header a:hover, footer a:hover {
   top: 0;
   height: 100%;
   width: 100%;
-  background: rgba(0, 0, 0, 0.2);
+ /* background: rgba(0, 0, 0, 0.2);*/
 }
 
 .homepage .content {

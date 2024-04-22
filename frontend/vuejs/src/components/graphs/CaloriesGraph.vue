@@ -2,39 +2,28 @@
 import { ref, onMounted, onBeforeMount} from 'vue';
 import Chart from 'chart.js/auto';
 import axios from 'axios'
-import internal from 'stream';
 
 var numbercal = 900;
-var xValues = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+var xValues = ["17/03", "18/03", "19/03", "21/03", "22/03", "23/03", "25/03"];
 var yValues = [550, 490, 440, 512, 400, 824, 715];
 var barColors = ["rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)"];
-var foodList = []
 
-await axios.post("http://localhost:14000/api/calories/getCal", { "userId": "375d99cbcf2a"})
-.then((res) => {
-  const calories_data= res.data
-  xValues = []
-  yValues = []
-  numbercal = calories_data.series[0].calories
-  console.log(typeof(calories_data.series[0].timestamp))
-  calories_data.series.forEach(cal_data => {
-    yValues.push(cal_data.calories)
-    var time = new Date(cal_data.timestamp)
-    xValues.push(time.toISOString().slice(0, 10)) //.toLocaleString('en-GB', { timezone: "GMT+7"}))
-  });
-  yValues.reverse()
-  xValues.reverse()
-  console.log(yValues)
-})
-
-await axios.post("http://localhost:14000/api/food/getFoodList", { "userId": "375d99cbcf2a", "calories": numbercal})
-.then((res) => {
-  foodList = res.data.foodList
-})
-
-function divide_calories(foodCalories) {
-  return Math.floor(numbercal / foodCalories)
-}
+// await axios.post("http://localhost:14000/api/calories/getCal", { "userId": "375d99cbcf2a"})
+// .then((res) => {
+  // const calories_data= res.data
+  // xValues = []
+  // yValues = []
+  // numbercal = calories_data.series[0].calories
+  // console.log(typeof(calories_data.series[0].timestamp))
+  // calories_data.series.forEach(cal_data => {
+    // yValues.push(cal_data.calories)
+    // var time = new Date(cal_data.timestamp)
+    // xValues.push(time.toISOString().slice(0, 10)) //.toLocaleString('en-GB', { timezone: "GMT+7"}))
+  // });
+  // yValues.reverse()
+  // xValues.reverse()
+  // console.log(yValues)
+// })
 
 onMounted(() => {
   const ctx = document.getElementById('kcalChart').getContext('2d');
@@ -70,6 +59,8 @@ onMounted(() => {
     }
   });
 });
+
+
 </script>
 
 
@@ -99,59 +90,21 @@ onMounted(() => {
     <section class="homepage" id="home">
       <div class="content">
         <div class="text">
-          <h2>การเผาผลาญเเคลอรี่วันนี้</h2>
+          <h2>คะเเนนของคุณวันนี้</h2>
         </div>
         <div class="calories-container">
           <h2 class="calories-number">{{ numbercal }}</h2>
-          <h1 class="kcal">kcal</h1>
+          <h1 class="kcal">คะเเนน</h1>
         </div>
         <!-- <a href="#services">อาหารที่เหมาะกับเเคลอรี่คุณ</a> -->
       </div>
     </section>
 
     <section class="services" id="services">
-      <h2>อาหารที่เหมาะกับเเคลอรี่คุณ</h2>
-      <ul class="cards">
-        <li v-for="food in foodList" class="card">
-          <img src="../../../pictures/background/food.png" alt="img"/>
-            <h3>{{ food.foodName }}</h3>
-            <h4>{{ food.caloriesGive }} kcal</h4>
-            <p>ซื้ออาหาร {{ divide_calories(food.caloriesGive) }} จาน</p>
-        </li>
-        <!-- <li class="card">
-          <img src="../../../pictures/background/food.jpg" alt="img">
-            <h3>{}</h3>
-            <p>ซื้ออาหาร X จาน</p>
-          </li>
-        <li class="card">
-          <img src="../../../pictures/background/food.png" alt="img">
-            <h3>ชื่อเมนู</h3>
-            <p>ซื้ออาหาร X จาน</p>
-        </li>
-        <li class="card">
-          <img src="../../../pictures/background/food.png" alt="img">
-            <h3>ชื่อเมนู</h3>
-            <p>ซื้ออาหาร X จาน</p>
-        </li>
-        <li class="card">
-          <img src="../../../pictures/background/food.png" alt="img">
-            <h3>ชื่อเมนู</h3>
-            <p>ซื้ออาหาร X จาน</p>
-        </li>
-        <li class="card">
-          <img src="../../../pictures/background/food.png" alt="img">
-            <h3>ชื่อเมนู</h3>
-            <p>ซื้ออาหาร X จาน</p>
-        </li>
-        <li class="card">
-            <img src="../../../pictures/background/food.png" alt="img">
-            <h3>ชื่อเมนู</h3>
-            <p>ซื้ออาหาร X จาน</p>
-        </li> -->
-      </ul>
-    </section>
-
-    <section class="services" id="services">
+      <h2>เป้าหมายเเคลอรี่ต่อสัปดาห์</h2> 
+	<div class="container"> 
+		<div class="skill html">80 %</div> 
+	</div> 
       <h2>สถิติการเผาผลาญเเคลอรี่</h2>
       <div class="graphsleep">
         <h2 class="graphsleep-h2"></h2>
@@ -177,11 +130,41 @@ onMounted(() => {
   font-family: "Poppins", sans-serif;
 }
 
+h2 { 
+  font-size: 2rem;
+		} 
+
+		.container { 
+			background-color: rgb(192, 192, 192); 
+			width: 80%; 
+			border-radius: 15px; 
+      margin-top: 20px;
+      margin-bottom: 20px;
+		} 
+
+		.skill { 
+			background-color: rgb(255, 186, 90); 
+			color: white; 
+			padding: 1%; 
+			text-align: right; 
+			font-size: 20px; 
+			border-radius: 15px; 
+		} 
+
+		.html { 
+			width: 80%; 
+		} 
+
+		.php { 
+			width: 60%; 
+		} 
+
 .graph-container {
-    width: 600px; /* Set your desired width */
-    height: 320px; /* Set your desired height */
-    margin: 30px; /* จัดตำแหน่ง container กลางหน้าจอ */
+    width: 1000px; /* Set your desired width */
+    height: 520px; /* Set your desired height */
+    margin: 40px; /* จัดตำแหน่ง container กลางหน้าจอ */
     background: #fff;
+    /*margin-left: -600px;*/
     border-radius: 10px;
   }
 
@@ -201,7 +184,7 @@ header {
   width: 100%;
   display: flex;
   justify-content: center;
-  background: rgb(150, 0, 0);
+  background: #fff;
 }
 
 .navbar {
@@ -241,7 +224,7 @@ header {
 header a, footer a {
   margin-left: 40px;
   text-decoration: none;
-  color: #fff;
+  color: #000000;
   height: 100%;
   padding: 20px 0;
   display: inline-block;
@@ -255,11 +238,11 @@ header a:hover, footer a:hover {
   margin: 0;
 }
 .homepage {
-  height: 100vh;
+  height: 80vh;
   width: 100%;
   position: relative;
-  background: url("../../../pictures/background/dumbel.jpg");
-  background-position: center 65%;
+  background: linear-gradient(#feafa4, #ffeaef);
+  /*background-position: center 65%;*/
   background-size: cover;
   background-attachment: fixed;
 }
@@ -271,7 +254,7 @@ header a:hover, footer a:hover {
   top: 0;
   height: 100%;
   width: 100%;
-  background: rgba(0, 0, 0, 0.2);
+ /* background: rgba(0, 0, 0, 0.2);*/
 }
 
 .homepage .content {

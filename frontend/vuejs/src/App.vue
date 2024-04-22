@@ -30,7 +30,7 @@ import SleepGraph from './components/graphs/SleepGraph.vue'
   <Suspense>
         <SleepGraph />
   </Suspense>
-  <footer>
+<!-- <footer>
       <div>
         <span>Evawell Project</span>
         <span class="link">
@@ -38,7 +38,7 @@ import SleepGraph from './components/graphs/SleepGraph.vue'
             <a href="#contact">ติดต่อเรา</a>
         </span>
       </div>
-    </footer>
+    </footer> -->
 
 </template>
 
