@@ -1,6 +1,9 @@
 <script setup>
 import CaloriesGraph from './components/graphs/CaloriesGraph.vue'
 import SleepGraph from './components/graphs/SleepGraph.vue'
+import Summary from './components/Summary.vue'
+// import SignUp from './components/graphs/SignUp.vue'
+// import SignIn from './components/graphs/SignIn.vue'
 
 </script>
 
@@ -16,14 +19,23 @@ import SleepGraph from './components/graphs/SleepGraph.vue'
             <path d="M3 18h18v-2H3v2zm0-5h18V11H3v2zm0-7v2h18V6H3z"/>
           </svg>
         </label>
-        <!-- <ul class="all-links">
+        <ul class="all-links">
           <li><a href="#home">หน้าหลัก</a></li>
-          <li><a href="#services">การบริการ</a></li>
-          <li><a href="#about">เกี่ยวกับเรา</a></li>
-          <li><a href="#contact">ติดต่อเรา</a></li>
-        </ul> -->
+          <li><a href="#services">การเผาผลาญ</a></li>
+          <li><a href="#portfolio">การนอนหลับ</a></li>
+          <li><a href="#about">ประวัติส่วนตัว</a></li>
+        </ul>
       </nav>
     </header>
+  <!-- <Suspense>
+    <SignUp />
+  </Suspense>
+  <Suspense>
+    <SignIn />
+  </Suspense> -->
+  <Suspense>
+    <Summary />
+  </Suspense>
   <Suspense>
     <CaloriesGraph />
   </Suspense>
@@ -66,7 +78,7 @@ header {
   width: 100%;
   display: flex;
   justify-content: center;
-  background: rgb(150, 0, 0);
+  background: #ffffff;
 }
 
 .navbar {
@@ -106,38 +118,87 @@ header {
 header a, footer a {
   margin-left: 40px;
   text-decoration: none;
-  color: #fff;
+  color: #000000;
   height: 100%;
   padding: 20px 0;
   display: inline-block;
 }
 
 header a:hover, footer a:hover {
-  color: #ddd;
+  color: #606060;
 }
 
-footer {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  background: #000;
-  padding: 20px 0;
+/*Hamburger-btn*/
+
+@media screen and (max-width: 860px) {
+  .navbar .all-links {
+    position: fixed;
+    left: -100%;
+    width: 300px;
+    display: block;
+    height: 100vh;
+    top: 75px;
+    background: #333;
+    transition: left 0.3s ease;
+  }
+
+  .navbar #menu-toggler:checked~.all-links {
+    left: 0;
+  }
+
+  .navbar .all-links li {
+    font-size: 18px;
+  }
+
+  .navbar #hamburger-btn {
+    display: block;
+  }
+
+  section > p {
+    text-align: center;
+  }
+
+  section .cards .card {
+    width: calc(100% / 2 - 15px);
+    margin-bottom: 30px;
+  }
+
+  .homepage .content h1 {
+    font-size: 40px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+
+  .homepage .content .text {
+    font-size: 17px;
+  }
+
+  .content a {
+    font-size: 17px;
+    padding: 9px 20px;
+  }
+
+  .contact .row {
+    flex-direction: column;
+  }
+
+  .contact .row .col {
+    width: 100%;
+  }
+
+  .contact .row .col:last-child {
+    margin-top: 40px;
+  }
+
+  footer a {
+    height: 0;
+  }
 }
 
-footer div {
-  padding: 0 10px;
-  max-width: 1200px;
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
+@media screen and (max-width: 560px) {
+  section .cards .card {
+    width: 100%;
+    margin-bottom: 30px;
+  }
 }
-
-footer span {
-  color: #fff;
-}
-
-footer a {
-  padding: 0;
-}
-
 </style>

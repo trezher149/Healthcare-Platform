@@ -3,38 +3,24 @@ import { ref, onMounted } from 'vue';
 import Chart from 'chart.js/auto';
 import axios from 'axios';
 
-var numberhour = 8;
-var numberminute = 24;
-var xValues = ["17/03", "18/03", "19/03", "20/03", "21/03", "22/03", "23/03"];
+var numbercal = 900;
+var xValues = ["17/03", "18/03", "19/03", "21/03", "22/03", "23/03", "25/03"];
 var yValues = [550, 490, 440, 512, 400, 824, 715];
-const barColors = ["rgb(58, 117, 246)", "rgb(58, 117, 246)", "rgb(58, 117, 246)", "rgb(58, 117, 246)", "rgb(58, 117, 246)"];
-
-// await axios.post("http://localhost:14000/api/sleep/getSleep", {userId: "375d99cbcf2a"})
-// .then((res) => {
-//   const sleep_data = res.data
-//   xValues = []
-//   yValues = []
-//   sleep_data.series.forEach(cal_data => {
-//     yValues.push(cal_data.sleepDuration)
-//     var time = new Date(cal_data.timestamp)
-//     xValues.push(time.toISOString().slice(0, 10)) //.toLocaleString('en-GB', { timezone: "GMT+7"}))
-//   });
-//   yValues.reverse()
-//   xValues.reverse()
-//   numberhour = Math.floor(yValues[0] / 100)
-//   numberminute = yValues[0] % 100
-// })
+var barColors = ["rgb(161, 137, 228)", "rgb(161, 137, 228)", "rgb(161, 137, 228)", "rgb(161, 137, 228)", "rgb(161, 137, 228)"];
 
 onMounted(() => {
   const ctx = document.getElementById('sleepChart').getContext('2d');
+  console.log(yValues)
+  console.log(xValues)
   new Chart(ctx, {
-    type: "bar",
+    type: "line",
     data: {
       labels: xValues,
       datasets: [{
         backgroundColor: barColors,
         data: yValues,
-        borderRadius: 10, // ค่าของมุม (border radius)
+        // เพิ่มตัวเลือก tension
+        tension: 0.4 // ปรับค่า tension ตามต้องการ
       }]
     },
     options: {
@@ -57,57 +43,13 @@ onMounted(() => {
     }
   });
 });
+
 </script>
 
 
 <template>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Camping Gear Website | CodingNepal</title>
-    <link rel="stylesheet" href="style.css">
-    <!-- Fontawesome Link for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
-  </head>
   <body>
-    <header>
-      <nav class="navbar">
-        <h2 class="logo"><a href="#">Evawell</a></h2>
-        <input type="checkbox" id="menu-toggler">
-        <label for="menu-toggler" id="hamburger-btn">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="24px" height="24px">
-            <path d="M0 0h24v24H0z" fill="none"/>
-            <path d="M3 18h18v-2H3v2zm0-5h18V11H3v2zm0-7v2h18V6H3z"/>
-          </svg>
-        </label>
-        <!-- <ul class="all-links">
-          <li><a href="#home">หน้าหลัก</a></li>
-          <li><a href="#services">การบริการ</a></li>
-          <li><a href="#about">เกี่ยวกับเรา</a></li>
-          <li><a href="#contact">ติดต่อเรา</a></li>
-        </ul> -->
-      </nav>
-    </header>
-
-    <section class="homepage" id="home">
-      <div class="content">
-        <div class="text">
-            <h2>การนอนคืนที่เเล้ว</h2>
-            <div class="sleep-container">
-                <div class="hour">
-                    <h1 class="sleep-number">{{ numberhour }}</h1>
-                    <h2 class="clock">ชั่วโมง</h2>
-                </div>
-                <div class="minute">
-                    <h1 class="sleep-number">{{ numberminute }}</h1>
-                    <h2 class="clock">นาที</h2>
-                </div>
-            </div>
-        </div>
-        <!-- <a href="#services">สถิติ</a> -->
-      </div>
-    </section>
 
     <section class="services" id="services">
       <h2>เป้าหมายการนอนหลับต่อสัปดาห์</h2> 
