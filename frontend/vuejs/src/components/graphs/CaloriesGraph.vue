@@ -25,18 +25,24 @@ var barColors = ["rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)", 
   // console.log(yValues)
 // })
 
+var numbercal = 900;
+var xValues = ["17/03", "18/03", "19/03", "21/03", "22/03", "23/03", "25/03"];
+var yValues = [550, 490, 440, 512, 400, 824, 715];
+var barColors = ["rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)"];
+
 onMounted(() => {
   const ctx = document.getElementById('kcalChart').getContext('2d');
   console.log(yValues)
   console.log(xValues)
   new Chart(ctx, {
-    type: "bar",
+    type: "line",
     data: {
       labels: xValues,
       datasets: [{
         backgroundColor: barColors,
         data: yValues,
-        borderRadius: 10, // ค่าของมุม (border radius)
+        // เพิ่มตัวเลือก tension
+        tension: 0.4 // ปรับค่า tension ตามต้องการ
       }]
     },
     options: {
@@ -49,7 +55,7 @@ onMounted(() => {
         y: {
           grid: {
             display: false // ปิดการแสดง grid lines ในแกน y
-          },
+          }
         }
       },
       legend: { display: false },
@@ -61,6 +67,8 @@ onMounted(() => {
 });
 
 
+
+
 </script>
 
 
@@ -68,37 +76,6 @@ onMounted(() => {
 <template>
 <html lang="en">
   <body>
-    <header>
-      <nav class="navbar">
-        <h2 class="logo"><a href="#">Evawell</a></h2>
-        <input type="checkbox" id="menu-toggler">
-        <label for="menu-toggler" id="hamburger-btn">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="24px" height="24px">
-            <path d="M0 0h24v24H0z" fill="none"/>
-            <path d="M3 18h18v-2H3v2zm0-5h18V11H3v2zm0-7v2h18V6H3z"/>
-          </svg>
-        </label>
-        <!-- <ul class="all-links">
-          <li><a href="#home">หน้าหลัก</a></li>
-          <li><a href="#services">การบริการ</a></li>
-          <li><a href="#about">เกี่ยวกับเรา</a></li>
-          <li><a href="#contact">ติดต่อเรา</a></li>
-        </ul> -->
-      </nav>
-    </header>
-
-    <section class="homepage" id="home">
-      <div class="content">
-        <div class="text">
-          <h2>คะเเนนของคุณวันนี้</h2>
-        </div>
-        <div class="calories-container">
-          <h2 class="calories-number">{{ numbercal }}</h2>
-          <h1 class="kcal">คะเเนน</h1>
-        </div>
-        <!-- <a href="#services">อาหารที่เหมาะกับเเคลอรี่คุณ</a> -->
-      </div>
-    </section>
 
     <section class="services" id="services">
       <h2>เป้าหมายเเคลอรี่ต่อสัปดาห์</h2> 
