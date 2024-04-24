@@ -170,6 +170,7 @@ section .cards .card3 {
 
 .swiper-slide{
   position: relative;
+  margin-top: 5%;
   height: 60vh;
   width: 100%;
   border-radius: 20px;

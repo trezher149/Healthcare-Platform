@@ -12,7 +12,8 @@
     "chart.js": "^4.4.0",
     "chartjs-plugin-annotation": "^3.0.1",
     "vue": "^3.3.4",
-    "vue-chartjs": "^5.2.0"
+    "vue-chartjs": "^5.2.0",
+    "vue-router": "^4.3.2"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.4.0",
