@@ -30,12 +30,12 @@ async function updateSleep(userId, sleepDurMinute){
   .catch(() => {return Promise.reject(500)})
 }
 
-async function getSleepSeriesData(userId, lengthDays = 10) {
+async function getSleepSeriesData(userId, lengthDays = 3) {
   const sleepData = await sleepDataModel.findOne({userId: userId})
   const sleepSeriesData = await sleepSeriesDataModel.find({
     tableRef: sleepData._id,
   }).limit(lengthDays).sort({timestamp: -1})
-  .select({ sleepDuration: 1, timestamp: 1}).lean()
+  .select({ sleepDuration: 1, sleepCond: 1, timestamp: 1}).lean()
   sleepSeriesData.forEach(item => {delete item._id})
   return sleepSeriesData
 }

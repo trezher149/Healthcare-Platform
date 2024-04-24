@@ -204,7 +204,7 @@ async function saveScoreSleep(userId, minutes) {
   }
 }
 
-async function listScore(userId, lengthDays = 10) {
+async function listScore(userId, lengthDays = 3) {
   const scoreData = await scoreDataModel.findOne({userId: userId})
   const scoreSeriesData = await scoreSeriesDataModel.find({
     tableRef: scoreData._id

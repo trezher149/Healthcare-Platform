@@ -2,6 +2,10 @@ const userModel = require('../../models/user')
 const userHealthData = require('../../models/userHealthData')
 const lineModel = require('../../models/lineUser')
 
+const {getCaloriesSeriesData} = require('../../controllers/seriesData/caloriesController')
+const {getSleepSeriesData} = require('../../controllers/seriesData/sleepController')
+const {listScore} = require('../../controllers/seriesData/scoreController')
+
 async function createUser(email, name, password, healthData){
   const checkExist = {
     foundSameUsername: false,
@@ -71,4 +75,34 @@ async function getUserIdFromLineId(lineId) {
   }
 }
 
-module.exports = { createUser, getUserData, addLineId, getUserIdFromLineId}
+async function getRecentData(userId) {
+  const today = new Date()
+  var date = undefined
+  var diffDays = 0
+  var result = {}
+  const recentCal = (await getCaloriesSeriesData(userId, 1))[0]
+  date = recentCal.timestamp
+  diffDays = (today - date) / (1000 * 3600 * 24)
+  if (diffDays < 10 && today.getDate() == date.getDate()) {
+    delete recentCal.timestamp
+    result = {...result, ...recentCal}
+  }
+  const recentSleep = (await getSleepSeriesData(userId, 1))[0]
+  date = recentSleep.timestamp
+  diffDays = (today - date) / (1000 * 3600 * 24)
+  if (diffDays < 10 && today.getDate() == date.getDate()) {
+    delete recentSleep.timestamp
+    result = {...result, ...recentSleep}
+  }
+  const recentScore = (await listScore(userId, 1)).scoreSeries[0]
+  date = recentScore.timestamp
+  diffDays = (today - date) / (1000 * 3600 * 24)
+  if (diffDays < 10 && today.getDate() == date.getDate()) {
+    delete recentScore.timestamp
+    result = {...result, ...recentScore}
+  }
+  return result
+}
+
+
+module.exports = { createUser, getUserData, addLineId, getUserIdFromLineId, getRecentData}

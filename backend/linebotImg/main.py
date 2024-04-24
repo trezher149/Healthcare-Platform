@@ -185,7 +185,14 @@ def handle_message(event):
                         if status_code == 404:
                             text, emojis = DefaultMessage.default(DEF_MSG_TH["UnregisteredUser"])
                         elif len(data_arr) > 0:
-                            text, emojis = send_msg(line_bot_api, event, ResultMessage.score_arr(total_score, data_arr))
+                            text, emojis = ResultMessage.score_arr(total_score, data_arr)
+                    case "recent":
+                        data, status_code = um.get_recent_data(URL, line_id)
+                        if status_code == 404:
+                            text, emojis = DefaultMessage.default(DEF_MSG_TH["UnregisteredUser"])
+                        else:
+                            text, emojis = ResultMessage.recentData(data)
+                            data_arr = ["a"] # Cheat my own code
                 if status_code == 404:
                     send_msg(line_bot_api, event, (text, emojis))
                 elif len(data_arr) == 0:

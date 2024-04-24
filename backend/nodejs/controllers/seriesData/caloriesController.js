@@ -58,12 +58,12 @@ async function updateCalories(userId, calories){
   .catch(() => {return Promise.reject(500)})
 }
 
-async function getCaloriesSeriesData(userId, lengthDays = 10) {
+async function getCaloriesSeriesData(userId, lengthDays = 3) {
   const caloriesData = await caloriesDataModel.findOne({userId: userId})
   const calSeriesData = await caloriesSeriesDataModel.find({
     tableRef: caloriesData._id
   }).limit(lengthDays).sort({timestamp: -1})
-  .select({calories: 1, timestamp: 1}).lean() 
+  .select({calories: 1, activityLvl: 1, timestamp: 1}).lean() 
   
   calSeriesData.forEach(item => {delete item._id})
 

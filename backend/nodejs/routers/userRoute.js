@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 const mongoose = require('mongoose')
 const { createUser, getUserData, addLineId,
-  getUserIdFromLineId } = require('../controllers/user/userController')
+  getUserIdFromLineId, getRecentData} = require('../controllers/user/userController')
 const {createUserCaloriesData} = require('../controllers/staticData/caloriesController')
 const {createUserSleepData} = require('../controllers/staticData/sleepController')
 const createScoreTable = require('../controllers/staticData/scoreController')
@@ -89,6 +89,27 @@ router.post('/getuseridfromlineid', (req, res) => {
     res.send()
   })
   .catch((reject) => res.sendStatus(reject))
+})
+
+router.post('/getRecentData', (req, res) => {
+  var fromLineBot = true
+  const auth_header = req.headers.authorization
+  try {
+    var decoded = tokenManager.headerTokenDecode("linebot-public.pem", auth_header)
+    console.log("nice")
+  } catch(err) {
+    var decoded = tokenManager.headerTokenDecode("web-public.pem", auth_header)
+    fromLineBot = false
+  }
+  mongoose.connect(mongodbURI)
+  getRecentData(decoded.userId)
+  .then((result) => {
+    const privt_key = fromLineBot ? "backend-private.pem" : "b2w-private.pem"
+    const encoded = tokenManager.generateToken(privt_key, result)
+    res.send({payload: encoded})
+  }) 
+  .catch((reject) => res.sendStatus(reject))
+
 })
 
 module.exports = router

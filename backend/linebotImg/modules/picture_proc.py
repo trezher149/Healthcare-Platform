@@ -179,7 +179,7 @@ class PictureProcess:
             minute_str = ""
             start_index = 0
           if len(minute_str) == 0:
-            continue
+            minute_str = "0"
           if int(minute_str) > 59:
             if len(minute_str) > 3:
               if len(hour_str) == 0:

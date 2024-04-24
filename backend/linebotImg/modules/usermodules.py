@@ -39,7 +39,7 @@ def send_calories(url, user_id: str, calories) -> tuple[dict, int]:
   decoded = _verify_token(res.json()["payload"])
   return decoded, res.status_code
 
-def get_calories(url, line_id: str, length_days = 10):
+def get_calories(url, line_id: str, length_days = 3):
   bearer = _gen_bearer({"lineId": line_id})
   res = requests.post(url + "/user/getuseridfromlineid", headers={"Authorization": bearer})
   if res.status_code == 404:
@@ -65,7 +65,7 @@ def send_sleep(url, user_id: str, sleep_minutes: int) -> tuple[dict, int]:
   decoded = _verify_token(res.json()["payload"])
   return decoded, res.status_code
 
-def get_sleep(url, line_id: str, length_days = 10):
+def get_sleep(url, line_id: str, length_days = 3):
   bearer = _gen_bearer({"lineId": line_id})
   res = requests.post(url + "/user/getuseridfromlineid", headers={"Authorization": bearer})
   if res.status_code == 404:
@@ -84,7 +84,7 @@ def get_sleep(url, line_id: str, length_days = 10):
   
   return sleep_arr, res.status_code
 
-def get_score(url, line_id: str, length_days = 10):
+def get_score(url, line_id: str, length_days = 3):
   bearer = _gen_bearer({"lineId": line_id})
   res = requests.post(url + "/user/getuseridfromlineid", headers={"Authorization": bearer})
   if res.status_code == 404:
@@ -102,3 +102,16 @@ def get_score(url, line_id: str, length_days = 10):
     score_data["scoreSeries"][i]["timestamp"] = time_diff.strftime("%d/%m/%Y")
   
   return score_data["totalScore"], score_data["scoreSeries"], res.status_code
+
+def get_recent_data(url, line_id: str):
+  bearer = _gen_bearer({"lineId": line_id})
+  res = requests.post(url + "/user/getuseridfromlineid", headers={"Authorization": bearer})
+  if res.status_code == 404:
+    return {}, res.status_code
+  user_id = _verify_token(res.headers["Authorization"].split(" ")[1])["userId"]
+
+  bearer = _gen_bearer({"userId": user_id})
+  res = requests.post(url + "/user/getRecentData", headers={"Authorization": bearer})
+  recent_data = _verify_token(res.json()["payload"])
+
+  return recent_data, res.status_code

@@ -57,6 +57,35 @@ class DefaultMessage(EmojiManager):
 
 class ResultMessage(EmojiManager):
 
+    def recentData(self, data: dict, lang = "th", index_init = 0):
+        f = open(f"modules/../messages/{lang}/picture_data.json")
+        msgs = json.loads(f.read())
+        f.close()
+        index = 0
+        emojis = []
+        emoji_ids = []
+        if not "calories" in data and not "sleepDuration" in data and not "score" in data:
+            return "", []
+        text = "$ ค่าของวันนี้\n"
+        emoji_ids.append("151")
+        if "score" in data:
+            text += f'$ {data["score"]:,} คะแนน' 
+            emoji_ids.append("129")
+        if "calories" in data:
+            text += f'\n$ {data["calories"]:,} กิโลแคลอรี่ ({msgs["ExerciseLvl"]["LvlMsg"][data["activityLvl"]]})' 
+            emoji_ids.append("029")
+        if "sleepDuration" in data:
+            hour = int(data["sleepDuration"]) // 60
+            minute = int(data["sleepDuration"]) % 60
+            if minute == 0:
+                text += f'\n$ {hour} ชั่วโมง'
+            else:
+                text += f'\n$ {hour} ชั่วโมง {minute} นาที'
+            emoji_ids.append("027")
+        emojis.extend(self.create_emoji(text, "5ac21a18040ab15980c9b43e", emoji_ids, index))
+        return text, emojis
+
+
     def calories(self, data: dict, lang = "th", index_init = 0):
         f = open(f"modules/../messages/{lang}/picture_data.json")
         msgs = json.loads(f.read())
@@ -97,13 +126,17 @@ class ResultMessage(EmojiManager):
         emojis.extend(self.create_emoji(text, product_id, emoji_ids, index))
         return text, emojis
     
-    def calories_arr(self, data_arr: list[dict]):
+    def calories_arr(self, data_arr: list[dict], lang = "th"):
+        f = open(f"modules/../messages/{lang}/picture_data.json")
+        msgs = json.loads(f.read())
+        f.close()
         text = ""
         emojis = []
         offset = 0
         for item in data_arr:
             text += "$ " + item["timestamp"] + "\n"
-            text += f"{item['calories']:,} กิโลแคลอรี่\n\n"
+            text += f'ออกกำลังกาย: {msgs["ExerciseLvl"]["LvlMsg"][item["activityLvl"]]}\n'
+            text += f'{item["calories"]:,} กิโลแคลอรี่\n\n'
             emojis.extend(self.create_emoji(text, "5ac21a18040ab15980c9b43e", ["129"], offset))
             offset = len(text)
         text = text[:len(text) - 2]
@@ -112,7 +145,7 @@ class ResultMessage(EmojiManager):
     def sleep(self, data: dict, lang = "th", index_init = 0):
         f = open(f"modules/../messages/{lang}/picture_data.json")
         msgs = json.loads(f.read())
-        f.close
+        f.close()
         f = open(f"modules/../messages/{lang}/tips.json")
         tip_msgs = json.loads(f.read())
         f.close()
@@ -150,12 +183,16 @@ class ResultMessage(EmojiManager):
         emojis.extend(self.create_emoji(text, product_id, emoji_ids, index))
         return text, emojis
 
-    def sleep_arr(self, data_arr: list[dict]):
+    def sleep_arr(self, data_arr: list[dict], lang = "th"):
+        f = open(f"modules/../messages/{lang}/picture_data.json")
+        msgs = json.loads(f.read())
+        f.close()
         text = ""
         emojis = []
         offset = 0
         for item in data_arr:
             text += "$ " + item["timestamp"] + "\n"
+            text += msgs["SleepCond"]["cond"][int(item["sleepCond"])] + "\n"
             hour = int(item["sleepDuration"]) // 60
             minute = int(item["sleepDuration"]) % 60
             if minute == 0:
