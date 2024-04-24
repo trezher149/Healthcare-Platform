@@ -4,7 +4,7 @@ import SleepGraph from './components/graphs/SleepGraph.vue'
 import Summary from './components/Summary.vue'
 // import SignUp from './components/graphs/SignUp.vue'
 // import SignIn from './components/graphs/SignIn.vue'
-import { RouterLink, RouterView } from 'vue-router'
+// import { RouterLink, RouterView } from 'vue-router'
 
 </script>
 

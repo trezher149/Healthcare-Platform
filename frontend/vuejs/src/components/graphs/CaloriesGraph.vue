@@ -2,50 +2,38 @@
 import { ref, onMounted, onBeforeMount} from 'vue';
 import Chart from 'chart.js/auto';
 import axios from 'axios'
-import jwt from 'jsonwebtoken'
-const {generateBearer, tokenDecode} = require('../tokenManager.js')
+import {generateBearer, headerTokenDecode, tokenDecode} from '../tokenManager'
 
-const pub_key = "-----BEGIN PUBLIC KEY----- \
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAl+VNzdShEP2xc2sUxUUH\
-5zO8Kuq9Kb+EFsXMbPeN0Bneu+79Y/AeqoyA2qygFpkS3cxR4FGg1uOl4Gt692Dn\
-hmQY9fJMzyCdFctVdnWVCyzIJsJPkWbJWmot+F/GPAyu3QlXBDZltGvjXU+vucSn\
-8eUu3s55sohkV9rlDECG7+2pbFrmoZ4+llFcnaTf3v2Br00FJp5BRbAerEo3Uusq\
-MRn+HiDpEnsNyXzKwFZM4av2fbBSCE4a36rHQjL08z05mAcAgHMJYu56At7pS3d7\
-Udn+dN+bMhcWBakdCXvhFtJ4Wfa7rnKebuAD6oEblc8zkO1rtJYdZGMmHd3u/FhE\
-KwIDAQAB\
------END PUBLIC KEY-----"
-
-var numbercal = 900;
-var xValues = ["17/03", "18/03", "19/03", "21/03", "22/03", "23/03", "25/03"];
-var yValues = [550, 490, 440, 512, 400, 824, 715];
-var barColors = ["rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)"];
-
-// const auth = generateBearer("", {"userId": "de5d59dd"})
+const bearer = await generateBearer({'userId': "de5d59dd"})
+console.log(bearer)
 
 const config = {headers: {
-  "Authorization": "auth"
+  "Authorization": bearer
 }}
+var xValues = []
+var yValues = []
+var barColors = []
+const barColor = "rgb(255, 162, 24)"
 await axios.post("http://localhost:14000/api/calories/getCal", {}, config)
-.then((res) => {
-  // const calories_data= tokenDecode("", res.data.data)
-  xValues = []
-  yValues = []
-  numbercal = calories_data.series[0].calories
-  console.log(typeof(calories_data.series[0].timestamp))
-  calories_data.series.forEach(cal_data => {
+.then(async (res) => {
+  console.log(res.data.payload)
+  const caloriesData = (await tokenDecode(res.data.payload)).data
+  console.log(caloriesData)
+  caloriesData.forEach(cal_data => {
     yValues.push(cal_data.calories)
     var time = new Date(cal_data.timestamp)
     xValues.push(time.toISOString().slice(0, 10)) //.toLocaleString('en-GB', { timezone: "GMT+7"}))
+    barColors.push(barColor)
   });
   yValues.reverse()
   xValues.reverse()
   console.log(yValues)
 })
 
-var numbercal = 900;
-var xValues = ["17/03", "18/03", "19/03", "21/03", "22/03", "23/03", "25/03"];
-var yValues = [550, 490, 440, 512, 400, 824, 715];
-var barColors = ["rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)"];
+// var numbercal = 900;
+// var xValues = ["17/03", "18/03", "19/03", "21/03", "22/03", "23/03", "25/03"];
+// var yValues = [550, 490, 440, 512, 400, 824, 715];
+// var barColors = ["rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)"];
 
 onMounted(() => {
   const ctx = document.getElementById('kcalChart').getContext('2d');
