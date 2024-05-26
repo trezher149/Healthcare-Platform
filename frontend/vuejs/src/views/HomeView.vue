@@ -3,21 +3,18 @@
 </script>
 
 <template>
-    <section class="homepage" id="home">
-      <div class="content">
-        <div class="text">
-          <h1>Evawel</h1>
-          <p>
-            เพื่อสุขภาพที่ดีของคุณ<br>อยู่เเค่ปลายนิ้ว</p>
-        </div>
+  <body>
+    <header>
+      <div class="text-content">
+      <h2>Evawel</h2><br><h3>เพื่อสุขภาพที่ดีของคุณอยู่เเค่ปลายนิ้ว</h3>
       </div>
-    </section>
+    </header>
+  </body>
 
 
 
     <section class="about" id="about">
       <h2>About Us</h2>
-      <p>Discover our story in project Evawel.</p>
       <div class="row company-info">
         <h3>Our Story</h3>
         <p>สมาร์ทวอทช์ คือนาฬิกาข้อมือที่สามารถบันทึกและติดตามกิจกรรมต่างๆ ของผู้ใช้งานเช่น แคลอรี่ที่เผาผลาญ และระยะเวลาการนอนของผู้ใช้งาน แต่การดึงข้อมูลจากสมาร์ทวอทช์เพื่อนำไปคำนวณเป็นค่าอย่างอื่น [ต้องเพิ่มความ สำคัญตรงนี้] เป็นไปได้ยาก เนื่องจากต้องใช้แอพพลิเคชั่นมือถือเพื่อเชื่อมต่อรับข้อมูลจากสมาร์ทวอทช์รุ่นนั้นโดยเฉพาะ ซึ่งแสดงค่าดิบที่ได้มาจากสมาร์ทวอทช์เพียงอย่างเดียวเท่านั้น 
@@ -29,34 +26,22 @@
             ซึ่งผู้ใช้สามารถตั้งเป้าหมายสำาหรับค่าแคลอรี่และจำนวนวันที่นอน 
             หลับที่เพียงพอในแต่ละคืนเพื่อเพิ่มคะแนนได้ </p>
       </div>
-      <div class="row team">
-        <h3>Our Mission</h3>
-        <ul>
-          <li>เพื่อออกแบบและพัฒนาระบบการแบ่งประเภทและอ่านข้อมูลจากสมาร์ทวอทช์ด้วยรูปถ่ายหน้าจอสมาร์ทวอทช์ โดยไม่จำกัดรุ่น</li>
-          <li>เพื่อออกแบบและพัฒนาแพลตฟอร์มดูแลสุขภาพด้วยข้อมูลสมาร์ทวอทช์ สำาหรับดูผลการเผาผลาญแคลอรี่และ ระยะเวลาในการนอนหลับในแต่ละวัน </li>
-          <li>เพื่อนำข้อมูลแคลอรี่และเวลาการนอนหลับมาประมวลผลและนำเสนอผลลัพธ์ในรูปแบบที่เข้าใจง่ายและชัดเจนให้ กับผู้ใช้งาน </li>
-        </ul>
-      </div>
     </section>
 
     <section class="services" id="services">
       <h2>Our Team</h2>
-      <p>นี่คือสมาชิกในทีมของเรา</p>
       <ul class="cards">
         <li class="card">
-          <img src="../assets/watch.jpg" alt="img">
+          <img src="../assets/user.jpg" alt="img">
           <h3>ศุภชัย</h3>
-          <p>6310530016</p>
         </li>
         <li class="card">
-          <img src="../assets/watch.jpg" alt="img">
+          <img src="../assets/user.jpg" alt="img">
           <h3>ธัญญวัฒน์</h3>
-          <p>6310682825</p>
         </li>
         <li class="card">
-          <img src="../assets/watch.jpg" alt="img">
+          <img src="../assets/user.jpg" alt="img">
           <h3>จารย์ส้ม</h3>
-          <p>ผู้ประเสริฐ</p>
         </li>
       </ul>
     </section>
@@ -71,6 +56,107 @@
   box-sizing: border-box;
   font-family: "Poppins", sans-serif;
 }
+
+body{
+  height: 100vh;;
+  width: 100%;
+  display: flex;
+  background-image: linear-gradient( 135deg, #ff9a9e  10%, #F6416C 100%);
+}
+::selection{
+  color: #f2f2f2;
+  background: #f86d8d;
+}
+body::before,
+body::after{
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+}
+body::before{
+  clip-path: circle(30% at left 20%);
+  opacity: 0.4;
+  background-image: linear-gradient( 135deg, #F6416C 10%, #ff9a9e 100%);
+}
+body::after{
+  opacity: 0.4;
+  clip-path: circle(25% at right 80%);
+  background-image: linear-gradient( 135deg, #F6416C 10%, #ff9a9e 100%);
+}
+
+header{
+  height: 50vh;
+  width: 90%;
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+  border-top: 1px solid rgba(255, 255, 255, 0.5);
+  border-left: 1px solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(5px);
+  z-index: 12;
+  border-radius: 25px;
+  top: 20px;
+  margin:auto;
+  position: relative;
+}
+
+ header .text-content{
+   width: 100%;
+   margin: 150px 0 0 50px ;
+ }
+.text-content h2{
+  font-size: 57px;
+  font-weight: 1000;
+  color: #f5557a;
+}
+
+.company-info {
+  background: #ffffff;
+  width: 90%;
+  border-radius: 12px;
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
+  height: 37vh;
+}
+
+.company-info p {
+  margin: 30px 30px 0 50px ;
+}
+
+@media (max-width:850px) {
+  header .navbar{
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 15px 5px;
+  }
+  .navbar .menu {
+    margin: 10px 0 20px 0;
+  }
+  header .text-content{
+    margin: 30px 0 0 20px ;
+    width: 70%;
+  }
+  header .text-content h2{
+    font-size: 20px;
+  }
+}
+@media (max-width:410px) {
+  header{
+    height: 100vh;
+    width: 100%;
+    border-radius: 0px;
+  }
+  header .navbar{
+    padding: 15px 10px;
+}
+}
+
+
+
+
+
 
 .homepage {
   height: 80vh;
@@ -94,7 +180,6 @@
 .homepage .content {
   display: flex;
   height: 85%;
-  z-index: 3;
   align-items: center;
   justify-content: center;
   flex-direction: column;
@@ -150,7 +235,7 @@ section.about {
 }
 
 .about h3 {
-  margin: 30px 0 10px;
+  margin: 40px 20px 20px;
   /* color: #ff5454; */
 }
 
@@ -165,7 +250,7 @@ section.about {
 
 section .cards .card {
   background: #fff;
-  padding: 40px 15px;
+  padding: 50px 70px;
   list-style: none;
   border-radius: 5px;
   box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.04);
@@ -174,16 +259,13 @@ section .cards .card {
   text-align: center;
 }
 
-.portfolio .cards .card {
-  padding: 0 0 20px;
-}
-
 .services .card img {
   width: 120px;
   height: 120px;
   margin-bottom: 20px;
   border-radius: 100%;
   object-fit: cover;
+  margin-right: 20px;
 }
 
 .portfolio .card img {

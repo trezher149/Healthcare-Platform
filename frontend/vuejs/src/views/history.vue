@@ -97,7 +97,7 @@ body{
 
 .dash-content {
     background: #ffffff;
-    padding: 10px 30px;
+    padding: 10px 200px;
     border-radius: 12px;
 }
 

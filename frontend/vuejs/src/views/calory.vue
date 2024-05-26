@@ -1,62 +1,63 @@
 <script setup>
 import sleep from  '../views/sleepchart.vue'
-// import Chart from 'chart.js/auto';
+import { ref, onMounted } from 'vue';
+import Chart from 'chart.js/auto';
 
-// var numbercal = 900;
-// var xValues = ["17/03", "18/03", "19/03", "21/03", "22/03", "23/03", "25/03"];
-// var yValues = [225, 400, 80, 125, 300, 289, 324];
-// var barColors = ["rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)"];
+var numbercal = 900;
+var xValues = ["17/03", "18/03", "19/03", "21/03", "22/03", "23/03", "25/03"];
+var yValues = [225, 400, 80, 125, 300, 289, 324];
+var barColors = ["rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)"];
 
-// onMounted(() => {
-//   const ctx = document.getElementById('kcalChart').getContext('2d');
-//   console.log(yValues)
-//   console.log(xValues)
-//   new Chart(ctx, {
-//     type: "line",
-//     data: {
-//       labels: xValues,
-//       datasets: [{
-//         backgroundColor: barColors,
-//         data: yValues,
-//         // เพิ่มตัวเลือก tension
-//         tension: 0.4 // ปรับค่า tension ตามต้องการ
-//       }]
-//     },
-//     options: {
-//       scales: {
-//         x: {
-//           grid: {
-//             display: false // ปิดการแสดง grid lines ในแกน x
-//           }
-//         },
-//         y: {
-//           grid: {
-//             display: false // ปิดการแสดง grid lines ในแกน y
-//           }
-//         }
-//       },
-//       legend: { display: false },
-//       title: {
-//         display: true,
-//       }
-//     }
-//   });
-// });
+onMounted(() => {
+  const ctx = document.getElementById('kcalChart').getContext('2d');
+  console.log(yValues)
+  console.log(xValues)
+  new Chart(ctx, {
+    type: "bar", // Change chart type to "bar"
+    data: {
+      labels: xValues,
+      datasets: [{
+        backgroundColor: barColors,
+        data: yValues
+      }]
+    },
+    options: {
+      scales: {
+        x: {
+          grid: {
+            display: false // Hide grid lines on x-axis
+          }
+        },
+        y: {
+          grid: {
+            display: false // Hide grid lines on y-axis
+          }
+        }
+      },
+      legend: { display: false },
+      title: {
+        display: true
+      }
+    }
+  });
+});
+
 </script>
 
 <template>
-<!-- <h2>สถิติการเผาผลาญเเคลอรี่</h2>
-    <div class="graphsleep">
-        <h2 class="graphsleep-h2"></h2>
-        <div ref="graphContainer" class="graph-container">
-            <canvas id="kcalChart" class="small-chart"></canvas>
-        </div>
-    </div> -->
+
         <section class="contact" id="contact">
       <div class="row">
         <div class="col information">
           <div class="contact-details">
-            <div class="color1">cal</div>
+            <div class="color1">
+              <div class="graphsleep">
+                <h2 class="graphsleep-h2"></h2>
+                <div ref="graphContainer" class="graph-container">
+                  <canvas id="kcalChart" class="small-chart"></canvas>
+                </div>
+              </div>
+            </div>
           </div>          
         </div>
         <div class="col form">
@@ -83,6 +84,21 @@ import sleep from  '../views/sleepchart.vue'
     font-size: 90px;
     font-weight: 700;
   }
+
+  .graphsleep-h2 {
+  margin: 0;
+}
+
+.graph-container {
+    width: 1000px; /* Set your desired width */
+    height: 500px; /* Set your desired height */
+    margin: 70px; /* จัดตำแหน่ง container กลางหน้าจอ */
+    background: #fff;
+    /*margin-left: -600px;*/
+    border-radius: 10px;
+  }
+
+
 
 
 
@@ -111,7 +127,7 @@ import sleep from  '../views/sleepchart.vue'
     border-radius: 12px;
     width: 90%;
     margin: 0 auto;
-    height: 60vh;
+    height: 35vh;
 }
 
 .color2 {

@@ -92,7 +92,7 @@ section .cards .card {
   border-radius: 5px;
   box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.04);
   margin-bottom: 40px;
-  width: calc(100% / 3 - 30px);
+  width: 100%;
   text-align: center;
 }
 
@@ -111,7 +111,7 @@ section .cards .card {
   }
 
   section .cards .card {
-    width: calc(100% / 2 - 15px);
+    width: calc(200% / 2 - 15px);
     margin-bottom: 30px;
   }
 

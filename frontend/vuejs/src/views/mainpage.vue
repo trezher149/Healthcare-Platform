@@ -69,15 +69,17 @@ body{
 .dashboard{
     position: relative;
     min-height: 35vh;
-    padding: 10px 14px;
+    padding: 20px 14px;
     border-radius: 12px;
     padding: 15px 20px;
 }
 
 .dash-content {
     background: #ffffff;
-    padding: 15px 30px;
+    padding: 40px 100px;
     border-radius: 12px;
+    width: 100%;
+    height: 30vh;
 }
 
 .dash-content .title i{
