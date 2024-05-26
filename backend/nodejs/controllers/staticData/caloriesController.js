@@ -63,7 +63,7 @@ async function setCaloriesGoal(userId, caloriesGoalVal, endDays = 7){
 
   var scoreToGet = 1000
   if (caloriesGoalVal <= sedentary) {
-    scoreToGet = scoreToGet * (caloriesGoalVal / sedentary) * 100
+    scoreToGet = scoreToGet + ((caloriesGoalVal / sedentary) * 100)
   }
   else if (caloriesGoalVal <= light) {scoreToGet += (caloriesGoalVal - sedentary)}
   else if (caloriesGoalVal <= medium) {scoreToGet += 500 + (caloriesGoalVal - light)}
