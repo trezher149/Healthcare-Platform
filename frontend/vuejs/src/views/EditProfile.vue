@@ -1,111 +1,190 @@
 <script setup>
-import { ref } from 'vue'
 
-const name = ref('')
-const currentPassword = ref('')
-const newPassword = ref('')
-const confirmPassword = ref('')
-const showCancelConfirmation = ref(false)
-
-const submitChanges = () => {
-  // Implement logic to verify current password and update new password
-  // if passwords match
-  console.log('Submitting changes...')
-}
-
-const cancelChanges = () => {
-  // Reset input fields or perform cancellation logic
-  console.log('Canceling changes...')
-}
 </script>
 
 
 <template>
-  <head>
-      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
-  </head>
-  <body class="body">
-    <section class="container py-5" id="cv">
-      <div class="row mt-4 py-3">
-        <div class="col-12 d-flex flex-column text-center">
-          <h2>CURRICULUM VITAE</h2>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-lg-4 mt-5 order-lg-0 order-1 text-center">
-          <img class="img-fluid rounded-circle border border-5 border-dark-subtle" src="../assets/user.jpg" alt="profile-img">
-          <h2 class="mt-3">Pumpuy Anderson</h2>
-          <ul class="list-unstyled contact-info">
-            <li>supachai.msk12@gmail.com</li>
-            <li><a>อายุ</a> 25</li>
-            <li><a>น้ำหนัก</a>85</li>
-          </ul>
-          <h5>ลบบัญชี</h5>
-          <ul class="list-unstyled">
-            <button>ลบบัญชี</button>
-            <!-- Add or remove interests as needed -->
-          </ul>
-        </div>
-        <div class="col-lg-7 order-lg-1 order-0 mt-5 text-start">
-          <h3>Edit Profile</h3>
-          <hr>
-          <dl>
-            <dt>Year - Year</dt>
-            <dd>University/Institution</dd>
-          </dl>
-          <dl>
-            <dt>Year - Year</dt>
-            <dd>University/Institution</dd>
-          </dl>
-          <dl>
-            <dt>Year - Year</dt>
-            <dd>University/Institution</dd>
-          </dl>
-          <dl>
-            <dt>Year - Year</dt>
-            <dd>University/Institution</dd>
-          </dl>
-        </div>
-      </div>      
-    </section>
-  </body>
+  <body>
+
+<section class="contact" id="contact">
+  <h2>Edit Profile</h2>
+  <div class="row">
+    <div class="col information">
+      <div class="contact-details">
+        <h2>Pumpuy</h2>
+        <p> supachai.msk12@gmail.com</p>
+        <p> 12/04/1998</p>
+        <p> อายุ 25 ปี</p>
+        <p> ส่วนสูง 178 cm</p>
+        <p> น้ำหนัก 85 cm</p>
+      </div>          
+    </div>
+    <div class="col form">
+      <form>
+        <input type="text" placeholder="Edit Name" required>
+        <input type="email" placeholder="Edit Email" required>
+        <input type="number" placeholder="Edit Weight" required>
+        <input type="number" placeholder="Edit Height" required>
+        <input type="password" placeholder="Edit password" required>
+        <input type="password" placeholder="confirm password" required>
+        <button id="submit" type="submit">confirm</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+</body>
   </template>
   
 
 <style scoped>
 
-#portfolio img {
-  height: 300px;
-  object-fit: cover;
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
 }
 
-
-#cv img {
-  width: 230px;
+body {
+  background: #f3cbcb;
 }
 
-/* Contact section background image */
-#contact {
-  background-size: cover;
-  background-attachment: fixed;
-  background-position: center;
+section {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  padding: 80px 0 0;
 }
 
-@media screen and (max-width: 990px) {
-  #skills .card {
-    width: calc(100% / 2 - 10px) !important;
+section h2 {
+  font-size: 2rem;
+}
+
+section > p {
+  text-align: center;
+}
+
+.contact .row {
+  margin: 60px 0 90px;
+  display: flex;
+  max-width: 1200px;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.contact .row .col {
+  padding: 0 10px;
+  width: calc(100% / 2 - 50px);
+}
+
+.contact .col p {
+  margin-bottom: 10px;
+}
+
+.contact .col p i {
+  color: #7a7a7a;
+  margin-right: 10px;
+}
+
+.contact form input {
+  height: 45px;
+  margin-bottom: 20px;
+  padding: 10px;
+  width: 100%;
+  font-size: 16px;
+  outline: none;
+  border: 1px solid #bfbfbf;
+}
+
+.contact form button {
+  margin-top: 10px;
+  padding: 10px 20px;
+  font-size: 17px;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  background: #f60f6f;
+  transition: 0.2s ease;
+}
+
+.contact form button:hover {
+  background: #d40d60;
+}
+@media screen and (max-width: 860px) {
+  .navbar .all-links {
+    position: fixed;
+    left: -100%;
+    width: 300px;
+    display: block;
+    height: 100vh;
+    top: 75px;
+    background: #333;
+    transition: left 0.3s ease;
+  }
+
+  .navbar #menu-toggler:checked~.all-links {
+    left: 0;
+  }
+
+  .navbar .all-links li {
+    font-size: 18px;
+  }
+
+  .navbar #hamburger-btn {
+    display: block;
+  }
+
+  section > p {
+    text-align: center;
+  }
+
+  section .cards .card {
+    width: calc(100% / 2 - 15px);
+    margin-bottom: 30px;
+  }
+
+  .homepage .content h1 {
+    font-size: 40px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+
+  .homepage .content .text {
+    font-size: 17px;
+  }
+
+  .content a {
+    font-size: 17px;
+    padding: 9px 20px;
+  }
+
+  .contact .row {
+    flex-direction: column;
+  }
+
+  .contact .row .col {
+    width: 100%;
+  }
+
+  .contact .row .col:last-child {
+    margin-top: 40px;
+  }
+
+  footer a {
+    height: 0;
   }
 }
 
-@media screen and (max-width: 668px) {
-  #skills .card,
-  #portfolio .card-wrapper {
-    width: 100% !important;
+@media screen and (max-width: 560px) {
+  section .cards .card {
+    width: 100%;
+    margin-bottom: 30px;
   }
-}
-
-.container {
-    background: linear-gradient(#ffdad5, #ffd0dc);
 }
 
 </style>

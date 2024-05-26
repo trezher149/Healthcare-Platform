@@ -101,7 +101,7 @@ const menuClass = computed(() => {
 }
 
 .navbar .links a:hover {
-  color: #47b2e4;
+  color: #ff5d7e;
 }
 
 .navbar .buttons a {
@@ -117,7 +117,7 @@ const menuClass = computed(() => {
 }
 
 .navbar .buttons .signin:hover {
-  color: #47b2e4;
+  color: #ff5d7e;
 }
 
 .navbar .buttons .signup {
@@ -129,7 +129,7 @@ const menuClass = computed(() => {
 }
 
 .navbar .buttons .signup:hover {
-  background-color: #47b2e4;
+  background-color: #ff5d7e;
   color: #fff;
 }
 
@@ -182,7 +182,7 @@ const menuClass = computed(() => {
 }
 
 .buttons .join {
-  background-color: #47b2e4;
+  background-color: #ff5d7e;
 }
 
 .hero-section .buttons .learn {
@@ -191,7 +191,7 @@ const menuClass = computed(() => {
 }
 
 .hero-section .buttons a:hover {
-  background-color: #47b2e4;
+  background-color: #ff5d7e;
 }
 
 /* Hamburger menu styles */
