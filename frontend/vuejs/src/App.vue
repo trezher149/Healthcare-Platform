@@ -2,9 +2,6 @@
 import CaloriesGraph from './components/graphs/CaloriesGraph.vue'
 import SleepGraph from './components/graphs/SleepGraph.vue'
 import Summary from './components/Summary.vue'
-// import SignUp from './components/graphs/SignUp.vue'
-// import SignIn from './components/graphs/SignIn.vue'
-// import { RouterLink, RouterView } from 'vue-router'
 
 </script>
 
@@ -22,19 +19,19 @@ import Summary from './components/Summary.vue'
         </label>
         <ul class="all-links">
           <li><a href="#home">หน้าหลัก</a></li>
-          <li><a href="#services">การเผาผลาญ</a></li>
-          <li><a href="#portfolio">การนอนหลับ</a></li>
+          <!-- <li><a href="#services">การเผาผลาญ</a></li>
+          <li><a href="#portfolio">การนอนหลับ</a></li> -->
           <li><RouterLink to="/SignIn"><a href="#about">เข้าสู่ระบบ</a></RouterLink></li>
         </ul>
       </nav>
     </header>
-    <RouterView />
   <!-- <Suspense>
     <SignUp />
   </Suspense>
   <Suspense>
     <SignIn />
   </Suspense> -->
+  <RouterView />
   <Suspense>
     <Summary />
   </Suspense>
@@ -44,6 +41,7 @@ import Summary from './components/Summary.vue'
   <Suspense>
         <SleepGraph />
   </Suspense>
+
 <!-- <footer>
       <div>
         <span>Evawell Project</span>
@@ -53,7 +51,7 @@ import Summary from './components/Summary.vue'
         </span>
       </div>
     </footer> -->
-
+  
 </template>
 
 <style scoped>

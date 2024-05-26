@@ -4,7 +4,6 @@ import Head from './App.vue'
 import SignIn from './components/SignIn.vue'
 
 const routes = [
-  { path: '/', component: Head },
   { path: '/SignIn', component: SignIn },
 ]
 

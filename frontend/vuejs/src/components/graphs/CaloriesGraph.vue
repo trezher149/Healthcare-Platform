@@ -4,36 +4,36 @@ import Chart from 'chart.js/auto';
 import axios from 'axios'
 import {generateBearer, headerTokenDecode, tokenDecode} from '../tokenManager'
 
-const bearer = await generateBearer({'userId': "de5d59dd"})
-console.log(bearer)
+// const bearer = await generateBearer({'userId': "de5d59dd"})
+// console.log(bearer)
 
-const config = {headers: {
-  "Authorization": bearer
-}}
-var xValues = []
-var yValues = []
-var barColors = []
-const barColor = "rgb(255, 162, 24)"
-await axios.post("http://localhost:14000/api/calories/getCal", {}, config)
-.then(async (res) => {
-  console.log(res.data.payload)
-  const caloriesData = (await tokenDecode(res.data.payload)).data
-  console.log(caloriesData)
-  caloriesData.forEach(cal_data => {
-    yValues.push(cal_data.calories)
-    var time = new Date(cal_data.timestamp)
-    xValues.push(time.toISOString().slice(0, 10)) //.toLocaleString('en-GB', { timezone: "GMT+7"}))
-    barColors.push(barColor)
-  });
-  yValues.reverse()
-  xValues.reverse()
-  console.log(yValues)
-})
+// const config = {headers: {
+//   "Authorization": bearer
+// }}
+// var xValues = []
+// var yValues = []
+// var barColors = []
+// const barColor = "rgb(255, 162, 24)"
+// await axios.post("http://localhost:14000/api/calories/getCal", {}, config)
+// .then(async (res) => {
+//   console.log(res.data.payload)
+//   const caloriesData = (await tokenDecode(res.data.payload)).data
+//   console.log(caloriesData)
+//   caloriesData.forEach(cal_data => {
+//     yValues.push(cal_data.calories)
+//     var time = new Date(cal_data.timestamp)
+//     xValues.push(time.toISOString().slice(0, 10)) //.toLocaleString('en-GB', { timezone: "GMT+7"}))
+//     barColors.push(barColor)
+//   });
+//   yValues.reverse()
+//   xValues.reverse()
+//   console.log(yValues)
+// })
 
-// var numbercal = 900;
-// var xValues = ["17/03", "18/03", "19/03", "21/03", "22/03", "23/03", "25/03"];
-// var yValues = [550, 490, 440, 512, 400, 824, 715];
-// var barColors = ["rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)"];
+var numbercal = 900;
+var xValues = ["17/03", "18/03", "19/03", "21/03", "22/03", "23/03", "25/03"];
+var yValues = [225, 400, 80, 125, 300, 289, 324];
+var barColors = ["rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)"];
 
 onMounted(() => {
   const ctx = document.getElementById('kcalChart').getContext('2d');
