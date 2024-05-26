@@ -1,47 +1,42 @@
-<script>
-import router from '../router'
+<script setup>
 import { RouterLink } from 'vue-router'
-
 </script>
 
 <template>
-<body>
+  <body>
     <div class="edge flex">
-        <!--<span class="big-circle"></span>-->
-        <span class="circle one"></span>
-        <!--<span class="circle two"></span>-->
-        <div class="facebook-page flex">
-            <div class="text">
-                <h1>Evawell</h1>
-            </div>
-            <div class="container">
-                <header>Signup Form</header>
-                <div class="form-outer">
-                    <form action="#">
-                        <div class="page slide-page">
-                            <div class="field">
-                                <div class="label">Username</div>
-                                <input type="text" />
-                            </div>
-                                <div class="field">
-                                <div class="label">Password</div>
-                                <input type="password" />
-                            </div>
-                            <div class="field">
-                                <button class="firstNext next">Sign In</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
+      <div class="facebook-page flex">
+        <div class="text">
+          <h1>Evawel</h1>
         </div>
+        <div class="container">
+          <header>Sign In</header>
+          <div class="form-outer">
+            <form action="#">
+              <div class="page slide-page">
+                <div class="field">
+                  <div class="label">Username</div>
+                  <input type="text" />
+                </div>
+                <div class="field">
+                  <div class="label">Password</div>
+                  <input type="password" />
+                </div>
+                <div class="field">
+                  <RouterLink to="/mainpage">
+                    <button class="firstNext next">Sign in</button>
+                  </RouterLink>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
-</body>
+  </body>
 </template>
 
-
-
-<style>
+<style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
 
 * {
@@ -63,54 +58,6 @@ import { RouterLink } from 'vue-router'
   background: linear-gradient(#ffdad5, #fff7f9);
 }
 
-
-.big-circle {
-  position: absolute;
-  width: 500px;
-  height: 500px;
-  border-radius: 50%;
-  background: linear-gradient(to bottom, #ffd1dc, #ff5b46);
-  bottom: 60%;
-  right: 15%;
-  transform: translate(-40%, 38%);
-}
-
-.big-circle:after {
-  content: "";
-  position: absolute;
-  width: 360px;
-  height: 360px;
-  background-color: #ffeeec;
-  border-radius: 50%;
-  top: calc(50% - 180px);
-  left: calc(50% - 180px);
-}
-
-
-
-.circle {
-  border-radius: 50%;
-  position: absolute;
-  transform: translate(-40%, 38%);
-}
-
-.circle.one {
-  background: linear-gradient(690deg, transparent 20%, #ff5b46);
-  width: 130px;
-  height: 130px;
-  bottom: 60%;
-  right: 75%;
-}
-
-.circle.two {
-  background: linear-gradient(135deg, transparent 20%, #ff5b46);
-  width: 80px;
-  height: 80px;
-  top: 10px;
-  right: 30px;
-}
-
-
 .facebook-page {
   justify-content: space-between;
   max-width: 1000px;
@@ -127,11 +74,6 @@ import { RouterLink } from 'vue-router'
   margin-bottom: 10px;
 }
 
-.facebook-page p {
-  font-size: 1.75rem;
-  white-space: nowrap;
-}
-
 .container {
   display: flex;
   z-index: 1000;
@@ -145,9 +87,6 @@ import { RouterLink } from 'vue-router'
   width: 100%;
 }
 
-
-
-
 .container header{
   font-size: 35px;
   font-weight: 600;
@@ -160,10 +99,12 @@ import { RouterLink } from 'vue-router'
   overflow: hidden;
   transform: translate(4%, 0%)
 }
+
 .container .form-outer form{
   display: flex;
   width: 400%;
 }
+
 .form-outer form .page{
   width: 25%;
   transition: margin-left 0.3s ease-in-out;
@@ -173,6 +114,7 @@ import { RouterLink } from 'vue-router'
   font-size: 25px;
   font-weight: 500;
 }
+
 .form-outer form .page .field{
   width: 330px;
   height: 45px;
@@ -185,6 +127,7 @@ form .page .field .label{
   top: -30px;
   font-weight: 500;
 }
+
 form .page .field input{
   height: 100%;
   width: 100%;
@@ -193,14 +136,16 @@ form .page .field input{
   padding-left: 15px;
   font-size: 18px;
 }
+
 form .page .field select{
   width: 100%;
   padding-left: 10px;
   font-size: 17px;
   font-weight: 500;
 }
+
 form .page .field button{
-  width: 100%;
+  width: 470%;
   height: calc(100% + 5px);
   border: none;
   background: linear-gradient(270deg, #ff994f, #fa6d86);
@@ -214,24 +159,30 @@ form .page .field button{
   text-transform: uppercase;
   transition: 0.5s ease;
 }
+
 form .page .field button:hover{
   background: #000;
 }
+
 form .page .btns button{
   margin-top: -20px!important;
 }
+
 form .page .btns button.prev{
   margin-right: 3px;
   font-size: 17px;
 }
+
 form .page .btns button.next{
   margin-left: 3px;
 }
+
 .container .progress-bar{
   display: flex;
   margin: 40px 0;
   user-select: none;
 }
+
 .container .progress-bar .step{
   text-align: center;
   width: 100%;
@@ -243,6 +194,7 @@ form .page .btns button.next{
   color: #000;
   margin-bottom: 8px;
 }
+
 .progress-bar .step .bullet{
   height: 25px;
   width: 25px;
@@ -255,18 +207,22 @@ form .page .btns button.next{
   font-size: 17px;
   line-height: 25px;
 }
+
 .progress-bar .step .bullet.active{
   border-color: #d43f8d;
   background: #d43f8d;
 }
+
 .progress-bar .step .bullet span{
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
 }
+
 .progress-bar .step .bullet.active span{
   display: none;
 }
+
 .progress-bar .step .bullet:before,
 .progress-bar .step .bullet:after{
   position: absolute;
@@ -277,25 +233,30 @@ form .page .btns button.next{
   width: 44px;
   background: #262626;
 }
+
 .progress-bar .step .bullet.active:after{
   background: #d43f8d;
   transform: scaleX(0);
   transform-origin: left;
   animation: animate 0.3s linear forwards;
 }
+
 @keyframes animate {
   100%{
     transform: scaleX(1);
   }
 }
+
 .progress-bar .step:last-child .bullet:before,
 .progress-bar .step:last-child .bullet:after{
   display: none;
 }
+
 .progress-bar .step p.active{
   color: #d43f8d;
   transition: 0.2s linear;
 }
+
 .progress-bar .step .check{
   position: absolute;
   left: 50%;
@@ -304,6 +265,7 @@ form .page .btns button.next{
   transform: translate(-50%, -50%);
   display: none;
 }
+
 .progress-bar .step .check.active{
   display: block;
   color: #fff;
@@ -345,6 +307,5 @@ form .page .btns button.next{
     display: none;
   }
 }
-
 
 </style>
