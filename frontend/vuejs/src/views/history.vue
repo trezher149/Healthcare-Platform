@@ -1,5 +1,6 @@
 <script>
-
+import calhistory from '../views/calhistory.vue'
+import sleephistory from './sleephistory.vue';
 </script>
 
 <template>
@@ -33,6 +34,10 @@
                     </div>
                 </div>
             </div>
+
+<main>
+    <calhistory />
+</main> 
 
             <div class="activity">
                 <div class="title">
@@ -128,7 +133,7 @@ body{
     align-items: center;
     border-radius: 12px;
     width: calc(100% / 3 - 15px);
-    padding: 15px 20px;
+    padding: 50px 70px;
     background-color: #4DA3FF;
 }
 .boxes .box i{
@@ -145,6 +150,7 @@ body{
 }
 .boxes .box.box2{
     background-color: #FFE6AC;
+    width: 30%;
 }
 .boxes .box.box3{
     background-color: #E7D1FC;
