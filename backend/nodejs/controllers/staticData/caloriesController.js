@@ -62,13 +62,13 @@ async function setCaloriesGoal(userId, caloriesGoalVal, endDays = 7){
   const heavy = Math.round(bmr * 0.725)
 
   var scoreToGet = 1000
-  if (caloriesGoalVal < sedentary) {
+  if (caloriesGoalVal <= sedentary) {
     scoreToGet = scoreToGet * (caloriesGoalVal / sedentary) * 100
   }
-  else if (caloriesGoalVal < light) {}
-  else if (caloriesGoalVal < medium) {scoreToGet += 500}
-  else if (caloriesGoalVal < heavy) {scoreToGet += 1000}
-  else {scoreToGet += 1500}
+  else if (caloriesGoalVal <= light) {scoreToGet += (caloriesGoalVal - sedentary)}
+  else if (caloriesGoalVal <= medium) {scoreToGet += 500 + (caloriesGoalVal - light)}
+  else if (caloriesGoalVal <= heavy) {scoreToGet += 1000 + (caloriesGoalVal - medium)}
+  else {scoreToGet += 1500 + (caloriesGoalVal - heavy)}
 
   if (endDays / minimumDays > 2) {
     const percentReduce = 1 - (Math.log10(endDays - (minimumDays * 2)) + 0.05)

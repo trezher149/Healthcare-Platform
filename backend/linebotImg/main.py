@@ -41,6 +41,7 @@ from linebot.v3.messaging import (
     MessagingApi,
     ReplyMessageRequest,
     TextMessage,
+    PushMessageRequest
 )
 from linebot.v3.webhooks import (
     MessageEvent,
@@ -136,7 +137,7 @@ def handle_message(event):
                         else:
                             goal_msg, status_code = Goal.calories_goal(site_user_id, calories, int(message[3]))
                         if status_code > 400:
-                            send_msg(line_bot_api, event, (DEF_MSG_TH["SetGoals"]["AlreadySet"]["Message"], []))
+                            send_msg(line_bot_api, event, (DEF_MSG_TH["AlreadySet"]["Message"], []))
                         else: 
                             send_msg(line_bot_api, event, goal_msg)
                     case "sleep":
@@ -146,7 +147,7 @@ def handle_message(event):
                         else:
                             goal_msg, status_code = Goal.sleep_goal(site_user_id, sleep_days, int(message[3]))
                         if status_code > 400:
-                            send_msg(line_bot_api, event, (DEF_MSG_TH["SetGoals"]["AlreadySet"]["Message"], []))
+                            send_msg(line_bot_api, event, (DEF_MSG_TH["AlreadySet"]["Message"], []))
                         else: 
                             send_msg(line_bot_api, event, goal_msg)
                     case _:
@@ -158,6 +159,7 @@ def handle_message(event):
                 status_code: int
                 text = ""
                 emojis = []
+                send_msg(line_bot_api, event, DefaultMessage.default(DEF_MSG_TH["Processing"]["FetchData"]))
                 match data_type:
                     case "cal":
                         if len(message) < 3:
@@ -193,11 +195,18 @@ def handle_message(event):
                         else:
                             text, emojis = ResultMessage.recentData(data)
                             data_arr = ["a"] # Cheat my own code
+                push_msg = None
                 if status_code == 404:
-                    send_msg(line_bot_api, event, (text, emojis))
+                    # send_msg(line_bot_api, event, (text, emojis))
+                    push_msg = PushMessageRequest(to=line_id, messages=[TextMessage(text=text, emojis=emojis)])
                 elif len(data_arr) == 0:
-                    send_msg(line_bot_api, event, ("คุณยังไม่มีการส่งค่านั้นค่ะ\nส่งรูปหน้าจอสมาร์ทวอทช์เพื่อเริ่มบันทึกค่านะคะ", []))
-                else: send_msg(line_bot_api, event, (text, emojis))
+                    push_msg = PushMessageRequest(to=line_id, messages=[TextMessage(text="คุณยังไม่มีการส่งค่านั้นค่ะ\nส่งรูปหน้าจอสมาร์ทวอทช์เพื่อเริ่มบันทึกค่านะคะ", emojis=emojis)])
+                    # send_msg(line_bot_api, event, ("คุณยังไม่มีการส่งค่านั้นค่ะ\nส่งรูปหน้าจอสมาร์ทวอทช์เพื่อเริ่มบันทึกค่านะคะ", []))
+                else:
+                    push_msg = PushMessageRequest(to=line_id, messages=[TextMessage(text=text, emojis=emojis)])
+                line_bot_api.push_message_with_http_info(push_message_request=push_msg)
+
+                # else: send_msg(line_bot_api, event, (text, emojis))
 
             case "tip":
                 pass
@@ -256,7 +265,7 @@ def handle_image(event):
             return 0
         
         #Image is being processed
-        #send_msg(line_bot_api, event, DefaultMessage.default(MSG_TH["Confirmations"]["Uploaded"]))
+        send_msg(line_bot_api, event, DefaultMessage.default(DEF_MSG_TH["Processing"]["Image"]))
         types, values = picproc.read_image()
         if len(types) == 0:
             send_msg(line_bot_api, event, DefaultMessage.default(DEF_MSG_TH["Err"]["ValueNotFound"]))
@@ -298,7 +307,9 @@ def handle_image(event):
                             txt_msgs.append(TextMessage(text=text, emojis=emojis))
             i += 1
             time.sleep(1)
-        send_msg_obj(line_bot_api, event, txt_msgs) 
+        line_bot_api.push_message_with_http_info(PushMessageRequest(to=event.source.user_id, messages=txt_msgs))
+
+        # send_msg_obj(line_bot_api, event, txt_msgs) 
         #Save image for checking match image next time
         app.logger.info("saving picture...")
         picproc.save_image()
