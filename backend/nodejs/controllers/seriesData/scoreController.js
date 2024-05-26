@@ -1,11 +1,11 @@
 const scoreDataModel = require('../../models/scoreData')
 const scoreSeriesDataModel = require('../../models/scoreSeriesData')
 const caloriesDataModel = require('../../models/caloriesData')
-const caloriesGoalModel= require('../../models/caloriesGoalData')
+const caloriesGoalModel = require('../../models/caloriesGoalData')
 const sleepDataModel = require('../../models/sleepData')
 const sleepGoalDataModel = require('../../models/sleepGoalData')
 
-async function saveScore(userId, realScore) {
+async function saveScore(userId, realScore, caloriesSent = false, sleepSent = false) {
   //Change later
   const scoreData = await scoreDataModel.findOne({userId: userId})
   const today = new Date()
@@ -20,9 +20,6 @@ async function saveScore(userId, realScore) {
   // console.log(scoreSeriesData)
   if (scoreSeriesData != null) {
     latestDate = scoreSeriesData.timestamp
-    // console.log(today.getDate())
-    // console.log(latestDate.getDate())
-    // console.log(today.getDate() == latestDate.getDate())
   }
 
   if (!latestDate) {
@@ -49,6 +46,8 @@ async function saveScore(userId, realScore) {
   }
   console.log(scoreResult)
   scoreData.totalScore += realScore
+  if (caloriesSent) {scoreSeriesData.caloriesSent = caloriesSent}
+  if (sleepSent) {scoreSeriesData.sleepSent = sleepSent}
   return scoreSeriesData.save().then(() => {
     return scoreData.save()
   }).then(() => {return scoreResult})
@@ -103,7 +102,7 @@ async function saveScoreCalories(userId, calories, oldCalories, activityLvl) {
     results.isActive = caloriesGoal.isActive = false
     await caloriesGoal.save()
     await caloriesGoalModel.create({tableRef: caloriesData._id, isRenew: true})
-    return saveScore(userId, newScore).then(async (score) => {
+    return saveScore(userId, newScore, true).then(async (score) => {
       await caloriesDataGoal.save()
       results.score = score.score
       results.totalScore = score.totalScore
@@ -131,7 +130,7 @@ async function saveScoreCalories(userId, calories, oldCalories, activityLvl) {
     else { results.caloriesGoal = caloriesGoal.caloriesGoal }
   }
   
-  return saveScore(userId, newScore).then(async (score) => {
+  return saveScore(userId, newScore, true).then(async (score) => {
     await caloriesGoal.save()
     results.score = score.score
     results.totalScore = score.totalScore
@@ -180,7 +179,7 @@ async function saveScoreSleep(userId, minutes) {
   }
   if (sleepGoalData) {
     return sleepGoalData.save().then(() => {
-      return saveScore(userId, realScore)
+      return saveScore(userId, realScore, false, true)
     }).then(async (score) => {
       await sleepData.save()
       results.score = score.score
