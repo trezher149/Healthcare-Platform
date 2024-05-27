@@ -3,23 +3,23 @@ import sleep from  '../views/sleepchart.vue'
 import { ref, onMounted } from 'vue';
 import Chart from 'chart.js/auto';
 import axios from 'axios'
-import jose from 'jose'
 
 var numbercal = 900;
 var xValues = ["17/03", "18/03", "19/03", "21/03", "22/03", "23/03", "25/03"];
 var yValues = [225, 400, 80, 125, 300, 289, 324];
 var barColors = ["rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)"];
-const pubKey = `-----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAl+VNzdShEP2xc2sUxUUH
-5zO8Kuq9Kb+EFsXMbPeN0Bneu+79Y/AeqoyA2qygFpkS3cxR4FGg1uOl4Gt692Dn
-hmQY9fJMzyCdFctVdnWVCyzIJsJPkWbJWmot+F/GPAyu3QlXBDZltGvjXU+vucSn
-8eUu3s55sohkV9rlDECG7+2pbFrmoZ4+llFcnaTf3v2Br00FJp5BRbAerEo3Uusq
-MRn+HiDpEnsNyXzKwFZM4av2fbBSCE4a36rHQjL08z05mAcAgHMJYu56At7pS3d7
-Udn+dN+bMhcWBakdCXvhFtJ4Wfa7rnKebuAD6oEblc8zkO1rtJYdZGMmHd3u/FhE
-KwIDAQAB
------END PUBLIC KEY-----`
 
-axios.post("http://localhost:14000/")
+// const token = jwt.sign({user_id: user_id}, pubKey, {algorithm: 'RS256'})
+// console.log(token)
+
+// axios.post("http://localhost:14000/api/calories/getCal", {
+//   headers: {
+//     "Authorization": token
+//   },
+//   data: {
+//     lengthDays: 30
+//   }
+// })
 
 onMounted(() => {
   const ctx = document.getElementById('kcalChart').getContext('2d');
