@@ -4,6 +4,9 @@
     "ProductId": "5ac21a18040ab15980c9b43e",
     "Emoji": "048"
   }, 
+  "AlreadySet": {
+    "Message": "คุณได้ตั้งเป้าหมายเรียบร้อยแล้วค่ะ"
+  },
   "Confirmations": {
     "AddUserId": {
       "Message": "$ ผูกบัญชี Line กับบัญชีเรียบร้อยแล้วค่ะ~",
@@ -14,9 +17,18 @@
       "Message": "$ คุณได้ผูกบัญชี Line กับบัญชีแล้วค่ะ",
       "ProductId": "5ac21a18040ab15980c9b43e",
       "Emoji": "048"
+    }
+  },
+  "Processing": {
+    "Image": {
+      "Message": "$ กำลังประมวลผลรูปภาพ...$\nกรุณารอสักครู่ค่ะ",
+      "ProductId": "5ac21542031a6752fb806d55",
+      "Emoji": ["247", "247"]
     },
-    "Uploaded": {
-      "Message": "กำลังประมวลผล กรุณารอสักครู่ค่ะ"
+    "FetchData": {
+      "Message": "$ กำลังดึงข้อมูล...$\nกรุณารอสักครู่ค่ะ",
+      "ProductId": "5ac21542031a6752fb806d55",
+      "Emoji": ["247", "247"]
     }
   },
 

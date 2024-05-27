@@ -7,7 +7,9 @@ const scoreSeriesDataSchema = new Schema({
   timestamp: {
     type: Date,
     default: () => new Date()
-  }
+  },
+  caloriesSent: Boolean,
+  sleepSent: Boolean
 },
 {
   collection: "scoreSeriesData"

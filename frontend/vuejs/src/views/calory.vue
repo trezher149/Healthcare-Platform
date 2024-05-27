@@ -2,11 +2,24 @@
 import sleep from  '../views/sleepchart.vue'
 import { ref, onMounted } from 'vue';
 import Chart from 'chart.js/auto';
+import axios from 'axios'
 
 var numbercal = 900;
 var xValues = ["17/03", "18/03", "19/03", "21/03", "22/03", "23/03", "25/03"];
 var yValues = [225, 400, 80, 125, 300, 289, 324];
 var barColors = ["rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)", "rgb(255, 162, 24)"];
+
+// const token = jwt.sign({user_id: user_id}, pubKey, {algorithm: 'RS256'})
+// console.log(token)
+
+// axios.post("http://localhost:14000/api/calories/getCal", {
+//   headers: {
+//     "Authorization": token
+//   },
+//   data: {
+//     lengthDays: 30
+//   }
+// })
 
 onMounted(() => {
   const ctx = document.getElementById('kcalChart').getContext('2d');
@@ -46,7 +59,7 @@ onMounted(() => {
 
 <template>
 
-        <section class="contact" id="contact">
+        <!-- <section class="contact" id="contact">
       <div class="row">
         <div class="col information">
           <div class="contact-details">
@@ -59,14 +72,21 @@ onMounted(() => {
               </div>
             </div>
           </div>          
-        </div>
-        <div class="col form">
+        </div> -->
+        <!-- <div class="col form">
             <main class="color2">
                 <sleep />
             </main>  
-        </div>
+        </div> -->
+      <!-- </div>
+    </section> -->
+    <!-- <canvas id="kcalChart" class="small-chart"></canvas> -->
+    <div class="color1 p-min-4 p-8">
+      <h2 class="text-center text-xl md:text-3xl font-bold mb-4">แคลอรี่ที่เผาผลาญ</h2>
+      <div ref="graphContainer" class="graph-container">
+        <canvas id="kcalChart"></canvas>
       </div>
-    </section>
+    </div>
 </template>
 
 <style scoped>
@@ -90,9 +110,6 @@ onMounted(() => {
 }
 
 .graph-container {
-    width: 1000px; /* Set your desired width */
-    height: 500px; /* Set your desired height */
-    margin: 70px; /* จัดตำแหน่ง container กลางหน้าจอ */
     background: #fff;
     /*margin-left: -600px;*/
     border-radius: 10px;
@@ -121,13 +138,6 @@ onMounted(() => {
 .color1 {
     background: #ffe993;
     border-radius: 12px;
-    position: relative;
-    min-height: 25vh;
-    padding: 15px 14px;
-    border-radius: 12px;
-    width: 90%;
-    margin: 0 auto;
-    height: 35vh;
 }
 
 .color2 {

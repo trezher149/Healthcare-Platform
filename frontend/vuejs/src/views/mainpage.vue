@@ -1,5 +1,6 @@
 <script setup>
 import calory from './calory.vue'
+import sleep from  './sleepchart.vue'
 
 </script>
 
@@ -7,7 +8,7 @@ import calory from './calory.vue'
 <body>
 
 
-<section class="dashboard">
+<section class="dashboard my-8">
 
     <div class="dash-content">
         <div class="overview">
@@ -16,8 +17,8 @@ import calory from './calory.vue'
                 <span class="text">Dashboard</span>
             </div>
 
-            <div class="boxes">
-                <div class="box box1">
+            <div class="boxes flex flex-wrap flex-col lg:flex-row mx-28">
+                <div class="box box1 p-min-16">
                     <i class="uil uil-thumbs-up"></i>
                     <span class="text">Total Scroll Today</span>
                     <span class="number">50,120</span>
@@ -38,13 +39,14 @@ import calory from './calory.vue'
 </section>
 
 <section class="portfolio" id="portfolio">
-    <h2>guidance</h2>
+    <h2>คำแนะนำ</h2>
     <p>Take a look at some of our memorable camping adventures.</p>
 </section>
 
 
-<main>
-    <calory />
+<main class="grid gap-8 grid-cols-1 md:grid-cols-2 mx-auto p-16">
+    <calory class="" />
+    <sleep class=""/>
 </main>        
           
 
@@ -68,18 +70,15 @@ body{
 
 .dashboard{
     position: relative;
-    min-height: 35vh;
-    padding: 20px 14px;
+    padding: 20px;
     border-radius: 12px;
-    padding: 15px 20px;
 }
 
 .dash-content {
     background: #ffffff;
-    padding: 40px 100px;
+    padding: 40px;
     border-radius: 12px;
-    width: 100%;
-    height: 30vh;
+    width: 90%;
 }
 
 .dash-content .title i{
@@ -108,8 +107,9 @@ body{
     flex-direction: column;
     align-items: center;
     border-radius: 12px;
-    width: calc(100% / 3 - 15px);
-    padding: 15px 20px;
+    padding: 1.5rem;
+    margin: 1rem;
+    width: 40%;
     background-color: #4DA3FF;
 }
 .boxes .box i{

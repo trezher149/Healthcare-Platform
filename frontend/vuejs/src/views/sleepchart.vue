@@ -45,8 +45,8 @@ onMounted(() => {
 </script >
 
 <template>
-<div class="graphsleep">
-    <h2 class="graphsleep-h2"></h2>
+<div class="color2 p-min-4 p-8">
+    <h2 class="text-center text-xl md:text-3xl font-bold mb-4">การนอน</h2>
     <div ref="graphContainer" class="graph-container">
         <canvas id="sleepChart"></canvas>
     </div>
@@ -55,9 +55,6 @@ onMounted(() => {
 
 <style>
 .graph-container {
-    width: 1000px; /* Set your desired width */
-    height: 520px; /* Set your desired height */
-    margin: 40px; /* จัดตำแหน่ง container กลางหน้าจอ */
     background: #fff;
     border-radius: 10px;
   }
@@ -76,7 +73,12 @@ h1.sleep-number {
     font-size: 90px;
     font-weight: 700;
 }
-    
+
+.color2 {
+    background: #b286ff;
+    border-radius: 12px;
+}
+
 .clock {
     color: #fff;
     transform: translate(15%, -200%);

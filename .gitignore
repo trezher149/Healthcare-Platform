@@ -6,6 +6,7 @@ backend/linebotImg/.EasyOCR
 frontend/**/.vscode/**
 frontend/vite_test/**
 frontend/**/node_modules/**
+frontend/**/package-lock.json
 **/*.env
 **.pem
 backend/db
