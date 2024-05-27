@@ -81,8 +81,8 @@ onMounted(() => {
       <!-- </div>
     </section> -->
     <!-- <canvas id="kcalChart" class="small-chart"></canvas> -->
-    <div class="color1 p-min-4 p-8">
-      <h2 class="text-center text-xl md:text-3xl font-bold mb-4">แคลอรี่ที่เผาผลาญ</h2>
+    <div class="color1 p-min-4 p-5">
+      <h2 class="text-center text-xl md:text-1xl font-bold mb-4">แคลอรี่ที่เผาผลาญ</h2>
       <div ref="graphContainer" class="graph-container">
         <canvas id="kcalChart"></canvas>
       </div>
@@ -113,6 +113,8 @@ onMounted(() => {
     background: #fff;
     /*margin-left: -600px;*/
     border-radius: 10px;
+    width: 650px;
+    height: 50vh;
   }
 
 

@@ -45,18 +45,22 @@ onMounted(() => {
 </script >
 
 <template>
-<div class="color2 p-min-4 p-8">
-    <h2 class="text-center text-xl md:text-3xl font-bold mb-4">การนอน</h2>
-    <div ref="graphContainer" class="graph-container">
+    <div class="color2 p-min-4 p-5">
+      <h2 class="text-center text-xl md:text-1xl font-bold mb-4">แคลอรี่ที่เผาผลาญ</h2>
+      <div ref="graphContainer" class="graph-container w-1/2">
         <canvas id="sleepChart"></canvas>
+      </div>
     </div>
-</div>
+
 </template>
 
 <style>
 .graph-container {
     background: #fff;
     border-radius: 10px;
+    /*margin-left: -600px;*/
+    border-radius: 10px;
+    width: auto;
   }
 
 .sleep-container {
