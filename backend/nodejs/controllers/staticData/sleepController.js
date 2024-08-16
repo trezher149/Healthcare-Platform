@@ -9,48 +9,48 @@ async function createUserSleepData(userId, optionsData = {}) {
 }
 
 async function setSleepGoal(userId, sleepDays, endDays = 14) {
-  const sleepData = await sleepDataModel.findOne({userId: userId})
-  var sleepDataGoal = await sleepDataGoalModel.findOne({tableRef: sleepData._id})
-                        .sort({setSleepGoalTime: -1})
-  console.log(sleepDataGoal)
-  const today = new Date()
-  const endDate = new Date(today)
-  endDate.setDate(endDate.getDate() + endDays) 
+  const PERSONAL_SLEEP_DATA = await sleepDataModel.findOne({userId: userId})
+  let LATEST_SLEEP_GOAL = await sleepDataGoalModel.findOne({
+    tableRef: PERSONAL_SLEEP_DATA._id,
+    isActive: true
+  }).sort({setSleepGoalTime: -1})
+  const TODAY = new Date()
+  const DATE_TO_FINISH = new Date(TODAY)
+  DATE_TO_FINISH.setDate(DATE_TO_FINISH.getDate() + endDays) 
 
-  const goals = {
+  const GOALS = {
     streakGoal: sleepDays,
     scoreToGet: 0,
     endDays: endDays,
-    endGoalDate: endDate.toLocaleString()
+    endGoalDate: DATE_TO_FINISH.toLocaleString()
   }
 
-  const fields = {
-    tableRef: sleepData._id,
+  const FIELDS = {
+    tableRef: PERSONAL_SLEEP_DATA._id,
     streakGoal: sleepDays,
     scoreToGet: 0,
-    endGoalTime: endDate
+    endGoalTime: DATE_TO_FINISH
   }
 
-  if (sleepDataGoal) {
-    if (!sleepDataGoal.isAchived) {
-      const diffDays = (today - sleepDataGoal.setSleepGoalTime) / (1000 * 3600 * 24)
-      if (diffDays < sleepDataGoal.setGoalIntervalDays) {
+  if (LATEST_SLEEP_GOAL) {
+    if (!LATEST_SLEEP_GOAL.isAchived) {
+      const diffDays = (TODAY - LATEST_SLEEP_GOAL.setSleepGoalTime) / (1000 * 3600 * 24)
+      if (diffDays < LATEST_SLEEP_GOAL.setGoalIntervalDays) {
         return Promise.reject(406)
       }
     }
   }
 
-  fields.scoreToGet = goals.scoreToGet = 3000 + ((sleepDays - 7) * 50)
+  FIELDS.scoreToGet = GOALS.scoreToGet = 3000 + ((sleepDays - 7) * 50)
   if (sleepDays >= 14) {
-    fields.scoreToGet = goals.scoreToGet = fields.scoreToGet + ((sleepDays - 14) * 100)
+    FIELDS.scoreToGet = GOALS.scoreToGet = FIELDS.scoreToGet + ((sleepDays - 14) * 100)
   }
 
-  sleepDataGoal = new sleepDataGoalModel(fields)
-  console.log(sleepDataGoal)
+  LATEST_SLEEP_GOAL = new sleepDataGoalModel(FIELDS)
 
-  return sleepDataGoal.save().then(() => {
-    sleepData.save()
-  }).then(() => { return goals })
+  return LATEST_SLEEP_GOAL.save().then(() => {
+    PERSONAL_SLEEP_DATA.save()
+  }).then(() => { return GOALS })
 }
 
 module.exports = {createUserSleepData, setSleepGoal}
