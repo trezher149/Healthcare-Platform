@@ -4,8 +4,8 @@ on:
   pull_request:
     branches:
     - "main"
-  paths:
-    - "backend/nodejs"
+    paths:
+      - "backend/nodejs"
 
 jobs:
   build:
