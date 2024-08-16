@@ -4,7 +4,7 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "test": "jest tests/mongodb.test.js --config=jest-config.json",
+    "test": "jest tests/controllers.test.js --config=jest-config.json",
     "dev": "node main.js"
   },
   "author": "Thunyavat Thanakornsombat",
