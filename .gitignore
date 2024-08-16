@@ -9,4 +9,5 @@ frontend/vite_test/**
 **.pem
 backend/db
 jest*
+!jest-mongodb-config.js
 !jest-config.json
