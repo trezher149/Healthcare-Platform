@@ -2,9 +2,11 @@ name: Testing nodejs controllers
 
 on:
   pull_request:
-    branches: [ "main" ]
-  paths:
-    - "backend/nodejs"
+    branches:
+    - "main"
+    paths:
+      - "backend/nodejs"
+
 jobs:
   build:
     if: github.head_ref == "backend-dev"
