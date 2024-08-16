@@ -5,11 +5,11 @@ on:
     branches:
     - "main"
     paths:
-      - "backend/nodejs/**"
+      - 'backend/nodejs/**'
 
 jobs:
   build:
-    if: github.head_ref == "backend-dev"
+    if: github.head_ref == 'backend-dev'
     runs-on: ubuntu-latest
 
     strategy:
