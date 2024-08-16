@@ -7,70 +7,62 @@ const sleepGoalDataModel = require('../../models/sleepGoalData')
 
 async function saveScore(userId, realScore, caloriesSent = false, sleepSent = false) {
   //Change later
-  const scoreData = await scoreDataModel.findOne({userId: userId})
-  const today = new Date()
-  var latestDate = undefined
-  if (scoreData == null) {
-    scoreData = new scoreDataModel({
+  const USER_SCORE_DATA = await scoreDataModel.findOne({userId: userId})
+  // const TODAY = new Date()
+  const TODAY = () => {
+    const TODAY_OBJ = new Date()
+    return `${TODAY_OBJ.getFullYear()}-${TODAY_OBJ.getMonth()}-${TODAY_OBJ.getDate()}`
+  }
+  let latestDate = undefined
+  if (USER_SCORE_DATA == null) {
+    USER_SCORE_DATA = new scoreDataModel({
       userId: userId
     })
   }
-  var scoreSeriesData = await scoreSeriesDataModel
-    .findOne({tableRef: scoreData._id}).sort({timestamp: -1})
-  // console.log(scoreSeriesData)
-  if (scoreSeriesData != null) {
-    latestDate = scoreSeriesData.timestamp
-  }
+  let latestScore = await scoreSeriesDataModel
+    .findOne({
+      tableRef: USER_SCORE_DATA._id,
+      timestamp: { $gte: TODAY()}
+    }).sort({timestamp: -1})
 
-  if (!latestDate) {
-    console.log(latestDate)
-    scoreSeriesData = new scoreSeriesDataModel({
-      tableRef: scoreData._id,
-      score: realScore
-    })
-  }
-  else if (today.getDate() != latestDate.getDate()) {
-    scoreSeriesData = new scoreSeriesDataModel({
-      tableRef: scoreData._id,
+  if (!latestScore) {
+    latestScore = new scoreSeriesDataModel({
+      tableRef: USER_SCORE_DATA._id,
       score: realScore
     })
   }
   else {
-    scoreSeriesData.score += realScore
-    scoreSeriesData.timestamp = today
+    latestScore.score += realScore
+    latestScore.timestamp = new Date()
   }
 
-  const scoreResult = {
+  const SCORE_RESULT = {
     score: realScore,
-    totalScore: scoreSeriesData.score
+    totalScore: latestScore.score
   }
-  console.log(scoreResult)
-  scoreData.totalScore += realScore
-  if (caloriesSent) {scoreSeriesData.caloriesSent = caloriesSent}
-  if (sleepSent) {scoreSeriesData.sleepSent = sleepSent}
-  return scoreSeriesData.save().then(() => {
-    return scoreData.save()
-  }).then(() => {return scoreResult})
+  USER_SCORE_DATA.totalScore += realScore
+  if (caloriesSent) {latestScore.caloriesSent = caloriesSent}
+  if (sleepSent) {latestScore.sleepSent = sleepSent}
+  await latestScore.save()
+  return USER_SCORE_DATA.save()
+  .then(() => {return SCORE_RESULT})
   .catch(() => {return 500})
 }
 
 async function saveScoreCalories(userId, calories, oldCalories, activityLvl) {
   const baseScore = 100
-  var oldScore = 0
+  var latestScore = 0
   const caloriesData = await caloriesDataModel.findOne({userId: userId})
   const today = Date.now()
   const sedentary = Math.round(caloriesData.bmr * 0.2)
-  var newScore = (calories <= sedentary) ? Math.round(calories / sedentary * baseScore) :
+  var recentScore = (calories <= sedentary) ? Math.round(calories / sedentary * baseScore) :
                   baseScore + Math.round(calories * 0.2)
   if (oldCalories > 0) {
-    oldScore = (oldCalories <= sedentary) ? Math.round(oldCalories / sedentary * baseScore) :
+    latestScore = (oldCalories <= sedentary) ? Math.round(oldCalories / sedentary * baseScore) :
                 baseScore + Math.round(oldCalories * 0.2)
   }
 
-  // console.log(newScore)
-  // console.log(oldScore)
-  newScore -= oldScore
-  // console.log(newScore)
+  recentScore -= latestScore
 
   const caloriesGoal = await caloriesGoalModel.findOne({tableRef: caloriesData._id})
                       .sort({setCaloriesGoalTime: -1})
@@ -87,11 +79,10 @@ async function saveScoreCalories(userId, calories, oldCalories, activityLvl) {
     daysLeft: 0
   }
   if (caloriesGoal == null) {
-    return saveScore(userId, newScore).then((score) => {
+    return saveScore(userId, recentScore).then((score) => {
       results.score = score.score
       results.totalScore = score.totalScore
       results.hasGoal = false
-      console.log(results)
       return results
     })
   }
@@ -102,7 +93,7 @@ async function saveScoreCalories(userId, calories, oldCalories, activityLvl) {
     results.isActive = caloriesGoal.isActive = false
     await caloriesGoal.save()
     await caloriesGoalModel.create({tableRef: caloriesData._id, isRenew: true})
-    return saveScore(userId, newScore, true).then(async (score) => {
+    return saveScore(userId, recentScore, true).then(async (score) => {
       await caloriesDataGoal.save()
       results.score = score.score
       results.totalScore = score.totalScore
@@ -112,9 +103,10 @@ async function saveScoreCalories(userId, calories, oldCalories, activityLvl) {
   if (!caloriesGoal.isAchived) {
     caloriesGoal.caloriesTotal += (calories - oldCalories)
     if (caloriesGoal.caloriesTotal >= caloriesGoal.caloriesGoal) {
-      newScore += caloriesGoal.scoreToGet
+      recentScore += caloriesGoal.scoreToGet
       results.achiveScore = caloriesGoal.scoreToGet
       results.isAchived = caloriesGoal.isAchived = true
+      results.isActive = caloriesGoal.isActive = false
     }
   }
   else {
@@ -130,7 +122,7 @@ async function saveScoreCalories(userId, calories, oldCalories, activityLvl) {
     else { results.caloriesGoal = caloriesGoal.caloriesGoal }
   }
   
-  return saveScore(userId, newScore, true).then(async (score) => {
+  return saveScore(userId, recentScore, true).then(async (score) => {
     await caloriesGoal.save()
     results.score = score.score
     results.totalScore = score.totalScore

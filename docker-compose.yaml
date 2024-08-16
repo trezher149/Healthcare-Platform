@@ -1,4 +1,3 @@
-version: '3'
 services:
   #backend
   cheffy:
@@ -8,18 +7,19 @@ services:
       - "14000:14000"
     env_file:
       - ./backend/nodejs/.env
-    depends_on:
-      - cupboard
+    # depends_on:
+    #   - cupboard
   #database
-  cupboard:
-    container_name: "cupboard"
-    image: "mongo:latest"
-    env_file:
-      - ./backend/.env
-    ports:
-      - "27017:27017"
-    volumes:
-      - "./backend/db:/var/lib/mongodb"
+  # cupboard:
+  #   container_name: "cupboard"
+  #   image: "mongo:latest"
+  #   env_file:
+  #     - ./backend/.env
+  #   ports:
+  #     - "27017:27017"
+  #   volumes:
+  #     - "./backend/db:/var/lib/mongodb"
+
   #Line-bot
   waiter:
     container_name: "waiter"

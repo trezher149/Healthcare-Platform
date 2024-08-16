@@ -1,7 +1,7 @@
 const caloriesDataModel = require('../../models/caloriesData')
 const caloriesGoalModel = require('../../models/caloriesGoalData')
 
-function HarrisBenedict(usrSex, weight, height, age) {
+function CalculateHarrisBenedict(usrSex, weight, height, age) {
   // Female
   if (usrSex) {
     return 655.0955 + (9.5634 * weight) + (1.8496 * height) - (4.6756 * age)
@@ -12,94 +12,96 @@ function HarrisBenedict(usrSex, weight, height, age) {
   }
 }
 
-async function createUserCaloriesData(userId, usrHealth, optionsData = {}) {
+async function createUserCaloriesData(userId, userHealthData, optionsData = {}) {
   //  First time user using the app
   // The bmr is the minimum
   // Using Harris-Benedict equation with average IC value in mind
-  const bmr = Math.round(
-    HarrisBenedict(usrHealth.sex, usrHealth.weight, usrHealth.height, usrHealth.age)
+  const BMR = Math.round(
+    CalculateHarrisBenedict(userHealthData.sex, userHealthData.weight, userHealthData.height, userHealthData.age)
   ) - 329
-  var caloriesData = new caloriesDataModel({
+
+  const PERSONAL_CALORIES_DATA = new caloriesDataModel({
     userId: userId,
-    bmr: bmr,
+    bmr: BMR,
   })
   if (Object.keys(optionsData).length > 0) {
-    setOptions(options,caloriesData)
-    caloriesData.caloriesGoal = otherData.setCaloriesGoal
+    setOptions(options,PERSONAL_CALORIES_DATA)
+    PERSONAL_CALORIES_DATA.caloriesGoal = otherData.setCaloriesGoal
   }
-  return caloriesData.save().then(() => {return 200})
+  return PERSONAL_CALORIES_DATA.save().then(() => {return 200})
   .catch(() => {return 500})
 }
 
-async function setCaloriesGoal(userId, caloriesGoalVal, endDays = 7){
-  const caloriesData = await caloriesDataModel.findOne({userId: userId})
+async function setCaloriesGoal(userId, caloriesGoalSet, endDays = 7){
+  const PERSONAL_CALORIES_DATA = await caloriesDataModel.findOne({userId: userId})
   .then((data) => {return data}).catch(() => {return 500})
-  if (caloriesData == null) {
-    return Promise.reject(406)
-  }
-  var caloriesGoal = await caloriesGoalModel.findOne({tableRef: caloriesData._id})
-                      .sort({setCaloriesGoalTime: -1})
+  if (PERSONAL_CALORIES_DATA == null) { return Promise.reject(406) }
 
-  const today = new Date()
-  const endDate = new Date(today)
-  endDate.setDate(endDate.getDate() + endDays)
+  let latestCaloriesGoal = await caloriesGoalModel.findOne({
+    tableRef: PERSONAL_CALORIES_DATA._id,
+    isActive: true
+  }).sort({setCaloriesGoalTime: -1})
+
+  const TODAY = new Date()
+  const DATE_TO_FINISH = new Date(TODAY)
+  DATE_TO_FINISH.setDate(DATE_TO_FINISH.getDate() + endDays)
   // console.log(endDate)
-  const minimumDays = 7
-  const bmr = caloriesData.bmr
+  const MINIMUM_DAYS_TO_SET = 7
+  const BMR = PERSONAL_CALORIES_DATA.bmr
 
-  if (caloriesGoal) {
-    if (!caloriesGoal.isAchived) {
-      const diffDays = (today - caloriesGoal.setCaloriesGoalTime) / (1000 * 3600 * 24)
-      if (diffDays < caloriesGoal.setGoalIntervalDays && caloriesGoal.isActive) {
-        return Promise.reject(406)
-      }
+  if (latestCaloriesGoal) {
+    const DAYS_DIFFERENCE = (TODAY - latestCaloriesGoal.setCaloriesGoalTime) / (1000 * 3600 * 24)
+    if (DAYS_DIFFERENCE < latestCaloriesGoal.setGoalIntervalDays && latestCaloriesGoal.isActive) {
+      return Promise.reject(406)
+    }
+    else if (DAYS_DIFFERENCE > latestCaloriesGoal.setGoalIntervalDays) {
+      latestCaloriesGoal.isActive = false
+      await latestCaloriesGoal.save()
     }
   }
 
-  const sedentary = Math.round(bmr * 0.2)
-  const light = Math.round(bmr * 0.375)
-  const medium = Math.round(bmr * 0.55)
-  const heavy = Math.round(bmr * 0.725)
+  const SEDENTARY = Math.round(BMR * 0.2)
+  const LIGHT = Math.round(BMR * 0.375)
+  const MEDIUM = Math.round(BMR * 0.55)
+  const HEAVY = Math.round(BMR * 0.725)
 
-  var scoreToGet = 1000
-  if (caloriesGoalVal <= sedentary) {
-    scoreToGet = scoreToGet + ((caloriesGoalVal / sedentary) * 100)
+  let scoreToGet = 1000
+  if (caloriesGoalSet <= SEDENTARY) {
+    scoreToGet = scoreToGet + ((caloriesGoalSet / SEDENTARY) * 100)
   }
-  else if (caloriesGoalVal <= light) {scoreToGet += (caloriesGoalVal - sedentary)}
-  else if (caloriesGoalVal <= medium) {scoreToGet += 500 + (caloriesGoalVal - light)}
-  else if (caloriesGoalVal <= heavy) {scoreToGet += 1000 + (caloriesGoalVal - medium)}
-  else {scoreToGet += 1500 + (caloriesGoalVal - heavy)}
+  else if (caloriesGoalSet <= LIGHT) {scoreToGet += (caloriesGoalSet - SEDENTARY)}
+  else if (caloriesGoalSet <= MEDIUM) {scoreToGet += 500 + (caloriesGoalSet - LIGHT)}
+  else if (caloriesGoalSet <= HEAVY) {scoreToGet += 1000 + (caloriesGoalSet - MEDIUM)}
+  else {scoreToGet += 1500 + (caloriesGoalSet - HEAVY)}
 
-  if (endDays / minimumDays > 2) {
-    const percentReduce = 1 - (Math.log10(endDays - (minimumDays * 2)) + 0.05)
-    console.log(percentReduce)
+  if (endDays / MINIMUM_DAYS_TO_SET > 2) {
+    const percentReduce = 1 - (Math.log10(endDays - (MINIMUM_DAYS_TO_SET * 2)) + 0.05)
     if (percentReduce < 0.4) {
       return Promise.reject(406)
     }
     scoreToGet *= percentReduce
   }
 
-  const goals = {
-    caloriesGoal: caloriesGoalVal,
+  const GOALS_RESULT = {
+    caloriesGoal: caloriesGoalSet,
     endDays: endDays,
     scoreToGet: Math.ceil(scoreToGet),
-    endGoalTime: endDate.toLocaleString()
+    endGoalTime: DATE_TO_FINISH.toLocaleString()
   }
 
-  const fields = {
-    tableRef: caloriesData._id,
-    caloriesGoal: caloriesGoalVal,
+  const FIELDS = {
+    tableRef: PERSONAL_CALORIES_DATA._id,
+    caloriesGoal: caloriesGoalSet,
     scoreToGet: Math.ceil(scoreToGet),
-    endGoalTime: endDate
+    endGoalTime: DATE_TO_FINISH
   }
 
-  caloriesGoal = new caloriesGoalModel(fields)
-  console.log(caloriesGoal)
+  latestCaloriesGoal = new caloriesGoalModel(FIELDS)
 
-  return caloriesGoal.save().then(() => {
-    return caloriesData.save()
+  return latestCaloriesGoal.save().then(() => {
+    return PERSONAL_CALORIES_DATA.save()
   })
-  .then(() => { return goals})
+  .then(() => { return GOALS_RESULT })
   .catch(() => {
     return Promise.reject(500)
   })

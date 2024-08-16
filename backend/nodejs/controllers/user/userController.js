@@ -1,6 +1,7 @@
 const userModel = require('../../models/user')
 const userHealthData = require('../../models/userHealthData')
 const lineModel = require('../../models/lineUser')
+const bcrypt = require('bcrypt')
 
 const {getCaloriesSeriesData} = require('../../controllers/seriesData/caloriesController')
 const {getSleepSeriesData} = require('../../controllers/seriesData/sleepController')
@@ -18,27 +19,22 @@ async function createUser(email, name, password, healthData){
   if (checkExist.foundSameUsername || checkExist.foundSameEmail ){
       return Promise.reject(checkExist)
   }
+  const salt = bcrypt.genSaltSync()
   const newUser = new userModel({
     email: email,
     username: name,
-    password: password
+    password: bcrypt.hashSync(password, salt)
+  })
+  await newUser.save()
+  await userHealthData.create({
+    userId: newUser._id,
+    sex: healthData.sex,
+    age: healthData.age,
+    height: healthData.height,
+    weight: healthData.weight,
   })
   console.log(newUser._id)
-  return newUser.save()
-  .then(async () => {
-    await userHealthData.create({
-      userId: newUser._id,
-      sex: healthData.sex,
-      age: healthData.age,
-      height: healthData.height,
-      weight: healthData.weight,
-    })
-    return newUser._id
-  })
-  .catch((e) => {
-    console.log(e)
-    return Promise.reject(500)
-  })
+  return newUser._id
 }
 
 async function addLineId(userId, lineId) {
@@ -56,6 +52,15 @@ async function addLineId(userId, lineId) {
     lineId: lineId
   }).then(user.save())
   .then(() => {return 200})
+}
+
+async function loginUser(name, password) {
+  const user = await userModel.findOne({username: name})
+                .select({_id: 1, password: 1}).lean()
+  if (bcrypt.compareSync(password, user.password)) {
+    return user._id
+  } else {return Promise.reject()}
+  
 }
 
 async function getUserData(userId) {
@@ -105,4 +110,4 @@ async function getRecentData(userId) {
 }
 
 
-module.exports = { createUser, getUserData, addLineId, getUserIdFromLineId, getRecentData}
+module.exports = { createUser, getUserData, addLineId, getUserIdFromLineId, getRecentData, loginUser}

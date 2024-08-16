@@ -1,8 +1,9 @@
 const scoreDataModel = require('../../models/scoreData')
 
 async function createScoreTable(userId) {
-  const scoreData = new scoreDataModel({userId: userId})
-  return scoreData.save().then(() => {return userId})
+  const SCORE_DATA = new scoreDataModel({userId: userId})
+  await SCORE_DATA.save()
+  return userId
 }
 
 module.exports = createScoreTable

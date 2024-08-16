@@ -1,73 +1,69 @@
 const caloriesDataModel = require('../../models/caloriesData')
 const caloriesSeriesDataModel = require('../../models/caloriesSeriesData')
-const {saveScoreCalories, updateScoreCal }= require('./scoreController')
+const {saveScoreCalories}= require('./scoreController')
 
-async function updateCalories(userId, calories){
-  var caloriesData = await caloriesDataModel.findOne({userId: userId})
-  const tableRef = caloriesData._id
-  const today = new Date()
-  var calData = undefined
-  var oldCalories = 0
-  const recentCalData = await caloriesSeriesDataModel.findOne({tableRef: tableRef}).sort({timestamp:-1})
-  var activityLvl = 0 // 0 sedentary, 1 light, 2 moderate, 3 active
+async function updateCalories(userId, caloriesBurned){
+  const PERSONAL_CALORIES_DATA = await caloriesDataModel.findOne({userId: userId})
+  const TABLE_REF_ID = PERSONAL_CALORIES_DATA._id
 
-  const sedentary = Math.round(caloriesData.bmr * 0.2)
-  const light = Math.round(caloriesData.bmr * 0.375)
-  const moderate = Math.round(caloriesData.bmr * 0.55)
+  const TODAY = () => {
+    const TODAY_OBJ = new Date()
+    return `${TODAY_OBJ.getFullYear()}-${TODAY_OBJ.getMonth()}-${TODAY_OBJ.getDate()}`
+  }
+
+  let latestCalories = 0
+  const LATEST_CALORIES_DATA = await caloriesSeriesDataModel
+  .findOne({
+    tableRef: TABLE_REF_ID,
+    timestamp: { $gte: TODAY()}
+  }).sort({timestamp:-1})
+
+  let activityLvl = 0 // 0 sedentary, 1 light, 2 moderate, 3 active
+  const SEDENTARY = Math.round(PERSONAL_CALORIES_DATA.bmr * 0.2)
+  const LIGHT = Math.round(PERSONAL_CALORIES_DATA.bmr * 0.375)
+  const MODERATE = Math.round(PERSONAL_CALORIES_DATA.bmr * 0.55)
   // const active = Math.round(caloriesData.bmr * 0.725)
 
-  if (calories >= sedentary) { activityLvl += 1}
-  if (calories >= light) { activityLvl += 1}
-  if (calories >= moderate) { activityLvl += 1 }
+  if (caloriesBurned >= SEDENTARY) { activityLvl += 1}
+  if (caloriesBurned >= LIGHT) { activityLvl += 1}
+  if (caloriesBurned >= MODERATE) { activityLvl += 1 }
 
-  if (!recentCalData) {
-    calData = new caloriesSeriesDataModel({
-      tableRef: tableRef,
-      calories: calories,
+  if (!LATEST_CALORIES_DATA) {
+    var caloriesResult = new caloriesSeriesDataModel({
+      tableRef: TABLE_REF_ID,
+      calories: caloriesBurned,
       activityLvl: activityLvl
     })
-    caloriesData.caloriesTotal += calData.calories
+    PERSONAL_CALORIES_DATA.caloriesTotal += caloriesResult.calories
   }
   else {
-    if (today.getDate() == recentCalData.timestamp.getDate()) {
-      if (calories > recentCalData.calories) {
-        oldCalories = recentCalData.calories
-        recentCalData.calories = calories
-        recentCalData.activityLvl = activityLvl
-        caloriesData.caloriesTotal = (caloriesData.caloriesTotal - oldCalories) + calories
-      }
-      else { return Promise.reject(406) }
-      calData = recentCalData
-      calData.timestamp = today
+    if (caloriesBurned > LATEST_CALORIES_DATA.calories) {
+      latestCalories = LATEST_CALORIES_DATA.calories
+      LATEST_CALORIES_DATA.calories = caloriesBurned
+      LATEST_CALORIES_DATA.activityLvl = activityLvl
+      PERSONAL_CALORIES_DATA.caloriesTotal = (PERSONAL_CALORIES_DATA.caloriesTotal - latestCalories) + caloriesBurned
     }
-    else {
-      calData = new caloriesSeriesDataModel({
-        tableRef: tableRef,
-        calories: calories,
-        activityLvl: activityLvl
-      })
-      caloriesData.caloriesTotal += calData.calories
-    }
+    else { return Promise.reject(406) }
+    var caloriesResult = LATEST_CALORIES_DATA
+    caloriesResult.timestamp = new Date()
   }
 
-  return calData.save().then(async () => {
-    await caloriesData.save()
-    return saveScoreCalories(userId, calories, oldCalories, activityLvl)
-  })
-  .then((score) => {return score})
-  .catch(() => {return Promise.reject(500)})
+  await caloriesResult.save()
+  await PERSONAL_CALORIES_DATA.save()
+  return saveScoreCalories(userId, caloriesBurned, latestCalories, activityLvl)
+  .then((result) => {return result}, () => {return Promise.reject(500)})
 }
 
 async function getCaloriesSeriesData(userId, lengthDays = 3) {
-  const caloriesData = await caloriesDataModel.findOne({userId: userId})
-  const calSeriesData = await caloriesSeriesDataModel.find({
-    tableRef: caloriesData._id
+  const PERSONAL_CALORIES_DATA = await caloriesDataModel.findOne({userId: userId})
+  const CALORIES_DATA_ARR = await caloriesSeriesDataModel.find({
+    tableRef: PERSONAL_CALORIES_DATA._id
   }).limit(lengthDays).sort({timestamp: -1})
   .select({calories: 1, activityLvl: 1, timestamp: 1}).lean() 
   
-  calSeriesData.forEach(item => {delete item._id})
+  CALORIES_DATA_ARR.forEach(item => {delete item._id})
 
-  return calSeriesData
+  return CALORIES_DATA_ARR
 }
 
 module.exports = {updateCalories, getCaloriesSeriesData}
