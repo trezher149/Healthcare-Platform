@@ -1,5 +1,6 @@
 const express = require('express')
 const body_parser = require('body-parser')
+const multer = require('multer')
 require('events').EventEmitter.setMaxListeners(15)
 const userRoute = require('./routers/userRoute')
 const caloriesRoute = require('./routers/caloriesRoute')
@@ -16,7 +17,7 @@ const cors = require('cors')
 const app = express()
 
 app.use(body_parser.json())
-app.use(express.urlencoded({extended: true}))
+app.use(multer().none())
 app.use(cors({
   origin: [`${frontendURL}:${frontendPort}`]
 }))
